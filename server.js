@@ -220,6 +220,59 @@ app.post('/v2.5/dialog/oauth', (req, res) => {
   res.send(html);
 });
 
+// ✅ ROTA NOVA: Processa o callback do Facebook automaticamente
+app.get('/fbconnect/success', (req, res) => {
+  try {
+    const access_token = req.query.access_token;
+    const user_id = req.query.user_id;
+    
+    if (!access_token || !user_id) {
+      return res.status(400).json({
+        error: 'Parâmetros inválidos',
+        success: false
+      });
+    }
+    
+    // Criar username baseado no user_id do Facebook
+    const username = 'fb_user_' + user_id;
+    const email = user_id + '@facebook.local';
+    
+    // Gerar token JWT para o jogo
+    const gameToken = jwt.sign(
+      { 
+        id: user_id, 
+        username: username,
+        provider: 'facebook'
+      },
+      config.jwtSecret,
+      { expiresIn: '7d' }
+    );
+    
+    // Retornar dados para o jogo
+    res.json({
+      success: true,
+      token: gameToken,
+      user: {
+        id: user_id,
+        username: username,
+        email: email,
+        level: 1,
+        exp: 0,
+        diamonds: 1000,
+        gold: 5000
+      },
+      expires_in: 604800,
+      redirect: '/dashboard'
+    });
+  } catch (error) {
+    console.error('Erro ao processar callback:', error);
+    res.status(500).json({
+      error: 'Erro interno do servidor',
+      success: false
+    });
+  }
+});
+
 // ✅ ROTA NOVA: Login com token Facebook
 app.post(`${apiPrefix}/auth/facebook`, (req, res) => {
   try {
