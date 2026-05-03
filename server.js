@@ -173,6 +173,45 @@ app.get('/v2.5/:app_id/activities', (req, res) => {
   });
 });
 
+// Rota de callback de login Facebook
+app.get('/fbconnect/success', (req, res) => {
+  res.json({
+    status: 'success',
+    message: 'Facebook login successful',
+    redirect: '/panel'
+  });
+});
+
+// Rota de autenticacao com token Facebook
+app.post('/api/v1/auth/facebook', (req, res) => {
+  const { access_token, user_id } = req.body;
+  
+  if (!access_token || !user_id) {
+    return res.status(400).json({
+      error: 'access_token e user_id sao obrigatorios'
+    });
+  }
+  
+  const username = 'fb_user_' + user_id;
+  const jwt = require('jsonwebtoken');
+  const token = jwt.sign(
+    { id: user_id, username: username },
+    config.jwtSecret,
+    { expiresIn: config.jwtExpire }
+  );
+  
+  res.json({
+    success: true,
+    token: token,
+    user: {
+      id: user_id,
+      username: username,
+      email: username + '@facebook.local'
+    },
+    redirect: '/dashboard'
+  });
+});
+
 // Rota de dashboard
 app.get('/dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
