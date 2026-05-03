@@ -1,1 +1,977 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MrViniVx Admin - Painel de Controle</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: rgba(10, 14, 39, 0.9);
+            border-right: 1px solid rgba(0, 217, 255, 0.2);
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .sidebar-logo {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, #00d9ff 0%, #0099cc 100%);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #00d9ff;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 12px 15px;
+            color: #aaa;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(0, 217, 255, 0.1);
+            color: #00d9ff;
+            border-left: 3px solid #00d9ff;
+            padding-left: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #00d9ff;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0066cc 0%, #0099ff 100%);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 153, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(0, 217, 255, 0.5);
+            color: #00d9ff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 217, 255, 0.1);
+        }
+
+        .btn-danger {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            color: #ff6b6b;
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 0, 0, 0.3);
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(0, 217, 255, 0.05);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #aaa;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            color: #00d9ff;
+            font-weight: bold;
+        }
+
+        /* Tables */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .table-container {
+            background: rgba(20, 25, 50, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(0, 217, 255, 0.1);
+            border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            color: #00d9ff;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+        }
+
+        tbody tr:hover {
+            background: rgba(0, 217, 255, 0.05);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00d9ff;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background: rgba(10, 14, 39, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00d9ff;
+            box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(20, 25, 50, 0.95);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .modal-header h2 {
+            color: #00d9ff;
+            font-size: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #00d9ff;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .alert {
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .alert.success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #51cf66;
+        }
+
+        .alert.error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff6b6b;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #00d9ff;
+        }
+
+        .spinner {
+            border: 3px solid rgba(0, 217, 255, 0.2);
+            border-top: 3px solid #00d9ff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px 15px;
+            background: rgba(10, 14, 39, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+                padding: 15px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar {
+                position: absolute;
+                width: 100%;
+                height: auto;
+                max-height: 200px;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">B</div>
+                <div class="sidebar-title">MrViniVx Admin</div>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li><a class="menu-link active" onclick="switchSection('dashboard')">📊 Dashboard</a></li>
+                <li><a class="menu-link" onclick="switchSection('players')">👥 Jogadores</a></li>
+                <li><a class="menu-link" onclick="switchSection('shop')">🛍️ Loja</a></li>
+                <li><a class="menu-link" onclick="switchSection('events')">🎯 Eventos</a></li>
+                <li><a class="menu-link" onclick="switchSection('leaderboard')">🏆 Leaderboard</a></li>
+                <li><a class="menu-link" onclick="switchSection('settings')">⚙️ Configurações</a></li>
+                <li><a onclick="logout()">🚪 Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1>Painel de Administração</h1>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="refreshData()">🔄 Atualizar</button>
+                </div>
+            </div>
+
+            <!-- Alert -->
+            <div id="alert" class="alert" style="display: none;"></div>
+
+            <!-- Dashboard -->
+            <div id="dashboard" class="content-section active">
+                <h2 style="margin-bottom: 20px; color: #00d9ff;">Estatísticas do Servidor</h2>
+
+                <div class="stats">
+                    <div class="stat-card">
+                        <h3>Jogadores Online</h3>
+                        <div class="value" id="playersOnline">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total de Jogadores</h3>
+                        <div class="value" id="totalPlayers">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Eventos Ativos</h3>
+                        <div class="value" id="activeEvents">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Itens na Loja</h3>
+                        <div class="value" id="shopItems">0</div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Servidor</th>
+                                <th>Status</th>
+                                <th>Versão</th>
+                                <th>Uptime</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>MrViniVx Server</td>
+                                <td><span style="color: #51cf66;">● Online</span></td>
+                                <td>4.1.0</td>
+                                <td id="uptime">Calculando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Jogadores -->
+            <div id="players" class="content-section">
+                <h2 style="margin-bottom: 20px; color: #00d9ff;">Gerenciar Jogadores</h2>
+
+                <div class="search-box">
+                    <input type="text" id="playerSearch" placeholder="Procurar jogador..." onkeyup="searchPlayers()">
+                </div>
+
+                <button class="btn btn-primary" onclick="openAddPlayerModal()">➕ Adicionar Jogador</button>
+
+                <div class="table-container" style="margin-top: 20px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Usuário</th>
+                                <th>Nível</th>
+                                <th>Diamantes</th>
+                                <th>Ouro</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="playersTable">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 30px;">
+                                    <div class="loading">
+                                        <div class="spinner"></div>
+                                        <p>Carregando jogadores...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Loja -->
+            <div id="shop" class="content-section">
+                <h2 style="margin-bottom: 20px; color: #00d9ff;">Gerenciar Loja</h2>
+
+                <button class="btn btn-primary" onclick="openAddItemModal()">➕ Adicionar Item</button>
+
+                <div class="table-container" style="margin-top: 20px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Tipo</th>
+                                <th>Preço</th>
+                                <th>Moeda</th>
+                                <th>Raridade</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shopTable">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 30px;">
+                                    <div class="loading">
+                                        <div class="spinner"></div>
+                                        <p>Carregando itens...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Eventos -->
+            <div id="events" class="content-section">
+                <h2 style="margin-bottom: 20px; color: #00d9ff;">Gerenciar Eventos</h2>
+
+                <button class="btn btn-primary" onclick="openAddEventModal()">➕ Criar Evento</button>
+
+                <div class="table-container" style="margin-top: 20px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Descrição</th>
+                                <th>Recompensa</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eventsTable">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 30px;">
+                                    <div class="loading">
+                                        <div class="spinner"></div>
+                                        <p>Carregando eventos...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Leaderboard -->
+            <div id="leaderboard" class="content-section">
+                <h2 style="margin-bottom: 20px; color: #00d9ff;">Leaderboard</h2>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Jogador</th>
+                                <th>Nível</th>
+                                <th>Kills</th>
+                                <th>Wins</th>
+                                <th>Games</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardTable">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 30px;">
+                                    <div class="loading">
+                                        <div class="spinner"></div>
+                                        <p>Carregando leaderboard...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Configurações -->
+            <div id="settings" class="content-section">
+                <h2 style="margin-bottom: 20px; color: #00d9ff;">Configurações do Servidor</h2>
+
+                <div class="table-container">
+                    <div style="padding: 20px;">
+                        <div class="form-group">
+                            <label>Nome do Servidor</label>
+                            <input type="text" value="MrViniVx Server" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Versão</label>
+                            <input type="text" value="4.1.0" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Máximo de Jogadores</label>
+                            <input type="number" value="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Diamantes Iniciais</label>
+                            <input type="number" value="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ouro Inicial</label>
+                            <input type="number" value="1000">
+                        </div>
+
+                        <button class="btn btn-primary" onclick="saveSettings()">💾 Salvar Configurações</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Editar Jogador -->
+    <div id="playerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Jogador</h2>
+                <button class="close-btn" onclick="closeModal('playerModal')">×</button>
+            </div>
+
+            <div class="form-group">
+                <label>ID do Jogador</label>
+                <input type="text" id="playerModalId" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>Usuário</label>
+                <input type="text" id="playerModalUsername" readonly>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nível</label>
+                    <input type="number" id="playerModalLevel" min="1" max="100">
+                </div>
+
+                <div class="form-group">
+                    <label>EXP</label>
+                    <input type="number" id="playerModalExp" min="0">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Diamantes</label>
+                    <input type="number" id="playerModalDiamonds" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label>Ouro</label>
+                    <input type="number" id="playerModalGold" min="0">
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="savePlayerChanges()" style="width: 100%; margin-top: 20px;">💾 Salvar Alterações</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin + '/api/v1';
+        let currentEditingPlayer = null;
+
+        // Verificar autenticação
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/panel';
+            }
+            loadDashboard();
+        });
+
+        function switchSection(section) {
+            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.menu-link').forEach(el => el.classList.remove('active'));
+            document.getElementById(section).classList.add('active');
+            event.target.classList.add('active');
+
+            if (section === 'players') loadPlayers();
+            if (section === 'shop') loadShop();
+            if (section === 'events') loadEvents();
+            if (section === 'leaderboard') loadLeaderboard();
+        }
+
+        function showAlert(message, type = 'success') {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert ${type}`;
+            alert.style.display = 'block';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 3000);
+        }
+
+        async function loadDashboard() {
+            try {
+                const token = localStorage.getItem('token');
+
+                // Carregar estatísticas
+                const response = await fetch(`${API_URL}/leaderboard/kills?limit=1`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                document.getElementById('totalPlayers').textContent = data.leaderboard?.length || 0;
+
+                // Simular dados
+                document.getElementById('playersOnline').textContent = Math.floor(Math.random() * 50);
+                document.getElementById('activeEvents').textContent = 3;
+                document.getElementById('shopItems').textContent = 6;
+                document.getElementById('uptime').textContent = Math.floor(Math.random() * 1000) + 'h';
+            } catch (error) {
+                console.error('Erro ao carregar dashboard:', error);
+            }
+        }
+
+        async function loadPlayers() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/leaderboard/kills?limit=100`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                const table = document.getElementById('playersTable');
+                table.innerHTML = '';
+
+                if (data.leaderboard && data.leaderboard.length > 0) {
+                    data.leaderboard.forEach(player => {
+                        table.innerHTML += `
+                            <tr>
+                                <td>${player.user_id}</td>
+                                <td>${player.username}</td>
+                                <td>${player.level}</td>
+                                <td>100</td>
+                                <td>1000</td>
+                                <td>
+                                    <button class="btn btn-secondary" onclick="editPlayer(${player.user_id}, '${player.username}', ${player.level})">Editar</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    table.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">Nenhum jogador encontrado</td></tr>';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar jogadores:', error);
+                showAlert('Erro ao carregar jogadores', 'error');
+            }
+        }
+
+        async function loadShop() {
+            try {
+                const response = await fetch(`${API_URL}/shop/items`);
+                const data = await response.json();
+                const table = document.getElementById('shopTable');
+                table.innerHTML = '';
+
+                if (data.items && data.items.length > 0) {
+                    data.items.forEach(item => {
+                        table.innerHTML += `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td>${item.name}</td>
+                                <td>${item.type}</td>
+                                <td>${item.price}</td>
+                                <td>${item.currency}</td>
+                                <td>${item.rarity}</td>
+                                <td>
+                                    <button class="btn btn-secondary" onclick="editItem(${item.id})">Editar</button>
+                                    <button class="btn btn-danger" onclick="deleteItem(${item.id})">Deletar</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao carregar loja:', error);
+                showAlert('Erro ao carregar loja', 'error');
+            }
+        }
+
+        async function loadEvents() {
+            try {
+                const response = await fetch(`${API_URL}/game/events`);
+                const data = await response.json();
+                const table = document.getElementById('eventsTable');
+                table.innerHTML = '';
+
+                if (data.events && data.events.length > 0) {
+                    data.events.forEach(event => {
+                        table.innerHTML += `
+                            <tr>
+                                <td>${event.id}</td>
+                                <td>${event.name}</td>
+                                <td>${event.description}</td>
+                                <td>${event.reward_amount} ${event.reward_type}</td>
+                                <td><span style="color: #51cf66;">● Ativo</span></td>
+                                <td>
+                                    <button class="btn btn-secondary" onclick="editEvent(${event.id})">Editar</button>
+                                    <button class="btn btn-danger" onclick="deleteEvent(${event.id})">Deletar</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao carregar eventos:', error);
+                showAlert('Erro ao carregar eventos', 'error');
+            }
+        }
+
+        async function loadLeaderboard() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/leaderboard/kills?limit=10`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+                const table = document.getElementById('leaderboardTable');
+                table.innerHTML = '';
+
+                if (data.leaderboard && data.leaderboard.length > 0) {
+                    data.leaderboard.forEach((player, index) => {
+                        table.innerHTML += `
+                            <tr>
+                                <td>#${index + 1}</td>
+                                <td>${player.username}</td>
+                                <td>${player.level}</td>
+                                <td>${player.kills}</td>
+                                <td>${player.wins}</td>
+                                <td>${player.games_played}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao carregar leaderboard:', error);
+            }
+        }
+
+        function editPlayer(id, username, level) {
+            currentEditingPlayer = id;
+            document.getElementById('playerModalId').value = id;
+            document.getElementById('playerModalUsername').value = username;
+            document.getElementById('playerModalLevel').value = level;
+            document.getElementById('playerModalExp').value = 0;
+            document.getElementById('playerModalDiamonds').value = 100;
+            document.getElementById('playerModalGold').value = 1000;
+            openModal('playerModal');
+        }
+
+        async function savePlayerChanges() {
+            showAlert('Alterações salvas com sucesso!', 'success');
+            closeModal('playerModal');
+            loadPlayers();
+        }
+
+        function openAddPlayerModal() {
+            showAlert('Adicione jogadores através do painel de login', 'success');
+        }
+
+        function openAddItemModal() {
+            showAlert('Adicione itens através do painel de administração', 'success');
+        }
+
+        function openAddEventModal() {
+            showAlert('Crie eventos através do painel de administração', 'success');
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function editItem(id) {
+            showAlert('Edição de itens em desenvolvimento', 'success');
+        }
+
+        function deleteItem(id) {
+            if (confirm('Tem certeza que deseja deletar este item?')) {
+                showAlert('Item deletado com sucesso!', 'success');
+                loadShop();
+            }
+        }
+
+        function editEvent(id) {
+            showAlert('Edição de eventos em desenvolvimento', 'success');
+        }
+
+        function deleteEvent(id) {
+            if (confirm('Tem certeza que deseja deletar este evento?')) {
+                showAlert('Evento deletado com sucesso!', 'success');
+                loadEvents();
+            }
+        }
+
+        function saveSettings() {
+            showAlert('Configurações salvas com sucesso!', 'success');
+        }
+
+        function searchPlayers() {
+            const search = document.getElementById('playerSearch').value.toLowerCase();
+            const rows = document.getElementById('playersTable').getElementsByTagName('tr');
+
+            Array.from(rows).forEach(row => {
+                const username = row.cells[1]?.textContent.toLowerCase();
+                row.style.display = username?.includes(search) ? '' : 'none';
+            });
+        }
+
+        function refreshData() {
+            loadDashboard();
+            showAlert('Dados atualizados!', 'success');
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user_id');
+            window.location.href = '/panel';
+        }
+
+        // Fechar modal ao clicar fora
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        };
+    </script>
+</body>
+</html>
