@@ -90,6 +90,47 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
+// Rotas de OAuth (compatível com APK)
+app.get('/v2.5/dialog/oauth', (req, res) => {
+  res.json({
+    access_token: 'mock_facebook_token_' + Date.now(),
+    user_id: Math.floor(Math.random() * 1000000),
+    expires_in: 5184000
+  });
+});
+
+app.post('/v2.5/dialog/oauth', (req, res) => {
+  res.json({
+    access_token: 'mock_facebook_token_' + Date.now(),
+    user_id: Math.floor(Math.random() * 1000000),
+    expires_in: 5184000
+  });
+});
+
+// Rota de autenticação VK
+app.get('/vk/oauth', (req, res) => {
+  res.json({
+    access_token: 'mock_vk_token_' + Date.now(),
+    user_id: Math.floor(Math.random() * 1000000)
+  });
+});
+
+// Rota de autenticação Line
+app.get('/line/oauth', (req, res) => {
+  res.json({
+    access_token: 'mock_line_token_' + Date.now(),
+    user_id: Math.floor(Math.random() * 1000000)
+  });
+});
+
+// Rota de autenticação Garena
+app.get('/garena/oauth', (req, res) => {
+  res.json({
+    access_token: 'mock_garena_token_' + Date.now(),
+    user_id: Math.floor(Math.random() * 1000000)
+  });
+});
+
 // Rota de dashboard
 app.get('/dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
