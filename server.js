@@ -91,21 +91,44 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// ✅ ROTA FINAL: OAuth Facebook com redirect simples
+// ✅ ROTA CORRIGIDA: OAuth Facebook com JavaScript Bridge
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const access_token = 'mock_facebook_token_' + Date.now();
   const user_id = Math.floor(Math.random() * 1000000);
   
-  // Retornar HTML que redireciona
   const html = `
     <!DOCTYPE html>
     <html>
     <head>
         <meta charset="UTF-8">
-        <meta http-equiv="refresh" content="0;url=fbconnect://success?access_token=${access_token}&user_id=${user_id}&expires_in=5184000">
+        <title>Facebook Login</title>
     </head>
-    <body>
-        Redirecionando...
+    <body style="margin:0;padding:0;background:#000;">
+        <script>
+          const token = '${access_token}';
+          const userId = '${user_id}';
+          
+          // Método 1: Chamar método Java do WebView
+          if (typeof Android !== 'undefined' && Android.onFacebookLogin) {
+            Android.onFacebookLogin(token, userId);
+          }
+          
+          // Método 2: Tentar fechar a WebView
+          if (typeof window.close === 'function') {
+            // Salvar dados no localStorage antes de fechar
+            try {
+              localStorage.setItem('fb_token', token);
+              localStorage.setItem('fb_user_id', userId);
+            } catch (e) {}
+            
+            window.close();
+          }
+          
+          // Método 3: Fallback - Redirecionar
+          setTimeout(() => {
+            window.location.href = 'fbconnect://success?access_token=' + token + '&user_id=' + userId + '&expires_in=5184000';
+          }, 100);
+        </script>
     </body>
     </html>
   `;
@@ -122,10 +145,34 @@ app.post('/v2.5/dialog/oauth', (req, res) => {
     <html>
     <head>
         <meta charset="UTF-8">
-        <meta http-equiv="refresh" content="0;url=fbconnect://success?access_token=${access_token}&user_id=${user_id}&expires_in=5184000">
+        <title>Facebook Login</title>
     </head>
-    <body>
-        Redirecionando...
+    <body style="margin:0;padding:0;background:#000;">
+        <script>
+          const token = '${access_token}';
+          const userId = '${user_id}';
+          
+          // Método 1: Chamar método Java do WebView
+          if (typeof Android !== 'undefined' && Android.onFacebookLogin) {
+            Android.onFacebookLogin(token, userId);
+          }
+          
+          // Método 2: Tentar fechar a WebView
+          if (typeof window.close === 'function') {
+            // Salvar dados no localStorage antes de fechar
+            try {
+              localStorage.setItem('fb_token', token);
+              localStorage.setItem('fb_user_id', userId);
+            } catch (e) {}
+            
+            window.close();
+          }
+          
+          // Método 3: Fallback - Redirecionar
+          setTimeout(() => {
+            window.location.href = 'fbconnect://success?access_token=' + token + '&user_id=' + userId + '&expires_in=5184000';
+          }, 100);
+        </script>
     </body>
     </html>
   `;
