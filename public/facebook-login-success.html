@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Bem-Sucedido</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+            color: #fff;
+        }
+        
+        .container {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: scaleIn 0.6s ease-out;
+        }
+        
+        h1 {
+            color: #00d9ff;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        
+        p {
+            color: #aaa;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .token-box {
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .token-box strong {
+            color: #00d9ff;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        
+        .token-box p {
+            word-break: break-all;
+            font-size: 11px;
+            color: #00d9ff;
+            margin: 0;
+            font-family: monospace;
+        }
+        
+        .loading {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">✅</div>
+        <h1>Login Bem-Sucedido!</h1>
+        <p>Você será redirecionado automaticamente...</p>
+        
+        <div class="token-box">
+            <strong>Access Token:</strong>
+            <p id="token">Carregando...</p>
+            
+            <strong style="margin-top: 15px;">User ID:</strong>
+            <p id="user-id">Carregando...</p>
+        </div>
+        
+        <div class="loading">
+            <p>Feche esta aba para continuar no jogo.</p>
+        </div>
+    </div>
+
+    <script>
+        // Extrair parâmetros da URL
+        const params = new URLSearchParams(window.location.search);
+        const access_token = params.get('access_token');
+        const user_id = params.get('user_id');
+
+        // Preencher os dados
+        document.getElementById('token').textContent = access_token || 'N/A';
+        document.getElementById('user-id').textContent = user_id || 'N/A';
+
+        // Fechar automaticamente após 2 segundos
+        setTimeout(() => {
+            window.close();
+        }, 2000);
+    </script>
+</body>
+</html>
