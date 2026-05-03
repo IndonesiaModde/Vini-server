@@ -188,7 +188,7 @@ app.get('/fbconnect/success', (req, res) => {
   }
 });
 
-// ✅ ROTA NOVA: Login com token Facebook
+// ✅ ROTA NOVA: Login com token Facebook (POST)
 app.post(`${apiPrefix}/auth/facebook`, (req, res) => {
   try {
     const { access_token, user_id } = req.body;
@@ -236,6 +236,47 @@ app.post(`${apiPrefix}/auth/facebook`, (req, res) => {
       error: 'Erro interno do servidor',
       success: false
     });
+  }
+});
+
+// ✅ ROTA ALTERNATIVA: Login com token Facebook (GET)
+app.get(`${apiPrefix}/auth/facebook`, (req, res) => {
+  try {
+    const token = req.query.access_token;
+    const uid = req.query.user_id;
+    
+    if (!token || !uid) {
+      return res.status(400).json({
+        error: 'access_token e user_id sao obrigatorios',
+        success: false
+      });
+    }
+    
+    const username = 'fb_user_' + uid;
+    const email = uid + '@facebook.local';
+    
+    const gameToken = jwt.sign(
+      { id: uid, username: username, provider: 'facebook' },
+      config.jwtSecret,
+      { expiresIn: '7d' }
+    );
+    
+    res.json({
+      success: true,
+      token: gameToken,
+      user: {
+        id: uid,
+        username: username,
+        email: email,
+        level: 1,
+        exp: 0,
+        diamonds: 1000,
+        gold: 5000
+      }
+    });
+  } catch (error) {
+    console.error('Erro:', error);
+    res.status(500).json({ error: 'Erro interno', success: false });
   }
 });
 
