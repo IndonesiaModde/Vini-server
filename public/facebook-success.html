@@ -3,84 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Sucesso</title>
+    <title>Login</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
             background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            font-family: Arial, sans-serif;
+            font-family: Arial;
             color: #fff;
+            margin: 0;
         }
-        
         .container {
             text-align: center;
-            padding: 40px;
         }
-        
-        .success-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: scaleIn 0.6s ease-out;
+        .spinner {
+            border: 4px solid rgba(0,217,255,0.2);
+            border-top: 4px solid #00d9ff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
         }
-        
-        h1 {
-            color: #00d9ff;
-            margin-bottom: 10px;
-            font-size: 24px;
-        }
-        
-        p {
-            color: #aaa;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        
-        @keyframes scaleIn {
-            from {
-                transform: scale(0);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="success-icon">✅</div>
-        <h1>Login Bem-Sucedido!</h1>
-        <p>Você será redirecionado automaticamente...</p>
+        <div class="spinner"></div>
+        <p>Finalizando...</p>
     </div>
-
     <script>
-        // Extrair parâmetros da URL
+        // Extrair parâmetros
         const params = new URLSearchParams(window.location.search);
         const access_token = params.get('access_token');
         const user_id = params.get('user_id');
         
-        console.log('Access Token:', access_token);
-        console.log('User ID:', user_id);
-        
-        // Tentar comunicar com o app nativo
-        if (window.GameBridge) {
-            window.GameBridge.onFacebookLoginSuccess(access_token, user_id);
+        // Enviar dados para o app nativo (se disponível)
+        if (window.android && window.android.onFacebookLoginSuccess) {
+            window.android.onFacebookLoginSuccess(access_token, user_id);
         }
         
-        // Tentar fazer redirect para protocolo customizado
+        // Fechar a aba após 2 segundos
         setTimeout(() => {
-            window.location.href = 'fbconnect://success?access_token=' + access_token + '&user_id=' + user_id;
-        }, 500);
+            window.close();
+        }, 2000);
     </script>
 </body>
 </html>
