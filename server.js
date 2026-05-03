@@ -90,21 +90,24 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// Rotas de OAuth (compatível com APK)
+// ✅ ROTA CORRIGIDA: OAuth Facebook com redirect
 app.get('/v2.5/dialog/oauth', (req, res) => {
-  res.json({
-    access_token: 'mock_facebook_token_' + Date.now(),
-    user_id: Math.floor(Math.random() * 1000000),
-    expires_in: 5184000
-  });
+  const access_token = 'mock_facebook_token_' + Date.now();
+  const user_id = Math.floor(Math.random() * 1000000);
+  const redirect_uri = req.query.redirect_uri || 'fbconnect://success';
+  
+  // Fazer redirect com os parâmetros
+  const redirectUrl = `${redirect_uri}?access_token=${access_token}&user_id=${user_id}&expires_in=5184000`;
+  res.redirect(redirectUrl);
 });
 
 app.post('/v2.5/dialog/oauth', (req, res) => {
-  res.json({
-    access_token: 'mock_facebook_token_' + Date.now(),
-    user_id: Math.floor(Math.random() * 1000000),
-    expires_in: 5184000
-  });
+  const access_token = 'mock_facebook_token_' + Date.now();
+  const user_id = Math.floor(Math.random() * 1000000);
+  const redirect_uri = req.query.redirect_uri || 'fbconnect://success';
+  
+  const redirectUrl = `${redirect_uri}?access_token=${access_token}&user_id=${user_id}&expires_in=5184000`;
+  res.redirect(redirectUrl);
 });
 
 // Rota de autenticação VK
