@@ -91,38 +91,21 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// ✅ ROTA FINAL: OAuth Facebook retorna HTML que fecha automaticamente
+// ✅ ROTA FINAL: OAuth Facebook com redirect simples
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const access_token = 'mock_facebook_token_' + Date.now();
   const user_id = Math.floor(Math.random() * 1000000);
   
-  // Retornar HTML que simula sucesso e fecha
+  // Retornar HTML que redireciona
   const html = `
     <!DOCTYPE html>
     <html>
     <head>
         <meta charset="UTF-8">
-        <title>Success</title>
+        <meta http-equiv="refresh" content="0;url=fbconnect://success?access_token=${access_token}&user_id=${user_id}&expires_in=5184000">
     </head>
     <body>
-        <script>
-            // Dados do login
-            const data = {
-                access_token: '${access_token}',
-                user_id: ${user_id},
-                expires_in: 5184000
-            };
-            
-            // Tentar comunicar com app nativo
-            if (window.android) {
-                if (window.android.onLoginSuccess) {
-                    window.android.onLoginSuccess(JSON.stringify(data));
-                }
-            }
-            
-            // Fechar a aba
-            window.close();
-        </script>
+        Redirecionando...
     </body>
     </html>
   `;
@@ -139,30 +122,17 @@ app.post('/v2.5/dialog/oauth', (req, res) => {
     <html>
     <head>
         <meta charset="UTF-8">
-        <title>Success</title>
+        <meta http-equiv="refresh" content="0;url=fbconnect://success?access_token=${access_token}&user_id=${user_id}&expires_in=5184000">
     </head>
     <body>
-        <script>
-            const data = {
-                access_token: '${access_token}',
-                user_id: ${user_id},
-                expires_in: 5184000
-            };
-            
-            if (window.android) {
-                if (window.android.onLoginSuccess) {
-                    window.android.onLoginSuccess(JSON.stringify(data));
-                }
-            }
-            
-            window.close();
-        </script>
+        Redirecionando...
     </body>
     </html>
   `;
   
   res.send(html);
 });
+
 
 
 // ✅ ROTA NOVA: Processa o callback do Facebook automaticamente
