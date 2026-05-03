@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const config = require('./config/config');
@@ -90,12 +91,11 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// ✅ ROTA CORRIGIDA: OAuth Facebook retorna HTML com redirect via meta tag
+// ✅ ROTA: OAuth Facebook retorna HTML com redirect
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const access_token = 'mock_facebook_token_' + Date.now();
   const user_id = Math.floor(Math.random() * 1000000);
   
-  // Retornar HTML que tenta fazer redirect via meta tag
   const html = `
     <!DOCTYPE html>
     <html lang="pt-BR">
@@ -145,7 +145,6 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
             <p style="font-size: 12px; color: #666; margin-top: 20px;">Se nada acontecer, feche esta aba.</p>
         </div>
         <script>
-            // Tentar fazer redirect via protocolo customizado
             setTimeout(function() {
                 window.location.href = 'fbconnect://success?access_token=${access_token}&user_id=${user_id}&expires_in=5184000';
             }, 500);
@@ -221,6 +220,57 @@ app.post('/v2.5/dialog/oauth', (req, res) => {
   res.send(html);
 });
 
+// ✅ ROTA NOVA: Login com token Facebook
+app.post(`${apiPrefix}/auth/facebook`, (req, res) => {
+  try {
+    const { access_token, user_id } = req.body;
+    
+    if (!access_token || !user_id) {
+      return res.status(400).json({
+        error: 'access_token e user_id sao obrigatorios',
+        success: false
+      });
+    }
+    
+    // Criar username baseado no user_id do Facebook
+    const username = 'fb_user_' + user_id;
+    const email = user_id + '@facebook.local';
+    
+    // Gerar token JWT para o jogo
+    const gameToken = jwt.sign(
+      { 
+        id: user_id, 
+        username: username,
+        provider: 'facebook'
+      },
+      config.jwtSecret,
+      { expiresIn: '7d' }
+    );
+    
+    // Retornar dados para o jogo
+    res.json({
+      success: true,
+      token: gameToken,
+      user: {
+        id: user_id,
+        username: username,
+        email: email,
+        level: 1,
+        exp: 0,
+        diamonds: 1000,
+        gold: 5000
+      },
+      expires_in: 604800
+    });
+  } catch (error) {
+    console.error('Erro ao fazer login com Facebook:', error);
+    res.status(500).json({
+      error: 'Erro interno do servidor',
+      success: false
+    });
+  }
+});
+
 // Rota de autenticação VK
 app.get('/vk/oauth', (req, res) => {
   res.json({
@@ -287,36 +337,6 @@ app.get('/v2.5/:app_id/activities', (req, res) => {
   });
 });
 
-// Rota de autenticacao com token Facebook
-app.post('/api/v1/auth/facebook', (req, res) => {
-  const { access_token, user_id } = req.body;
-  
-  if (!access_token || !user_id) {
-    return res.status(400).json({
-      error: 'access_token e user_id sao obrigatorios'
-    });
-  }
-  
-  const username = 'fb_user_' + user_id;
-  const jwt = require('jsonwebtoken');
-  const token = jwt.sign(
-    { id: user_id, username: username },
-    config.jwtSecret,
-    { expiresIn: config.jwtExpire }
-  );
-  
-  res.json({
-    success: true,
-    token: token,
-    user: {
-      id: user_id,
-      username: username,
-      email: username + '@facebook.local'
-    },
-    redirect: '/dashboard'
-  });
-});
-
 // Rota de dashboard
 app.get('/dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
@@ -362,7 +382,7 @@ Endpoints disponíveis:
   POST   ${apiPrefix}/auth/register
   POST   ${apiPrefix}/auth/login
   POST   ${apiPrefix}/auth/guest
-  POST   ${apiPrefix}/auth/facebook
+  POST   ${apiPrefix}/auth/facebook ⭐ NOVO
   POST   ${apiPrefix}/auth/vk
   POST   ${apiPrefix}/auth/logout
   GET    ${apiPrefix}/user/profile
