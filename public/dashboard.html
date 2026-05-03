@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MrViniVx - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 217, 255, 0.05);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 12px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, #00d9ff 0%, #0099cc 100%);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 24px;
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            color: #00d9ff;
+        }
+
+        .header-title p {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0066cc 0%, #0099ff 100%);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 153, 255, 0.4);
+        }
+
+        .btn-danger {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            color: #ff6b6b;
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 0, 0, 0.3);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(0, 217, 255, 0.05);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(0, 217, 255, 0.1);
+            border-color: rgba(0, 217, 255, 0.4);
+            transform: translateY(-5px);
+        }
+
+        .stat-card .label {
+            color: #aaa;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            color: #00d9ff;
+            font-weight: bold;
+        }
+
+        .stat-card .icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(20, 25, 50, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(0, 217, 255, 0.4);
+            background: rgba(20, 25, 50, 0.8);
+        }
+
+        .card h3 {
+            color: #00d9ff;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .card-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+        }
+
+        .card-item:last-child {
+            border-bottom: none;
+        }
+
+        .card-item-label {
+            color: #aaa;
+            font-size: 12px;
+        }
+
+        .card-item-value {
+            color: #00d9ff;
+            font-weight: bold;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .inventory-item {
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .inventory-item:hover {
+            background: rgba(0, 217, 255, 0.2);
+            border-color: rgba(0, 217, 255, 0.4);
+        }
+
+        .inventory-item-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .inventory-item-name {
+            font-size: 10px;
+            color: #aaa;
+        }
+
+        .alert {
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .alert.success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #51cf66;
+        }
+
+        .alert.error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff6b6b;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .spinner {
+            border: 3px solid rgba(0, 217, 255, 0.2);
+            border-top: 3px solid #00d9ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 8px;
+            height: 20px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #00d9ff 0%, #0099cc 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .header-left {
+                width: 100%;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="logo">V</div>
+                <div class="header-title">
+                    <h1>MrViniVx Server</h1>
+                    <p id="username">Bem-vindo, Jogador!</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-primary" onclick="refreshData()">🔄 Atualizar</button>
+                <button class="btn btn-danger" onclick="logout()">🚪 Sair</button>
+            </div>
+        </div>
+
+        <!-- Alert -->
+        <div id="alert" class="alert" style="display: none;"></div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="icon">⭐</div>
+                <div class="label">Nível</div>
+                <div class="value" id="playerLevel">1</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">💎</div>
+                <div class="label">Diamantes</div>
+                <div class="value" id="playerDiamonds">100</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">🪙</div>
+                <div class="label">Ouro</div>
+                <div class="value" id="playerGold">1000</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">⚡</div>
+                <div class="label">EXP</div>
+                <div class="value" id="playerExp">0</div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content-grid">
+            <!-- Perfil -->
+            <div class="card">
+                <h3>👤 Perfil</h3>
+                <div class="card-item">
+                    <span class="card-item-label">Usuário</span>
+                    <span class="card-item-value" id="profileUsername">-</span>
+                </div>
+                <div class="card-item">
+                    <span class="card-item-label">ID</span>
+                    <span class="card-item-value" id="profileId">-</span>
+                </div>
+                <div class="card-item">
+                    <span class="card-item-label">Email</span>
+                    <span class="card-item-value" id="profileEmail">-</span>
+                </div>
+                <div class="card-item">
+                    <span class="card-item-label">Registrado em</span>
+                    <span class="card-item-value" id="profileCreated">-</span>
+                </div>
+            </div>
+
+            <!-- Estatísticas de Jogo -->
+            <div class="card">
+                <h3>🎮 Estatísticas</h3>
+                <div class="card-item">
+                    <span class="card-item-label">Jogos Jogados</span>
+                    <span class="card-item-value" id="statsGames">0</span>
+                </div>
+                <div class="card-item">
+                    <span class="card-item-label">Vitórias</span>
+                    <span class="card-item-value" id="statsWins">0</span>
+                </div>
+                <div class="card-item">
+                    <span class="card-item-label">Taxa de Vitória</span>
+                    <span class="card-item-value" id="statsWinRate">0%</span>
+                </div>
+                <div class="card-item">
+                    <span class="card-item-label">Total de Kills</span>
+                    <span class="card-item-value" id="statsKills">0</span>
+                </div>
+                <div class="card-item">
+                    <span class="card-item-label">K/D Ratio</span>
+                    <span class="card-item-value" id="statsKD">0.0</span>
+                </div>
+            </div>
+
+            <!-- Progresso -->
+            <div class="card">
+                <h3>📊 Progresso</h3>
+                <div style="margin-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="color: #aaa; font-size: 12px;">Próximo Nível</span>
+                        <span style="color: #00d9ff; font-size: 12px;" id="expProgress">0 / 1000 EXP</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="expBar" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventário -->
+            <div class="card">
+                <h3>🎒 Inventário</h3>
+                <div class="inventory-grid" id="inventory">
+                    <div class="inventory-item">
+                        <div class="inventory-item-icon">🔫</div>
+                        <div class="inventory-item-name">Arma 1</div>
+                    </div>
+                    <div class="inventory-item">
+                        <div class="inventory-item-icon">🛡️</div>
+                        <div class="inventory-item-name">Armadura</div>
+                    </div>
+                    <div class="inventory-item">
+                        <div class="inventory-item-icon">💊</div>
+                        <div class="inventory-item-name">Poção</div>
+                    </div>
+                    <div class="inventory-item">
+                        <div class="inventory-item-icon">🎁</div>
+                        <div class="inventory-item-name">Bônus</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Amigos Online -->
+            <div class="card">
+                <h3>👥 Amigos Online</h3>
+                <div id="friendsList">
+                    <div style="text-align: center; padding: 20px; color: #aaa;">
+                        Nenhum amigo online
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ações Rápidas -->
+            <div class="card">
+                <h3>⚡ Ações Rápidas</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+                    <button class="btn btn-primary" onclick="goToShop()">🛍️ Loja</button>
+                    <button class="btn btn-primary" onclick="goToLeaderboard()">🏆 Ranking</button>
+                    <button class="btn btn-primary" onclick="startGame()">🎮 Jogar</button>
+                    <button class="btn btn-primary" onclick="goToEvents()">🎯 Eventos</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin + '/api/v1';
+
+        // Verificar autenticação
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('token');
+            const userId = localStorage.getItem('user_id');
+            const username = localStorage.getItem('username');
+
+            if (!token || !userId) {
+                window.location.href = '/panel';
+                return;
+            }
+
+            document.getElementById('username').textContent = `Bem-vindo, ${username}!`;
+            loadProfile();
+        });
+
+        function showAlert(message, type = 'success') {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert ${type}`;
+            alert.style.display = 'block';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 3000);
+        }
+
+        async function loadProfile() {
+            try {
+                const token = localStorage.getItem('token');
+                const userId = localStorage.getItem('user_id');
+                const username = localStorage.getItem('username');
+
+                // Simular dados do perfil
+                document.getElementById('profileId').textContent = userId;
+                document.getElementById('profileUsername').textContent = username;
+                document.getElementById('profileEmail').textContent = username + '@game.local';
+                document.getElementById('profileCreated').textContent = new Date().toLocaleDateString('pt-BR');
+
+                // Simular estatísticas
+                document.getElementById('playerLevel').textContent = Math.floor(Math.random() * 50) + 1;
+                document.getElementById('playerDiamonds').textContent = Math.floor(Math.random() * 1000) + 100;
+                document.getElementById('playerGold').textContent = Math.floor(Math.random() * 10000) + 1000;
+                document.getElementById('playerExp').textContent = Math.floor(Math.random() * 1000);
+
+                // Estatísticas de jogo
+                const games = Math.floor(Math.random() * 100);
+                const wins = Math.floor(games * 0.3);
+                const kills = Math.floor(Math.random() * 500);
+                const deaths = Math.floor(Math.random() * 200);
+
+                document.getElementById('statsGames').textContent = games;
+                document.getElementById('statsWins').textContent = wins;
+                document.getElementById('statsWinRate').textContent = games > 0 ? ((wins / games) * 100).toFixed(1) + '%' : '0%';
+                document.getElementById('statsKills').textContent = kills;
+                document.getElementById('statsKD').textContent = deaths > 0 ? (kills / deaths).toFixed(2) : kills.toFixed(2);
+
+                // Progresso
+                const exp = Math.floor(Math.random() * 1000);
+                const expMax = 1000;
+                const expPercent = (exp / expMax) * 100;
+                document.getElementById('expProgress').textContent = `${exp} / ${expMax} EXP`;
+                document.getElementById('expBar').style.width = expPercent + '%';
+
+                showAlert('Perfil carregado com sucesso!', 'success');
+            } catch (error) {
+                console.error('Erro ao carregar perfil:', error);
+                showAlert('Erro ao carregar perfil', 'error');
+            }
+        }
+
+        function refreshData() {
+            loadProfile();
+            showAlert('Dados atualizados!', 'success');
+        }
+
+        function goToShop() {
+            showAlert('Funcionalidade de loja em desenvolvimento', 'success');
+        }
+
+        function goToLeaderboard() {
+            showAlert('Funcionalidade de ranking em desenvolvimento', 'success');
+        }
+
+        function startGame() {
+            showAlert('Iniciando jogo...', 'success');
+        }
+
+        function goToEvents() {
+            showAlert('Funcionalidade de eventos em desenvolvimento', 'success');
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('username');
+            window.location.href = '/panel';
+        }
+    </script>
+</body>
+</html>
