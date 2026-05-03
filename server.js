@@ -90,12 +90,12 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// ✅ ROTA CORRIGIDA: OAuth Facebook com página intermediária
+// ✅ ROTA CORRIGIDA: OAuth Facebook
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const access_token = 'mock_facebook_token_' + Date.now();
   const user_id = Math.floor(Math.random() * 1000000);
   
-  // Redirecionar para a página OAuth que vai fazer o redirect de volta
+  // Redirecionar para a página OAuth
   res.redirect(`/oauth-callback.html?access_token=${access_token}&user_id=${user_id}&expires_in=5184000`);
 });
 
@@ -104,6 +104,20 @@ app.post('/v2.5/dialog/oauth', (req, res) => {
   const user_id = Math.floor(Math.random() * 1000000);
   
   res.redirect(`/oauth-callback.html?access_token=${access_token}&user_id=${user_id}&expires_in=5184000`);
+});
+
+// ✅ ROTA NOVA: Retornar sucesso do login com token
+app.get('/fbconnect/success', (req, res) => {
+  const access_token = req.query.access_token || 'mock_facebook_token_' + Date.now();
+  const user_id = req.query.user_id || Math.floor(Math.random() * 1000000);
+  
+  res.json({
+    access_token: access_token,
+    user_id: user_id,
+    expires_in: 5184000,
+    token_type: 'bearer',
+    status: 'success'
+  });
 });
 
 // Rota de autenticação VK
@@ -155,7 +169,7 @@ app.get('/app/info/get', (req, res) => {
   });
 });
 
-// Rota de atividades do Facebook
+// ✅ ROTA IMPORTANTE: Aceitar atividades com access_token vazio
 app.post('/v2.5/:app_id/activities', (req, res) => {
   res.json({
     success: true,
@@ -169,15 +183,6 @@ app.get('/v2.5/:app_id/activities', (req, res) => {
     success: true,
     app_id: req.params.app_id,
     activities: []
-  });
-});
-
-// Rota de callback de login Facebook
-app.get('/fbconnect/success', (req, res) => {
-  res.json({
-    status: 'success',
-    message: 'Facebook login successful',
-    redirect: '/panel'
   });
 });
 
