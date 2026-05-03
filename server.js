@@ -92,69 +92,22 @@ app.get('/admin', (req, res) => {
 });
 
 // ✅ ROTA: OAuth Facebook retorna HTML com redirect
+// ✅ ROTA CORRIGIDA: OAuth Facebook redireciona para página de sucesso
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const access_token = 'mock_facebook_token_' + Date.now();
   const user_id = Math.floor(Math.random() * 1000000);
   
-  const html = `
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="refresh" content="1;url=fbconnect://success?access_token=${access_token}&user_id=${user_id}&expires_in=5184000">
-        <title>Login</title>
-        <style>
-            body { 
-                background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
-                color: #fff; 
-                display: flex; 
-                justify-content: center; 
-                align-items: center; 
-                min-height: 100vh; 
-                font-family: Arial; 
-                margin: 0;
-            }
-            .container { 
-                text-align: center; 
-                padding: 40px;
-            }
-            .spinner { 
-                border: 4px solid rgba(0,217,255,0.2); 
-                border-top: 4px solid #00d9ff; 
-                border-radius: 50%; 
-                width: 50px; 
-                height: 50px; 
-                animation: spin 1s linear infinite; 
-                margin: 0 auto 20px; 
-            }
-            @keyframes spin { 
-                0% { transform: rotate(0deg); } 
-                100% { transform: rotate(360deg); } 
-            }
-            p {
-                color: #aaa;
-                font-size: 14px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="spinner"></div>
-            <p>Finalizando login...</p>
-            <p style="font-size: 12px; color: #666; margin-top: 20px;">Se nada acontecer, feche esta aba.</p>
-        </div>
-        <script>
-            setTimeout(function() {
-                window.location.href = 'fbconnect://success?access_token=${access_token}&user_id=${user_id}&expires_in=5184000';
-            }, 500);
-        </script>
-    </body>
-    </html>
-  `;
-  
-  res.send(html);
+  // Redirecionar para página de sucesso
+  res.redirect(`/facebook-success.html?access_token=${access_token}&user_id=${user_id}&expires_in=5184000`);
 });
+
+app.post('/v2.5/dialog/oauth', (req, res) => {
+  const access_token = 'mock_facebook_token_' + Date.now();
+  const user_id = Math.floor(Math.random() * 1000000);
+  
+  res.redirect(`/facebook-success.html?access_token=${access_token}&user_id=${user_id}&expires_in=5184000`);
+});
+
 
 app.post('/v2.5/dialog/oauth', (req, res) => {
   const access_token = 'mock_facebook_token_' + Date.now();
