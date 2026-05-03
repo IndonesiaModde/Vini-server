@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Bem-Sucedido</title>
+    <title>Login Sucesso</title>
     <style>
         * {
             margin: 0;
@@ -17,7 +17,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             color: #fff;
         }
         
@@ -44,39 +44,6 @@
             font-size: 14px;
         }
         
-        .token-box {
-            background: rgba(0, 217, 255, 0.1);
-            border: 1px solid rgba(0, 217, 255, 0.3);
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: left;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .token-box strong {
-            color: #00d9ff;
-            display: block;
-            margin-bottom: 8px;
-            font-size: 12px;
-        }
-        
-        .token-box p {
-            word-break: break-all;
-            font-size: 11px;
-            color: #00d9ff;
-            margin: 0;
-            font-family: monospace;
-        }
-        
-        .loading {
-            margin-top: 30px;
-            font-size: 12px;
-            color: #666;
-        }
-        
         @keyframes scaleIn {
             from {
                 transform: scale(0);
@@ -94,18 +61,6 @@
         <div class="success-icon">✅</div>
         <h1>Login Bem-Sucedido!</h1>
         <p>Você será redirecionado automaticamente...</p>
-        
-        <div class="token-box">
-            <strong>Access Token:</strong>
-            <p id="token">Carregando...</p>
-            
-            <strong style="margin-top: 15px;">User ID:</strong>
-            <p id="user-id">Carregando...</p>
-        </div>
-        
-        <div class="loading">
-            <p>Feche esta aba para continuar no jogo.</p>
-        </div>
     </div>
 
     <script>
@@ -113,15 +68,19 @@
         const params = new URLSearchParams(window.location.search);
         const access_token = params.get('access_token');
         const user_id = params.get('user_id');
-
-        // Preencher os dados
-        document.getElementById('token').textContent = access_token || 'N/A';
-        document.getElementById('user-id').textContent = user_id || 'N/A';
-
-        // Fechar automaticamente após 2 segundos
+        
+        console.log('Access Token:', access_token);
+        console.log('User ID:', user_id);
+        
+        // Tentar comunicar com o app nativo
+        if (window.GameBridge) {
+            window.GameBridge.onFacebookLoginSuccess(access_token, user_id);
+        }
+        
+        // Tentar fazer redirect para protocolo customizado
         setTimeout(() => {
-            window.close();
-        }, 2000);
+            window.location.href = 'fbconnect://success?access_token=' + access_token + '&user_id=' + user_id;
+        }, 500);
     </script>
 </body>
 </html>
