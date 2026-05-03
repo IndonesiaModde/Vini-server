@@ -90,24 +90,20 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// ✅ ROTA CORRIGIDA: OAuth Facebook com redirect
+// ✅ ROTA CORRIGIDA: OAuth Facebook com página intermediária
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const access_token = 'mock_facebook_token_' + Date.now();
   const user_id = Math.floor(Math.random() * 1000000);
-  const redirect_uri = req.query.redirect_uri || 'fbconnect://success';
   
-  // Fazer redirect com os parâmetros
-  const redirectUrl = `${redirect_uri}?access_token=${access_token}&user_id=${user_id}&expires_in=5184000`;
-  res.redirect(redirectUrl);
+  // Redirecionar para a página OAuth que vai fazer o redirect de volta
+  res.redirect(`/oauth-callback.html?access_token=${access_token}&user_id=${user_id}&expires_in=5184000`);
 });
 
 app.post('/v2.5/dialog/oauth', (req, res) => {
   const access_token = 'mock_facebook_token_' + Date.now();
   const user_id = Math.floor(Math.random() * 1000000);
-  const redirect_uri = req.query.redirect_uri || 'fbconnect://success';
   
-  const redirectUrl = `${redirect_uri}?access_token=${access_token}&user_id=${user_id}&expires_in=5184000`;
-  res.redirect(redirectUrl);
+  res.redirect(`/oauth-callback.html?access_token=${access_token}&user_id=${user_id}&expires_in=5184000`);
 });
 
 // Rota de autenticação VK
