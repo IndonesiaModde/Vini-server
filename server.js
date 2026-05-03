@@ -393,6 +393,129 @@ app.get('/v2.5/:app_id/activities', (req, res) => {
   });
 });
 
+// ✅ ROTAS PARA INTERCEPTAR SERVIDOR TENCENT (cs.mainconn.gamesafe.qq.com)
+// Essas rotas simulam as respostas do servidor de conexão da Tencent
+
+// Rota de login do servidor de conexão
+app.post('/csapi/login', (req, res) => {
+  try {
+    const { access_token, user_id } = req.body;
+    
+    if (!access_token || !user_id) {
+      return res.status(400).json({
+        code: 400,
+        msg: 'Parametros invalidos',
+        success: false
+      });
+    }
+    
+    const username = 'fb_user_' + user_id;
+    const gameToken = jwt.sign(
+      { id: user_id, username: username, provider: 'facebook' },
+      config.jwtSecret,
+      { expiresIn: '7d' }
+    );
+    
+    res.json({
+      code: 0,
+      msg: 'ok',
+      success: true,
+      data: {
+        token: gameToken,
+        user_id: user_id,
+        username: username,
+        level: 1,
+        exp: 0,
+        diamonds: 1000,
+        gold: 5000,
+        server_time: Date.now()
+      }
+    });
+  } catch (error) {
+    console.error('Erro ao fazer login:', error);
+    res.status(500).json({
+      code: 500,
+      msg: 'Erro interno',
+      success: false
+    });
+  }
+});
+
+// Rota de autenticacao do servidor de conexao
+app.post('/csapi/auth', (req, res) => {
+  try {
+    const { token, user_id } = req.body;
+    
+    if (!token || !user_id) {
+      return res.status(400).json({
+        code: 400,
+        msg: 'Token invalido',
+        success: false
+      });
+    }
+    
+    res.json({
+      code: 0,
+      msg: 'ok',
+      success: true,
+      data: {
+        authenticated: true,
+        user_id: user_id,
+        server_time: Date.now()
+      }
+    });
+  } catch (error) {
+    console.error('Erro ao autenticar:', error);
+    res.status(500).json({
+      code: 500,
+      msg: 'Erro interno',
+      success: false
+    });
+  }
+});
+
+// Rota de informacoes do servidor
+app.get('/csapi/server/info', (req, res) => {
+  res.json({
+    code: 0,
+    msg: 'ok',
+    success: true,
+    data: {
+      server_name: 'MrViniVx Server',
+      server_version: '4.1.0',
+      status: 'online',
+      max_players: config.game.maxPlayers,
+      current_players: Math.floor(Math.random() * config.game.maxPlayers),
+      server_time: Date.now()
+    }
+  });
+});
+
+// Rota de handshake do servidor de conexao
+app.post('/csapi/handshake', (req, res) => {
+  res.json({
+    code: 0,
+    msg: 'ok',
+    success: true,
+    data: {
+      server_id: 'mrvvinivx_001',
+      server_time: Date.now(),
+      challenge: Math.random().toString(36).substring(7)
+    }
+  });
+});
+
+// Rota generica para capturar outras requisicoes do servidor Tencent
+app.all('/csapi/*', (req, res) => {
+  console.log(`[CSAPI] ${req.method} ${req.path}`, req.body);
+  res.json({
+    code: 0,
+    msg: 'ok',
+    success: true,
+    data: {}
+  });
+});
+
 // Rota de dashboard
 app.get('/dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
