@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Callback</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            color: #fff;
+        }
+        .container {
+            text-align: center;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 217, 255, 0.2);
+            border-top: 4px solid #00d9ff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        p {
+            font-size: 16px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner"></div>
+        <p>Processando login...</p>
+    </div>
+
+    <script>
+        // Extrair parâmetros da URL
+        const params = new URLSearchParams(window.location.search);
+        const access_token = params.get('access_token');
+        const user_id = params.get('user_id');
+        const expires_in = params.get('expires_in');
+
+        // Se temos os parâmetros, fazer redirect para o app
+        if (access_token && user_id) {
+            // Tentar redirecionar para o protocolo customizado do app
+            const redirectUrl = `fbconnect://success?access_token=${access_token}&user_id=${user_id}&expires_in=${expires_in || 5184000}`;
+            
+            // Usar setTimeout para dar tempo do redirect ser processado
+            setTimeout(() => {
+                window.location.href = redirectUrl;
+            }, 500);
+
+            // Se o redirect não funcionar em 2 segundos, mostrar mensagem
+            setTimeout(() => {
+                document.body.innerHTML = `
+                    <div class="container">
+                        <h2>Login Bem-Sucedido!</h2>
+                        <p>Token: ${access_token}</p>
+                        <p>User ID: ${user_id}</p>
+                        <p>Você pode fechar esta aba e voltar ao jogo.</p>
+                    </div>
+                `;
+            }, 2000);
+        } else {
+            // Se não temos os parâmetros, mostrar erro
+            document.body.innerHTML = `
+                <div class="container">
+                    <h2>Erro no Login</h2>
+                    <p>Parâmetros inválidos ou ausentes.</p>
+                    <p><a href="/panel" style="color: #00d9ff; text-decoration: none;">Voltar ao Painel</a></p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
