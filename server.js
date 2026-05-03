@@ -131,6 +131,48 @@ app.get('/garena/oauth', (req, res) => {
   });
 });
 
+// Rota de info do app Facebook
+app.get('/v2.5/:app_id', (req, res) => {
+  res.json({
+    id: req.params.app_id,
+    name: 'MrViniVx Game',
+    supports_implicit_sdk_logging: true,
+    gdpv4_nux_content: '',
+    gdpv4_nux_enabled: false,
+    android_dialog_configs: [],
+    android_sdk_error_categories: []
+  });
+});
+
+// Rota de info da aplicacao
+app.get('/app/info/get', (req, res) => {
+  res.json({
+    app_id: req.query.app_id || '100067',
+    client_type: req.query.client_type || '4352',
+    client_version: req.query.client_version || '2018120316',
+    status: 'ok',
+    version: '4.1.0',
+    server_time: Date.now()
+  });
+});
+
+// Rota de atividades do Facebook
+app.post('/v2.5/:app_id/activities', (req, res) => {
+  res.json({
+    success: true,
+    app_id: req.params.app_id,
+    timestamp: Date.now()
+  });
+});
+
+app.get('/v2.5/:app_id/activities', (req, res) => {
+  res.json({
+    success: true,
+    app_id: req.params.app_id,
+    activities: []
+  });
+});
+
 // Rota de dashboard
 app.get('/dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
