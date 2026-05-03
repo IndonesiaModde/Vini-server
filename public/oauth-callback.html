@@ -49,36 +49,39 @@
         const params = new URLSearchParams(window.location.search);
         const access_token = params.get('access_token');
         const user_id = params.get('user_id');
-        const expires_in = params.get('expires_in');
+        const expires_in = params.get('expires_in') || 5184000;
 
-        // Se temos os parâmetros, fazer redirect para o app
+        // Se temos os parâmetros
         if (access_token && user_id) {
             // Tentar redirecionar para o protocolo customizado do app
-            const redirectUrl = `fbconnect://success?access_token=${access_token}&user_id=${user_id}&expires_in=${expires_in || 5184000}`;
+            const redirectUrl = `fbconnect://success?access_token=${access_token}&user_id=${user_id}&expires_in=${expires_in}`;
             
-            // Usar setTimeout para dar tempo do redirect ser processado
-            setTimeout(() => {
-                window.location.href = redirectUrl;
-            }, 500);
+            // Fazer redirect imediatamente
+            window.location.href = redirectUrl;
 
-            // Se o redirect não funcionar em 2 segundos, mostrar mensagem
+            // Se o redirect não funcionar em 3 segundos, mostrar mensagem
             setTimeout(() => {
                 document.body.innerHTML = `
                     <div class="container">
-                        <h2>Login Bem-Sucedido!</h2>
-                        <p>Token: ${access_token}</p>
-                        <p>User ID: ${user_id}</p>
-                        <p>Você pode fechar esta aba e voltar ao jogo.</p>
+                        <h2 style="color: #00d9ff; margin-bottom: 20px;">✅ Login Bem-Sucedido!</h2>
+                        <div style="background: rgba(0, 217, 255, 0.1); border: 1px solid rgba(0, 217, 255, 0.3); border-radius: 8px; padding: 20px; margin: 20px auto; max-width: 300px; text-align: left;">
+                            <p><strong>Token:</strong></p>
+                            <p style="word-break: break-all; font-size: 12px; color: #00d9ff;">${access_token}</p>
+                            <p style="margin-top: 15px;"><strong>User ID:</strong></p>
+                            <p style="font-size: 14px; color: #00d9ff;">${user_id}</p>
+                        </div>
+                        <p style="margin-top: 30px; color: #aaa;">Você pode fechar esta aba e voltar ao jogo.</p>
+                        <p style="margin-top: 10px; font-size: 12px; color: #666;">Se o jogo não responder, tente novamente.</p>
                     </div>
                 `;
-            }, 2000);
+            }, 3000);
         } else {
             // Se não temos os parâmetros, mostrar erro
             document.body.innerHTML = `
                 <div class="container">
-                    <h2>Erro no Login</h2>
-                    <p>Parâmetros inválidos ou ausentes.</p>
-                    <p><a href="/panel" style="color: #00d9ff; text-decoration: none;">Voltar ao Painel</a></p>
+                    <h2 style="color: #ff6b6b;">❌ Erro no Login</h2>
+                    <p style="margin-top: 20px;">Parâmetros inválidos ou ausentes.</p>
+                    <p style="margin-top: 20px;"><a href="/panel" style="color: #00d9ff; text-decoration: none; padding: 10px 20px; border: 1px solid #00d9ff; border-radius: 5px; display: inline-block;">Voltar ao Painel</a></p>
                 </div>
             `;
         }
