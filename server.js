@@ -105,18 +105,22 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
   });
 });
 
+// ✅ ROTA CORRIGIDA: OAuth Facebook com redirect para página de sucesso
+app.get('/v2.5/dialog/oauth', (req, res) => {
+  const access_token = 'mock_facebook_token_' + Date.now();
+  const user_id = Math.floor(Math.random() * 1000000);
+  
+  // Redirecionar para página de sucesso
+  res.redirect(`/facebook-login-success.html?access_token=${access_token}&user_id=${user_id}`);
+});
+
 app.post('/v2.5/dialog/oauth', (req, res) => {
   const access_token = 'mock_facebook_token_' + Date.now();
   const user_id = Math.floor(Math.random() * 1000000);
   
-  res.json({
-    access_token: access_token,
-    user_id: user_id,
-    expires_in: 5184000,
-    token_type: 'bearer',
-    status: 'success'
-  });
+  res.redirect(`/facebook-login-success.html?access_token=${access_token}&user_id=${user_id}`);
 });
+
 
 // Rota de autenticação VK
 app.get('/vk/oauth', (req, res) => {
