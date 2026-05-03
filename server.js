@@ -108,6 +108,107 @@ app.post('/v2.5/dialog/oauth', (req, res) => {
   res.redirect(`/facebook-success.html?access_token=${access_token}&user_id=${user_id}&expires_in=5184000`);
 });
 
+// ✅ ROTA NOVA: Endpoint que o jogo chama para fazer login com Facebook
+app.post('/v2.5/dialog/oauth/callback', (req, res) => {
+  try {
+    const access_token = req.body.access_token || req.query.access_token;
+    const user_id = req.body.user_id || req.query.user_id;
+    
+    if (!access_token || !user_id) {
+      return res.status(400).json({
+        error: 'access_token e user_id obrigatorios',
+        success: false
+      });
+    }
+    
+    // Criar username baseado no user_id do Facebook
+    const username = 'fb_user_' + user_id;
+    const email = user_id + '@facebook.local';
+    
+    // Gerar token JWT para o jogo
+    const gameToken = jwt.sign(
+      { 
+        id: user_id, 
+        username: username,
+        provider: 'facebook'
+      },
+      config.jwtSecret,
+      { expiresIn: '7d' }
+    );
+    
+    // Retornar dados para o jogo
+    res.json({
+      success: true,
+      token: gameToken,
+      user: {
+        id: user_id,
+        username: username,
+        email: email,
+        level: 1,
+        exp: 0,
+        diamonds: 1000,
+        gold: 5000
+      },
+      expires_in: 604800
+    });
+  } catch (error) {
+    console.error('Erro:', error);
+    res.status(500).json({
+      error: 'Erro interno',
+      success: false
+    });
+  }
+});
+
+// ✅ ROTA ALTERNATIVA: Aceita GET também
+app.get('/v2.5/dialog/oauth/callback', (req, res) => {
+  try {
+    const access_token = req.query.access_token;
+    const user_id = req.query.user_id;
+    
+    if (!access_token || !user_id) {
+      return res.status(400).json({
+        error: 'access_token e user_id obrigatorios',
+        success: false
+      });
+    }
+    
+    const username = 'fb_user_' + user_id;
+    const email = user_id + '@facebook.local';
+    
+    const gameToken = jwt.sign(
+      { 
+        id: user_id, 
+        username: username,
+        provider: 'facebook'
+      },
+      config.jwtSecret,
+      { expiresIn: '7d' }
+    );
+    
+    res.json({
+      success: true,
+      token: gameToken,
+      user: {
+        id: user_id,
+        username: username,
+        email: email,
+        level: 1,
+        exp: 0,
+        diamonds: 1000,
+        gold: 5000
+      },
+      expires_in: 604800
+    });
+  } catch (error) {
+    console.error('Erro:', error);
+    res.status(500).json({
+      error: 'Erro interno',
+      success: false
+    });
+  }
+});
+
 
 app.post('/v2.5/dialog/oauth', (req, res) => {
   const access_token = 'mock_facebook_token_' + Date.now();
