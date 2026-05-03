@@ -91,33 +91,79 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// ✅ ROTA CORRIGIDA: OAuth Facebook retorna JSON com URL de sucesso
+// ✅ ROTA FINAL: OAuth Facebook retorna HTML que fecha automaticamente
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const access_token = 'mock_facebook_token_' + Date.now();
   const user_id = Math.floor(Math.random() * 1000000);
   
-  // Retornar JSON ao invés de fazer redirect
-  res.json({
-    access_token: access_token,
-    user_id: user_id,
-    expires_in: 5184000,
-    token_type: 'bearer',
-    redirect_uri: 'fbconnect://success'
-  });
+  // Retornar HTML que simula sucesso e fecha
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Success</title>
+    </head>
+    <body>
+        <script>
+            // Dados do login
+            const data = {
+                access_token: '${access_token}',
+                user_id: ${user_id},
+                expires_in: 5184000
+            };
+            
+            // Tentar comunicar com app nativo
+            if (window.android) {
+                if (window.android.onLoginSuccess) {
+                    window.android.onLoginSuccess(JSON.stringify(data));
+                }
+            }
+            
+            // Fechar a aba
+            window.close();
+        </script>
+    </body>
+    </html>
+  `;
+  
+  res.send(html);
 });
 
 app.post('/v2.5/dialog/oauth', (req, res) => {
   const access_token = 'mock_facebook_token_' + Date.now();
   const user_id = Math.floor(Math.random() * 1000000);
   
-  res.json({
-    access_token: access_token,
-    user_id: user_id,
-    expires_in: 5184000,
-    token_type: 'bearer',
-    redirect_uri: 'fbconnect://success'
-  });
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Success</title>
+    </head>
+    <body>
+        <script>
+            const data = {
+                access_token: '${access_token}',
+                user_id: ${user_id},
+                expires_in: 5184000
+            };
+            
+            if (window.android) {
+                if (window.android.onLoginSuccess) {
+                    window.android.onLoginSuccess(JSON.stringify(data));
+                }
+            }
+            
+            window.close();
+        </script>
+    </body>
+    </html>
+  `;
+  
+  res.send(html);
 });
+
 
 // ✅ ROTA NOVA: Processa o callback do Facebook automaticamente
 app.get('/fbconnect/success', (req, res) => {
