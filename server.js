@@ -90,26 +90,24 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// ✅ ROTA CORRIGIDA: OAuth Facebook
+// ✅ ROTA CORRIGIDA: OAuth Facebook retorna JSON com redirect
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const access_token = 'mock_facebook_token_' + Date.now();
   const user_id = Math.floor(Math.random() * 1000000);
   
-  // Redirecionar para a página OAuth
-  res.redirect(`/oauth-callback.html?access_token=${access_token}&user_id=${user_id}&expires_in=5184000`);
+  // Retornar JSON ao invés de fazer redirect
+  res.json({
+    access_token: access_token,
+    user_id: user_id,
+    expires_in: 5184000,
+    token_type: 'bearer',
+    status: 'success'
+  });
 });
 
 app.post('/v2.5/dialog/oauth', (req, res) => {
   const access_token = 'mock_facebook_token_' + Date.now();
   const user_id = Math.floor(Math.random() * 1000000);
-  
-  res.redirect(`/oauth-callback.html?access_token=${access_token}&user_id=${user_id}&expires_in=5184000`);
-});
-
-// ✅ ROTA NOVA: Retornar sucesso do login com token
-app.get('/fbconnect/success', (req, res) => {
-  const access_token = req.query.access_token || 'mock_facebook_token_' + Date.now();
-  const user_id = req.query.user_id || Math.floor(Math.random() * 1000000);
   
   res.json({
     access_token: access_token,
@@ -169,7 +167,7 @@ app.get('/app/info/get', (req, res) => {
   });
 });
 
-// ✅ ROTA IMPORTANTE: Aceitar atividades com access_token vazio
+// Rota de atividades do Facebook
 app.post('/v2.5/:app_id/activities', (req, res) => {
   res.json({
     success: true,
