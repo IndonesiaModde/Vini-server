@@ -62,6 +62,11 @@ app.get('/v2.5/:app_id', (req, res) => {
   });
 });
 
+// Endpoint de Atividades do Facebook (necessário para o SDK não dar erro)
+app.post('/v2.5/:app_id/activities', (req, res) => {
+  res.json({ success: true });
+});
+
 // --- DIÁLOGO DE LOGIN ---
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const token = uuidv4();
@@ -118,7 +123,6 @@ const handleLoginSuccess = (req, res) => {
     status: 200
   };
 
-  // Se for exchange, responde no formato plano usando os dados que o jogo enviou
   if (req.path.includes('exchange')) {
     console.log(`[Exchange Success] Token: ${token}, UID: ${uid}`);
     return res.json(response);
@@ -134,4 +138,4 @@ app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/v2.5/me', '/oauth/t
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Sync Master) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Activities Master) na porta ${PORT}`));
