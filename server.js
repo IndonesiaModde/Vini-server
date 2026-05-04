@@ -94,19 +94,33 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
 });
 
 // -----------------------------------------------------------------------
-// GARENA / AUTH
+// GARENA / AUTH - RESPOSTA MESTRA
 // -----------------------------------------------------------------------
 
 const sendAuthResponse = (res, token, uid) => {
   const now = Math.floor(Date.now() / 1000);
   const openId = `vini_${uid}`; 
+  
   const authData = {
+    // TOKENS
     authToken: token, token: token, access_token: token, refreshToken: token, key: token, session_key: token,
-    openId: openId, user_id: uid, uid: uid, account_id: uid, nickname: "ViniPlayer",
+    // IDs
+    openId: openId, user_id: uid, uid: uid, account_id: uid,
+    // INFO
+    nickname: "ViniPlayer",
     expiryTimestamp: now + 5184000, expires_in: 5184000, lastInspectTime: now,
-    tokenProvider: 0, login_type: 2, is_guest: false, status: 200, code: 0, msg: "success"
+    tokenProvider: 0, login_type: 2, is_guest: false,
+    // STATUS (Múltiplos formatos para garantir)
+    status: 200, code: 0, error: 0, message: "success", msg: "success", result: "success"
   };
-  res.json({ ...authData, data: { ...authData } });
+
+  res.json({
+    ...authData,
+    data: {
+        ...authData,
+        account: { uid: uid, nickname: "ViniPlayer", openId: openId }
+    }
+  });
 };
 
 app.all([
@@ -118,10 +132,9 @@ app.all([
 });
 
 // -----------------------------------------------------------------------
-// LOBBY / GAMEPLAY / NETWORK
+// LOBBY / GAMEPLAY
 // -----------------------------------------------------------------------
 
-// Configuração de Rede (Vital para o jogo saber onde se conectar)
 app.all(['/network/config', '/api/v1/network/config'], (req, res) => {
     res.json({
         status: 200, code: 0, msg: "success",
@@ -134,19 +147,11 @@ app.all(['/network/config', '/api/v1/network/config'], (req, res) => {
     });
 });
 
-// Perfil do Usuário (Nível, Diamantes, Ouro)
 app.all(['/api/v1/user/profile', '/user/profile', '/game/user/info'], (req, res) => {
     res.json({
         status: 200, code: 0, msg: "success",
         data: {
-            uid: PLAYER_UID,
-            nickname: "ViniPlayer",
-            level: 70,
-            exp: 999999,
-            diamonds: 999999,
-            gold: 999999,
-            badges: 100,
-            rank: 25 // Mestre
+            uid: PLAYER_UID, nickname: "ViniPlayer", level: 70, exp: 999999, diamonds: 999999, gold: 999999, rank: 25
         }
     });
 });
@@ -171,4 +176,4 @@ app.get('/live/*', (req, res) => {
 });
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V32 (Network Config) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V33 (Master Response) na porta ${PORT}`));
