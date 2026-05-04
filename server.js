@@ -9,9 +9,33 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Logging
+// --- SISTEMA DE SUPER LOG (MODO DEBUG FULL) ---
 app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  const timestamp = new Date().toISOString();
+  console.log(`\n--- [${timestamp}] NOVA REQUISIÇÃO ---`);
+  console.log(`MÉTODO: ${req.method}`);
+  console.log(`ROTA: ${req.path}`);
+  
+  if (Object.keys(req.headers).length > 0) {
+    console.log("HEADERS:", JSON.stringify(req.headers, null, 2));
+  }
+  
+  if (Object.keys(req.query).length > 0) {
+    console.log("QUERY:", JSON.stringify(req.query, null, 2));
+  }
+  
+  if (req.method === 'POST' && Object.keys(req.body).length > 0) {
+    console.log("BODY:", JSON.stringify(req.body, null, 2));
+  }
+
+  // Capturar a resposta que o servidor envia
+  const oldJson = res.json;
+  res.json = function(data) {
+    console.log("RESPOSTA ENVIADA:", JSON.stringify(data, null, 2));
+    console.log(`--- FIM DA REQUISIÇÃO ---\n`);
+    return oldJson.apply(res, arguments);
+  };
+
   next();
 });
 
@@ -44,31 +68,15 @@ app.all('/v2.5/:id', (req, res) => {
 
 app.post('/v2.5/:app_id/activities', (req, res) => res.json({ success: true }));
 
-// --- DIÁLOGO DE LOGIN (AJUSTADO PARA 1.25.3) ---
+// --- DIÁLOGO DE LOGIN ---
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const token = uuidv4();
   const uid = "100067";
   const payload = Buffer.from(JSON.stringify({ user_id: uid, algorithm: "HMAC-SHA256" })).toString('base64');
   const signed_request = "vini_sig." + payload;
-  
-  // Parâmetros de fragmento específicos para APKs mais antigos
   const params = `access_token=${token}&expires_in=5184000&signed_request=${signed_request}&user_id=${uid}&base_domain=onrender.com&return_scopes=true`;
   const finalUrl = `fbconnect://success#${params}`;
-
-  res.send(`
-    <html>
-    <body style="background:#000;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;">
-        <div style="text-align:center;">
-            <h2>Vini Server</h2>
-            <p>Sincronizando...</p>
-            <script>
-                window.location.href = "${finalUrl}";
-                setTimeout(() => { window.location.href = "${finalUrl}"; }, 1000);
-            </script>
-        </div>
-    </body>
-    </html>
-  `);
+  res.send(`<html><script>window.location.href="${finalUrl}";</script></html>`);
 });
 
 const handleLoginSuccess = (req, res) => {
@@ -97,7 +105,6 @@ const handleLoginSuccess = (req, res) => {
   };
 
   if (req.path.includes('exchange')) {
-    console.log(`[Exchange Success] UID: ${uid}`);
     return res.json({ ...response, data: response });
   }
 
@@ -107,4 +114,4 @@ const handleLoginSuccess = (req, res) => {
 app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/oauth/token/facebook/exchange'], handleLoginSuccess);
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (1.25.3 Final) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Super Log Mode) na porta ${PORT}`));
