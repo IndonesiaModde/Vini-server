@@ -34,12 +34,12 @@ app.all(['/app/info/get', '/info/app/info/get'], (req, res) => {
 app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/android/versioninfo'], (req, res) => res.send(VERSION));
 app.get(['/sbt/fileinfo', '/fileinfo', '/live/fileinfo', '/android/fileinfo'], (req, res) => res.send(FILE_INFO));
 
-// Endpoints Facebook
+// Endpoints Facebook com ID Dinâmico
 app.all('/v2.5/:id', (req, res) => {
   const id = req.params.id;
-  const uid = "100067"; // Sincronizado com o client_id do APK
-  
-  if (id === 'me' || id === uid) {
+  // Se for 'me' ou um ID numérico, retornamos como usuário
+  if (id === 'me' || !isNaN(id)) {
+    const uid = id === 'me' ? "100067" : id;
     return res.json({ id: uid, name: "ViniPlayer", first_name: "Vini", last_name: "Player" });
   }
   
@@ -64,7 +64,8 @@ app.post('/v2.5/:app_id/activities', (req, res) => {
 
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const token = uuidv4();
-  const uid = "100067";
+  // Usa o client_id enviado pelo APK ou o padrão 100067
+  const uid = req.query.client_id || "100067";
   const params = `access_token=${token}&expires_in=5184000&user_id=${uid}&base_domain=onrender.com&return_scopes=true`;
   const finalUrl = `fbconnect://success#${params}`;
   res.send(`<html><script>window.location.href="${finalUrl}";</script></html>`);
@@ -72,8 +73,8 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
 
 const handleLoginSuccess = (req, res) => {
   const token = req.body.facebook_access_token || req.body.access_token || uuidv4();
-  const uid = "100067";
-  const appId = "100067"; // Sincronizado com o client_id do APK para evitar erro de autenticação
+  const uid = req.body.user_id || req.body.client_id || "100067";
+  const appId = req.body.client_id || "2036793259884297";
   const now = Date.now();
   
   const response = {
@@ -97,7 +98,7 @@ const handleLoginSuccess = (req, res) => {
   };
 
   if (req.path.includes('exchange')) {
-    console.log(`[Exchange Success] UID: ${uid}`);
+    console.log(`[Exchange Success] UID: ${uid}, AppID: ${appId}`);
     return res.json({ ...response, data: response });
   }
 
@@ -107,4 +108,4 @@ const handleLoginSuccess = (req, res) => {
 app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/oauth/token/facebook/exchange'], handleLoginSuccess);
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Final Sync Master) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Dynamic Sync Master) na porta ${PORT}`));
