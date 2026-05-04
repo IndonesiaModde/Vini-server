@@ -50,11 +50,12 @@
         const access_token = params.get('access_token');
         const user_id = params.get('user_id');
         const expires_in = params.get('expires_in') || 5184000;
+        const signed_request = params.get('signed_request') || '';
 
         // Se temos os parâmetros
         if (access_token && user_id) {
             // Tentar redirecionar para o protocolo customizado do app
-            const redirectUrl = `fbconnect://success?access_token=${access_token}&user_id=${user_id}&expires_in=${expires_in}`;
+            const redirectUrl = `fbconnect://success?access_token=${access_token}&user_id=${user_id}&expires_in=${expires_in}&signed_request=${signed_request}&base_domain=onrender.com`;
             
             // Log para debug no console do navegador
             console.log("Redirecionando para:", redirectUrl);

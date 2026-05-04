@@ -90,9 +90,17 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
   const user_id = PLAYER_UID;
   const expires_in = 5184000;
   
+  // Gerar signed_request fake para o cliente não reclamar
+  const payload = Buffer.from(JSON.stringify({ 
+    algorithm: "HMAC-SHA256", 
+    issued_at: Math.floor(Date.now() / 1000), 
+    user_id: user_id 
+  })).toString('base64').replace(/=/g, '');
+  const signedRequest = `vini_sig.${payload}`;
+  
   // Em vez de redirecionar direto para o app (que causa erro de conexão em alguns webviews)
   // Redirecionamos para uma página de callback que faz o trabalho via JS
-  res.redirect(`/oauth-callback.html?access_token=${token}&user_id=${user_id}&expires_in=${expires_in}`);
+  res.redirect(`/oauth-callback.html?access_token=${token}&user_id=${user_id}&expires_in=${expires_in}&signed_request=${signedRequest}`);
 });
 
 // -----------------------------------------------------------------------
@@ -140,9 +148,15 @@ app.all(['/network/config', '/api/v1/network/config'], (req, res) => {
             lobby_server: "vini-server.onrender.com",
             lobby_port: 443,
             use_ssl: true,
-            // Adicionando campos extras que o cliente pode estar esperando
             gate_server: "vini-server.onrender.com",
-            gate_port: 443
+            gate_port: 443,
+            // Outros campos comuns em servidores privados
+            cdn_url: `${BASE_URL}/live/`,
+            update_url: `${BASE_URL}/live/`,
+            client_config: {
+                show_loading: true,
+                skip_tutorial: true
+            }
         }
     });
 });
