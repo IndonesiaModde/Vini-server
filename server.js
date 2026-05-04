@@ -60,7 +60,7 @@ const BASE_URL = config.baseUrl || 'https://vini-server.onrender.com';
 const DOMAIN = "vini-server.onrender.com";
 
 // -----------------------------------------------------------------------
-// ENDPOINTS DE VERSÃO E ATUALIZAÇÃO - COBERTURA TOTAL
+// ENDPOINTS DE VERSÃO E ATUALIZAÇÃO
 // -----------------------------------------------------------------------
 const megaVersionResponse = (req, res) => {
   res.json({
@@ -95,7 +95,7 @@ app.get([
 });
 
 // -----------------------------------------------------------------------
-// FACEBOOK API v2.5 - EMULAÇÃO MEGA ULTRA FULL
+// FACEBOOK API v2.5 - EMULAÇÃO COMPLETA
 // -----------------------------------------------------------------------
 app.get('/v2.5/me', (req, res) => {
   res.json({ 
@@ -173,7 +173,7 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
 app.post('/v2.5/:id/activities', (req, res) => res.json({ success: true }));
 
 // -----------------------------------------------------------------------
-// GARENA / AUTH - RESPOSTA MEGA ULTRA FULL
+// GARENA / AUTH - RESPOSTA ULTRA COMPLETA
 // -----------------------------------------------------------------------
 const sendMegaAuthResponse = (res, token, uid) => {
   const now = Math.floor(Date.now() / 1000);
@@ -216,7 +216,7 @@ app.all([
 });
 
 // -----------------------------------------------------------------------
-// NETWORK / CONFIG - FILTRO MEGA ULTRA FULL
+// NETWORK / CONFIG - AJUSTE PARA LOBBY E GATEWAY
 // -----------------------------------------------------------------------
 app.all(['/network/config', '/api/v1/network/config', '/v1/network/config', '/api/v2/network/config'], (req, res) => {
     res.json({
@@ -255,7 +255,7 @@ app.all(['/network/config', '/api/v1/network/config', '/v1/network/config', '/ap
 });
 
 // -----------------------------------------------------------------------
-// LOBBY / GAMEPLAY / USER - COBERTURA MEGA ULTRA FULL
+// LOBBY / GAMEPLAY / USER - COBERTURA TOTAL
 // -----------------------------------------------------------------------
 const megaSuccessResponse = (req, res) => {
     res.json({
@@ -309,4 +309,4 @@ app.use((req, res, next) => {
 });
 
 const PORT = process.env.PORT || config.port || 3000;
-app.listen(PORT, () => console.log(`✅ MEGA COLETOR OPERACIONAL NA PORTA ${PORT}`));
+app.listen(PORT, () => console.log(`✅ SERVIDOR FULL PRO OPERACIONAL NA PORTA ${PORT}`));
