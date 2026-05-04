@@ -64,8 +64,7 @@ app.get('/v2.5/:app_id', (req, res) => {
 
 // --- DIÁLOGO DE LOGIN (V21 - EXCLUSIVO POR FRAGMENTO #) ---
 app.get('/v2.5/dialog/oauth', (req, res) => {
-  const s = uuidv4().replace(/-/g, '');
-  const token = "EAAG_VINI_" + s.substring(0, 24);
+  const token = uuidv4(); // Usando UUID puro conforme exemplo do usuário
   const uid = "1000001";
   const payload = Buffer.from(JSON.stringify({ user_id: uid, algorithm: "HMAC-SHA256" })).toString('base64');
   const signed_request = "vini_sig." + payload;
@@ -74,7 +73,7 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
   const params = `access_token=${token}&expires_in=5184000&signed_request=${signed_request}&user_id=${uid}&e2e=${encodeURIComponent(e2e)}&return_scopes=true&glive_uid=${uid}`;
   const finalUrl = `fbconnect://success#${params}`;
 
-  console.log("Enviando Fragment Redirect (V21)...");
+  console.log("Enviando Fragment Redirect (V21) com UUID Token...");
 
   res.send(`
     <html><head><title>Success access_token=${token}</title></head>
@@ -90,11 +89,9 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
 });
 
 const handleLoginSuccess = (req, res) => {
-  const s = uuidv4().replace(/-/g, '');
+  const token = uuidv4(); // UUID Puro para compatibilidade total
   const uid = "1000001";
-  const token = "EAAG_VINI_" + s.substring(0, 24);
   
-  // Estrutura de resposta PLANA (Flat) para máxima compatibilidade
   const response = {
     access_token: token,
     token: token,
@@ -104,8 +101,8 @@ const handleLoginSuccess = (req, res) => {
     uid: uid,
     id: uid,
     account_id: uid,
-    session_key: "s_" + s.substring(0, 16),
-    refresh_token: "r_" + s.substring(0, 8),
+    session_key: uuidv4(), // Session key também como UUID
+    refresh_token: uuidv4().substring(0, 8),
     expires_in: 5184000,
     expire_time: 5184000,
     nickname: "ViniPlayer",
@@ -120,20 +117,18 @@ const handleLoginSuccess = (req, res) => {
     status: 200
   };
 
-  // Se for exchange, retorna APENAS o objeto plano na raiz
   if (req.path.includes('exchange')) {
     return res.json(response);
   }
 
-  // Para outras rotas, mantém o envelope 'data' por segurança
   res.json({ code: 0, msg: "success", data: response, ...response });
 };
 
-// Rotas unificadas para sucesso de login e exchange
+// Rotas unificadas
 app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/v2.5/me', '/oauth/token/facebook/exchange', '/v2.5/dialog/oauth/confirm', '/v2.5/oauth/token/facebook/exchange'], handleLoginSuccess);
 
 // Rota padrão para favicon
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Fragment Master) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (UUID Master) na porta ${PORT}`));
