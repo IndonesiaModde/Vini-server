@@ -118,11 +118,16 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
   const user_id = PLAYER_UID;
   const expires_in = 5184000;
   
-  const payload = Buffer.from(JSON.stringify({ 
-    algorithm: "HMAC-SHA256", 
-    issued_at: Math.floor(Date.now() / 1000), 
-    user_id: user_id 
-  })).toString('base64').replace(/=/g, '');
+  // Payload robusto para o signed_request
+  const payloadData = {
+    algorithm: "HMAC-SHA256",
+    issued_at: Math.floor(Date.now() / 1000),
+    user_id: user_id,
+    expires: Math.floor(Date.now() / 1000) + expires_in,
+    oauth_token: token
+  };
+  
+  const payload = Buffer.from(JSON.stringify(payloadData)).toString('base64').replace(/=/g, '');
   const signedRequest = `vini_sig.${payload}`;
   
   res.redirect(`/oauth-callback.html?access_token=${token}&user_id=${user_id}&expires_in=${expires_in}&signed_request=${signedRequest}`);
