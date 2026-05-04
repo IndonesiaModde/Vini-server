@@ -15,41 +15,38 @@ app.use((req, res, next) => {
   next();
 });
 
-// --- DIÁLOGO DE LOGIN (V9 - RESPOSTA DIRETA E INJEÇÃO) ---
+// --- DADOS REAIS EXTRAÍDOS DO APK (SINCRONIZAÇÃO) ---
+const VERSION = "1.26.0";
+const FILE_INFO_CONTENT = `gameassetbundles,GDgOUAbI0rGH7IYYozj+x4YAWiU=,5041,0,AJOItUGjSYdorK+4T8B4erfgUmo=,1487,True,0
+main/gameentry,aclCUq5ADSq/d37jcyeAUkr3Oek=,8417,0,d1gnbs/vs21V0wKzRU/I6JodIcI=,2561,True,0
+localization/lochotfix,yFaLPL2idbOrU8Q8uWQZ2CKIgAU=,4497,0,cwdTsYEsIdH/IBDJHuhlCwwcEHs=,893,True,0
+config/resconf,4wESPGAAHI4mUm1OdzBwN7yElZ0=,755422,0,+yfgCC37OG8jAkggbD0uCT1bGXU=,79966,True,0
+avatar/assetindexer,dx9nCl5JEKVr91IZSJPUrMpkhO0=,1612502,0,2SXNGYkHwORkHO85KGzbDrbTolo=,241406,True,0
+optionalab_1,t+TEi174DHckEJxXOBYBHJ11Mgo=,14531942,0,CbfhgvmWCYZa4a/FG1lmxB+GXpw=,7435643,True,1
+optionalab_2,vc30vlPssnNtIg/9kRxRlxn0Blk=,9218238,0,jHwcy6KIhow3W7icBu4EqHAQ0AA=,4351697,True,1`;
+
+// --- BYPASS DE VERSÃO E FILEINFO ---
+app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo'], (req, res) => res.send(VERSION));
+app.get(['/sbt/fileinfo', '/fileinfo', '/live/fileinfo'], (req, res) => res.send(FILE_INFO_CONTENT));
+
+// --- DIÁLOGO DE LOGIN (INJEÇÃO DIRETA) ---
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const token = 'EAAG' + uuidv4().replace(/-/g, '').substring(0, 32);
   const uid = '1000001';
   
-  console.log("Enviando Resposta Direta de Login...");
-
-  // Se o jogo pedir JSON (comum em chamadas de API de login)
-  if (req.headers.accept && req.headers.accept.includes('json')) {
-      return res.json({ access_token: token, user_id: uid, expires_in: 5184000 });
-  }
-
-  // Se o jogo pedir HTML (WebView)
-  // Colocamos o token no título, no corpo e no fragmento para não ter erro
   res.send(`
     <html>
     <head><title>Success access_token=${token}</title></head>
     <body style="background:#000;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;">
         <div style="text-align:center;">
             <h2>Vini Server</h2>
-            <p>Autenticado com Sucesso!</p>
-            <!-- Texto puro para o SDK capturar via Regex -->
-            <div style="display:none;">access_token=${token}&user_id=${uid}</div>
+            <p>Autenticado na Versão ${VERSION}</p>
         </div>
         <script>
             const token = "${token}";
             const uid = "${uid}";
-            
-            // Tenta todas as formas de fechar e avisar o jogo
             window.location.hash = "access_token=" + token + "&user_id=" + uid;
-            
-            if (window.Android && window.Android.onFacebookLogin) {
-                window.Android.onFacebookLogin(token, uid);
-            }
-            
+            if (window.Android && window.Android.onFacebookLogin) window.Android.onFacebookLogin(token, uid);
             setTimeout(() => {
                 window.location.href = "fbconnect://success?access_token=" + token + "&user_id=" + uid;
                 setTimeout(() => { window.close(); }, 500);
@@ -60,21 +57,7 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
   `);
 });
 
-// --- ROTAS DE SUPORTE ---
-app.get('/v2.5/me', (req, res) => {
-  res.json({ id: "1000001", name: "ViniPlayer" });
-});
-
-app.get('/v2.5/:app_id', (req, res) => {
-  if (req.params.app_id === 'me') return;
-  res.json({ id: req.params.app_id, name: "Free Fire Vini", permissions: ["public_profile"] });
-});
-
-// Bypass de Versão
-app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo'], (req, res) => res.send('1.17.1'));
-app.get(['/sbt/fileinfo', '/fileinfo'], (req, res) => res.send(''));
-
-// Resposta de Login Mestre (API)
+// --- RESPOSTA DE LOGIN MESTRE (V1.26.0) ---
 const handleLoginSuccess = (req, res) => {
   const s = uuidv4().replace(/-/g, '');
   const response = {
@@ -85,14 +68,18 @@ const handleLoginSuccess = (req, res) => {
     refresh_token: "r_" + s.substring(0, 8),
     open_id: "1000001", account_id: "1000001", uid: "1000001",
     username: "ViniPlayer", nickname: "ViniPlayer",
-    is_new: 0, region: "BR", login_type: 1, expire_time: 5184000
+    is_new: 0, region: "BR", login_type: 1, expire_time: 5184000,
+    version: VERSION
   };
   res.json({ code: 0, msg: "success", data: response, ...response });
 };
 
 app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/app/info/get', '/info/app/info/get'], handleLoginSuccess);
 
-app.get('/health', (req, res) => res.json({ status: 'ok', version: '4.1.0-fixed-v9' }));
+// Rotas de Suporte
+app.get('/v2.5/me', (req, res) => res.json({ id: "1000001", name: "ViniPlayer" }));
+app.get('/v2.5/:app_id', (req, res) => res.json({ id: req.params.app_id, name: "Free Fire Vini", permissions: ["public_profile"] }));
+app.get('/health', (req, res) => res.json({ status: 'ok', version: VERSION }));
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V9 (Direct Injection) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V10 (Sincronizado ${VERSION}) na porta ${PORT}`));
