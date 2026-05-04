@@ -15,60 +15,60 @@ app.use((req, res, next) => {
   next();
 });
 
-// --- PÁGINA DE LOGIN COM BOTÃO (V7 - BYPASS DE BLOQUEIO WEBVIEW) ---
+// --- PÁGINA DE LOGIN (V8 - CAPTURA POR TÍTULO E FRAGMENTO) ---
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const token = 'EAAG' + uuidv4().replace(/-/g, '').substring(0, 32);
   const uid = '1000001';
-  const appId = "2036793259884297";
   
-  res.send(`
-    <html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-            body { background: #121212; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; margin: 0; }
-            .btn { background: #1877f2; color: white; border: none; padding: 15px 30px; border-radius: 5px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-            .btn:active { transform: scale(0.98); background: #166fe5; }
-        </style>
-    </head>
-    <body>
-        <div style="text-align:center;">
-            <h2 style="margin-bottom: 20px;">Vini Server Login</h2>
-            <button class="btn" onclick="doLogin()">ENTRAR NO JOGO</button>
-            <p id="status" style="margin-top: 15px; color: #aaa; font-size: 14px;">Clique no botão para autenticar</p>
-        </div>
-        <script>
-          function doLogin() {
-            const token = "${token}";
-            const uid = "${uid}";
-            const appId = "${appId}";
-            
-            document.getElementById('status').innerText = "Autenticando...";
-            
-            // Tentativa 1: Esquema FB oficial
-            window.location.href = "fb" + appId + "://authorize?access_token=" + token + "&user_id=" + uid;
-            
-            // Tentativa 2: Esquema FB connect (fallback)
-            setTimeout(() => {
-                window.location.href = "fbconnect://success?access_token=" + token + "&user_id=" + uid;
-            }, 500);
+  // Redireciona para uma URL que termina em #access_token=... (padrão oficial FB)
+  const successUrl = `/connect/login_success.html#access_token=${token}&user_id=${uid}&expires_in=5184000`;
+  res.redirect(successUrl);
+});
 
-            // Tentativa 3: Interface Java
-            if (window.Android && window.Android.onFacebookLogin) {
-                window.Android.onFacebookLogin(token, uid);
-            }
-          }
-          
-          // Auto-login após 3 segundos se não clicar
-          setTimeout(doLogin, 3000);
-        </script>
-    </body>
-    </html>
-  `);
+// Página de Sucesso que o WebView monitora
+app.get('/connect/login_success.html', (req, res) => {
+    res.send(`
+        <html>
+        <head><title>Success access_token=EAAG_VINI_TOKEN</title></head>
+        <body style="background:#000;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;">
+            <div style="text-align:center;">
+                <h2>Vini Server</h2>
+                <p>Login Concluído!</p>
+            </div>
+            <script>
+                // Muda o título para o token real - Muitos WebViews capturam assim
+                const hash = window.location.hash.substring(1);
+                document.title = "Success " + hash;
+                
+                // Tenta fechar e redirecionar também por segurança
+                setTimeout(() => {
+                    window.location.href = "fbconnect://success?" + hash;
+                    if (window.Android && window.Android.onFacebookLogin) {
+                        const params = new URLSearchParams(hash);
+                        window.Android.onFacebookLogin(params.get('access_token'), params.get('user_id'));
+                    }
+                }, 1000);
+            </script>
+        </body>
+        </html>
+    `);
+});
+
+// --- ROTA DE PERFIL DO FACEBOOK (/v2.5/me) ---
+app.get('/v2.5/me', (req, res) => {
+  res.json({
+    id: "1000001",
+    name: "ViniPlayer",
+    first_name: "Vini",
+    last_name: "Player",
+    email: "vini@server.com",
+    picture: { data: { url: "https://vini-server-1.onrender.com/favicon.ico" } }
+  });
 });
 
 // Validação de App ID
 app.get('/v2.5/:app_id', (req, res) => {
+  if (req.params.app_id === 'me') return; // Ignora se for a rota /me
   res.json({ id: req.params.app_id, name: "Free Fire Vini", permissions: ["public_profile"] });
 });
 
@@ -94,7 +94,7 @@ const handleLoginSuccess = (req, res) => {
 
 app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/app/info/get', '/info/app/info/get'], handleLoginSuccess);
 
-app.get('/health', (req, res) => res.json({ status: 'ok', version: '4.1.0-fixed-v7' }));
+app.get('/health', (req, res) => res.json({ status: 'ok', version: '4.1.0-fixed-v8' }));
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V7 (Manual Login) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V8 (Title Capture) na porta ${PORT}`));
