@@ -1,13 +1,250 @@
-2026-05-04T13:46:04.759873048Z ==> ///////////////////////////////////////////////////////////
-2026-05-04T13:46:48.364213325Z [2026-05-04T13:46:48.363Z] GET /v2.5/2036793259884297
-2026-05-04T13:46:48.364722909Z Headers: {"host":"vini-server.onrender.com","user-agent":"FBAndroidSDK.4.9.0","accept-encoding":"gzip, br","accept-language":"pt_BR","cdn-loop":"cloudflare; loops=1","cf-connecting-ip":"160.20.201.170","cf-ipcountry":"BR","cf-ray":"9f67f423b9f452ee-IAD","cf-visitor":"{\"scheme\":\"https\"}","content-encoding":"gzip","content-type":"application/x-www-form-urlencoded","render-proxy-ttl":"4","rndr-id":"1a6b1f18-78a5-4b7b","true-client-ip":"160.20.201.170","x-forwarded-for":"160.20.201.170, 162.158.79.96, 10.24.235.129","x-forwarded-proto":"https","x-request-start":"1777902408358861"}
-2026-05-04T13:46:48.369188955Z [2026-05-04T13:46:48.368Z] GET /app/info/get
-2026-05-04T13:46:48.369247916Z Headers: {"host":"vini-server.onrender.com","user-agent":"GarenaMSDK/3.0.17(SM-A145M ;Android 15;pt;BR;)","accept-encoding":"gzip, br","cdn-loop":"cloudflare; loops=1","cf-connecting-ip":"160.20.201.170","cf-ipcountry":"BR","cf-ray":"9f67f423bb32fd72-IAD","cf-visitor":"{\"scheme\":\"https\"}","render-proxy-ttl":"4","rndr-id":"0dd7df26-5266-4624","true-client-ip":"160.20.201.170","x-forwarded-for":"160.20.201.170, 162.158.79.95, 10.24.235.129","x-forwarded-proto":"https","x-request-start":"1777902408364040"}
-2026-05-04T13:46:51.44794498Z [2026-05-04T13:46:51.447Z] GET /v2.5/dialog/oauth
-2026-05-04T13:46:51.448443503Z Headers: {"host":"vini-server.onrender.com","user-agent":"Mozilla/5.0 (Linux; Android 15; SM-A145M Build/AP3A.240905.015.A2; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/147.0.7727.111 Mobile Safari/537.36","accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7","accept-encoding":"gzip, br","accept-language":"pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7","cdn-loop":"cloudflare; loops=1","cf-connecting-ip":"160.20.201.170","cf-ipcountry":"BR","cf-ray":"9f67f4354f6b2bf9-GRU","cf-visitor":"{\"scheme\":\"https\"}","priority":"u=0, i","render-proxy-ttl":"4","rndr-id":"0229255e-5c03-4e26","sec-ch-ua":"\"Android WebView\";v=\"147\", \"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"147\"","sec-ch-ua-mobile":"?1","sec-ch-ua-platform":"\"Android\"","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"none","sec-fetch-user":"?1","true-client-ip":"160.20.201.170","upgrade-insecure-requests":"1","x-forwarded-for":"160.20.201.170, 172.71.238.177, 10.24.235.129","x-forwarded-proto":"https","x-request-start":"1777902411445152","x-requested-with":"com.tech.barbosa"}
-2026-05-04T13:46:51.981422973Z [2026-05-04T13:46:51.981Z] GET /favicon.ico
-2026-05-04T13:46:51.982205465Z Headers: {"host":"vini-server.onrender.com","user-agent":"Mozilla/5.0 (Linux; Android 15; SM-A145M Build/AP3A.240905.015.A2; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/147.0.7727.111 Mobile Safari/537.36","accept":"image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8","accept-encoding":"gzip, br","accept-language":"pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7","cdn-loop":"cloudflare; loops=1","cf-connecting-ip":"160.20.201.170","cf-ipcountry":"BR","cf-ray":"9f67f43a49b92bf9-IAD","cf-visitor":"{\"scheme\":\"https\"}","priority":"u=1, i","referer":"https://vini-server.onrender.com/v2.5/dialog/oauth?client_id=2036793259884297&e2e=%7B%22init%22%3A1777902410669%7D&sdk=android-4.9.0&scope=public_profile%2Cuser_friends%2Cemail&default_audience=friends&redirect_uri=fbconnect%3A%2F%2Fsuccess&display=touch&response_type=token%2Csigned_request&return_scopes=true","render-proxy-ttl":"4","rndr-id":"e309d714-8711-46f1","sec-ch-ua":"\"Android WebView\";v=\"147\", \"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"147\"","sec-ch-ua-mobile":"?1","sec-ch-ua-platform":"\"Android\"","sec-fetch-dest":"image","sec-fetch-mode":"no-cors","sec-fetch-site":"same-origin","true-client-ip":"160.20.201.170","x-forwarded-for":"160.20.201.170, 104.23.209.107, 10.25.126.129","x-forwarded-proto":"https","x-request-start":"1777902411976761","x-requested-with":"com.tech.barbosa"}
-2026-05-04T13:46:55.534760159Z [2026-05-04T13:46:55.534Z] GET /v2.5/dialog/oauth
-2026-05-04T13:46:55.534796431Z Headers: {"host":"vini-server.onrender.com","user-agent":"Mozilla/5.0 (Linux; Android 15; SM-A145M Build/AP3A.240905.015.A2; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/147.0.7727.111 Mobile Safari/537.36","accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7","accept-encoding":"gzip, br","accept-language":"pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7","cdn-loop":"cloudflare; loops=1","cf-connecting-ip":"160.20.201.170","cf-ipcountry":"BR","cf-ray":"9f67f44f1cac128c-GRU","cf-visitor":"{\"scheme\":\"https\"}","priority":"u=0, i","render-proxy-ttl":"4","rndr-id":"0fca5757-1f6f-42c3","sec-ch-ua":"\"Android WebView\";v=\"147\", \"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"147\"","sec-ch-ua-mobile":"?1","sec-ch-ua-platform":"\"Android\"","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"none","sec-fetch-user":"?1","true-client-ip":"160.20.201.170","upgrade-insecure-requests":"1","x-forwarded-for":"160.20.201.170, 172.69.39.40, 10.27.81.130","x-forwarded-proto":"https","x-request-start":"1777902415532197","x-requested-with":"com.tech.barbosa"}
-2026-05-04T13:46:55.88272574Z [2026-05-04T13:46:55.882Z] GET /favicon.ico
-2026-05-04T13:46:55.882757371Z Headers: {"host":"vini-server.onrender.com","user-agent":"Mozilla/5.0 (Linux; Android 15; SM-A145M Build/AP3A.240905.015.A2; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/147.0.7727.111 Mobile Safari/537.36","accept":"image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8","accept-encoding":"gzip, br","accept-language":"pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7","cdn-loop":"cloudflare; loops=1","cf-connecting-ip":"160.20.201.170","cf-ipcountry":"BR","cf-ray":"9f67f452dc20128c-GRU","cf-visitor":"{\"scheme\":\"https\"}","priority":"u=1, i","referer":"https://vini-server.onrender.com/v2.5/dialog/oauth?client_id=2036793259884297&e2e=%7B%22init%22%3A1777902415832%7D&sdk=android-4.9.0&scope=public_profile%2Cuser_friends%2Cemail&default_audience=friends&redirect_uri=fbconnect%3A%2F%2Fsuccess&display=touch&response_type=token%2Csigned_request&return_scopes=true","render-proxy-ttl":"4","rndr-id":"d051ab6f-185b-4020","sec-ch-ua":"\"Android WebView\";v=\"147\", \"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"147\"","sec-ch-ua-mobile":"?1","sec-ch-ua-platform":"\"Android\"","sec-fetch-dest":"image","sec-fetch-mode":"no-cors","sec-fetch-site":"same-origin","true-client-ip":"160.20.201.170","x-forwarded-for":"160.20.201.170, 172.69.39.40, 10.27.81.130","x-forwarded-proto":"https","x-request-start":"1777902415880735","x-requested-with":"com.tech.barbosa"}
+2026-05-04T16:22:40.617203427Z ==> Running build command 'npm install'...
+2026-05-04T16:22:53.899433643Z 
+2026-05-04T16:22:53.899490437Z added 231 packages, and audited 232 packages in 13s
+2026-05-04T16:22:53.899497467Z 
+2026-05-04T16:22:53.899636607Z 35 packages are looking for funding
+2026-05-04T16:22:53.899755764Z   run `npm fund` for details
+2026-05-04T16:22:53.907309305Z 
+2026-05-04T16:22:53.907358248Z 8 vulnerabilities (2 low, 1 moderate, 5 high)
+2026-05-04T16:22:53.907367309Z 
+2026-05-04T16:22:53.907373169Z To address all issues (including breaking changes), run:
+2026-05-04T16:22:53.90737808Z   npm audit fix --force
+2026-05-04T16:22:53.90738275Z 
+2026-05-04T16:22:53.90738861Z Run `npm audit` for details.
+2026-05-04T16:22:55.035729081Z ==> Uploading build...
+2026-05-04T16:22:58.550158028Z ==> Uploaded in 2.1s. Compression took 1.4s
+2026-05-04T16:22:58.569230702Z ==> Build successful 🎉
+2026-05-04T16:23:01.164700091Z ==> Deploying...
+2026-05-04T16:23:01.269846546Z ==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
+2026-05-04T16:23:11.247646021Z ==> Running 'npm start'
+2026-05-04T16:23:12.552700576Z 
+2026-05-04T16:23:12.552733677Z > barbosa-server@4.1.0 start
+2026-05-04T16:23:12.552738177Z > node server.js
+2026-05-04T16:23:12.552740757Z 
+2026-05-04T16:23:13.647094614Z ✅ Servidor Vini V21 (Super Log Mode) na porta 3000
+2026-05-04T16:23:14.602756158Z 
+2026-05-04T16:23:14.602794989Z --- [2026-05-04T16:23:14.595Z] NOVA REQUISIÇÃO ---
+2026-05-04T16:23:14.602800679Z MÉTODO: HEAD
+2026-05-04T16:23:14.60280537Z ROTA: /
+2026-05-04T16:23:14.602877101Z HEADERS: {
+2026-05-04T16:23:14.602890542Z   "host": "vini-server.onrender.com",
+2026-05-04T16:23:14.602895662Z   "user-agent": "Go-http-client/1.1"
+2026-05-04T16:23:14.602900182Z }
+2026-05-04T16:23:23.8290462Z ==> Your service is live 🎉
+2026-05-04T16:23:23.968567259Z 
+2026-05-04T16:23:23.968591049Z --- [2026-05-04T16:23:23.968Z] NOVA REQUISIÇÃO ---
+2026-05-04T16:23:23.968596329Z MÉTODO: GET
+2026-05-04T16:23:23.968609709Z ROTA: /
+2026-05-04T16:23:23.968767433Z HEADERS: {
+2026-05-04T16:23:23.968774274Z   "host": "vini-server.onrender.com",
+2026-05-04T16:23:23.968779154Z   "user-agent": "Go-http-client/2.0",
+2026-05-04T16:23:23.968784394Z   "accept-encoding": "gzip, br",
+2026-05-04T16:23:23.968788914Z   "cdn-loop": "cloudflare; loops=1",
+2026-05-04T16:23:23.968793284Z   "cf-connecting-ip": "35.197.117.9",
+2026-05-04T16:23:23.968798144Z   "cf-ipcountry": "US",
+2026-05-04T16:23:23.968802485Z   "cf-ray": "9f68d9866d25a354-IAD",
+2026-05-04T16:23:23.968808755Z   "cf-visitor": "{\"scheme\":\"https\"}",
+2026-05-04T16:23:23.968813125Z   "render-proxy-ttl": "4",
+2026-05-04T16:23:23.968817515Z   "rndr-id": "4c446cf1-d313-4a65",
+2026-05-04T16:23:23.968822345Z   "true-client-ip": "35.197.117.9",
+2026-05-04T16:23:23.968827315Z   "x-forwarded-for": "35.197.117.9, 104.23.209.107, 10.27.81.130",
+2026-05-04T16:23:23.968831965Z   "x-forwarded-proto": "https",
+2026-05-04T16:23:23.968836315Z   "x-request-start": "1777911803963144"
+2026-05-04T16:23:23.968840875Z }
+2026-05-04T16:23:23.989711596Z ==> 
+2026-05-04T16:23:23.992506965Z ==> ///////////////////////////////////////////////////////////
+2026-05-04T16:23:23.995751662Z ==> 
+2026-05-04T16:23:23.99910263Z ==> Available at your primary URL https://vini-server.onrender.com
+2026-05-04T16:23:24.002323497Z ==> 
+2026-05-04T16:23:24.005206317Z ==> ///////////////////////////////////////////////////////////
+2026-05-04T16:23:30.191421795Z 
+2026-05-04T16:23:30.191443615Z --- [2026-05-04T16:23:30.191Z] NOVA REQUISIÇÃO ---
+2026-05-04T16:23:30.191448526Z MÉTODO: GET
+2026-05-04T16:23:30.191453246Z ROTA: /v2.5/dialog/oauth
+2026-05-04T16:23:30.191541898Z HEADERS: {
+2026-05-04T16:23:30.191554948Z   "host": "vini-server.onrender.com",
+2026-05-04T16:23:30.191560469Z   "user-agent": "Mozilla/5.0 (Linux; Android 15; SM-A145M Build/AP3A.240905.015.A2; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/147.0.7727.111 Mobile Safari/537.36",
+2026-05-04T16:23:30.191566759Z   "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+2026-05-04T16:23:30.191571599Z   "accept-encoding": "gzip, br",
+2026-05-04T16:23:30.191575919Z   "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+2026-05-04T16:23:30.191580069Z   "cdn-loop": "cloudflare; loops=1",
+2026-05-04T16:23:30.191584429Z   "cf-connecting-ip": "160.20.201.170",
+2026-05-04T16:23:30.191588929Z   "cf-ipcountry": "BR",
+2026-05-04T16:23:30.191593059Z   "cf-ray": "9f68d9ad1af8407e-IAD",
+2026-05-04T16:23:30.191597199Z   "cf-visitor": "{\"scheme\":\"https\"}",
+2026-05-04T16:23:30.191601519Z   "priority": "u=0, i",
+2026-05-04T16:23:30.19160554Z   "render-proxy-ttl": "4",
+2026-05-04T16:23:30.19160986Z   "rndr-id": "5ca56c91-7332-4c7b",
+2026-05-04T16:23:30.19161441Z   "sec-ch-ua": "\"Android WebView\";v=\"147\", \"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"147\"",
+2026-05-04T16:23:30.19161877Z   "sec-ch-ua-mobile": "?1",
+2026-05-04T16:23:30.19162293Z   "sec-ch-ua-platform": "\"Android\"",
+2026-05-04T16:23:30.19163692Z   "sec-fetch-dest": "document",
+2026-05-04T16:23:30.191639711Z   "sec-fetch-mode": "navigate",
+2026-05-04T16:23:30.191642111Z   "sec-fetch-site": "none",
+2026-05-04T16:23:30.191644491Z   "sec-fetch-user": "?1",
+2026-05-04T16:23:30.191646781Z   "true-client-ip": "160.20.201.170",
+2026-05-04T16:23:30.191649231Z   "upgrade-insecure-requests": "1",
+2026-05-04T16:23:30.191652191Z   "x-forwarded-for": "160.20.201.170, 104.23.209.107, 10.27.81.130",
+2026-05-04T16:23:30.191654571Z   "x-forwarded-proto": "https",
+2026-05-04T16:23:30.191657021Z   "x-request-start": "1777911810186253",
+2026-05-04T16:23:30.191659581Z   "x-requested-with": "com.tech.barbosa"
+2026-05-04T16:23:30.191662061Z }
+2026-05-04T16:23:30.191664511Z QUERY: {
+2026-05-04T16:23:30.191666971Z   "client_id": "2036793259884297",
+2026-05-04T16:23:30.191669441Z   "e2e": "{\"init\":1777911809784}",
+2026-05-04T16:23:30.191671991Z   "sdk": "android-4.9.0",
+2026-05-04T16:23:30.191674552Z   "scope": "public_profile,user_friends,email",
+2026-05-04T16:23:30.191677021Z   "default_audience": "friends",
+2026-05-04T16:23:30.191679421Z   "redirect_uri": "fbconnect://success",
+2026-05-04T16:23:30.191681962Z   "display": "touch",
+2026-05-04T16:23:30.191684512Z   "response_type": "token,signed_request",
+2026-05-04T16:23:30.191687022Z   "return_scopes": "true"
+2026-05-04T16:23:30.191689572Z }
+2026-05-04T16:23:30.826573847Z 
+2026-05-04T16:23:30.826598698Z --- [2026-05-04T16:23:30.826Z] NOVA REQUISIÇÃO ---
+2026-05-04T16:23:30.826608548Z MÉTODO: GET
+2026-05-04T16:23:30.826644149Z ROTA: /v2.5/me
+2026-05-04T16:23:30.82670479Z HEADERS: {
+2026-05-04T16:23:30.826710261Z   "host": "vini-server.onrender.com",
+2026-05-04T16:23:30.826713341Z   "user-agent": "FBAndroidSDK.4.9.0",
+2026-05-04T16:23:30.826716501Z   "accept-encoding": "gzip, br",
+2026-05-04T16:23:30.826722101Z   "accept-language": "pt_BR",
+2026-05-04T16:23:30.826724721Z   "cdn-loop": "cloudflare; loops=1",
+2026-05-04T16:23:30.826727061Z   "cf-connecting-ip": "160.20.201.170",
+2026-05-04T16:23:30.826730341Z   "cf-ipcountry": "BR",
+2026-05-04T16:23:30.826732961Z   "cf-ray": "9f68d9b12a4a8a4f-GRU",
+2026-05-04T16:23:30.826735361Z   "cf-visitor": "{\"scheme\":\"https\"}",
+2026-05-04T16:23:30.826737782Z   "content-encoding": "gzip",
+2026-05-04T16:23:30.826740342Z   "content-type": "application/x-www-form-urlencoded",
+2026-05-04T16:23:30.826742702Z   "render-proxy-ttl": "4",
+2026-05-04T16:23:30.826745112Z   "rndr-id": "693527f3-8181-44c3",
+2026-05-04T16:23:30.826747502Z   "true-client-ip": "160.20.201.170",
+2026-05-04T16:23:30.826750542Z   "x-forwarded-for": "160.20.201.170, 172.71.238.176, 10.24.235.129",
+2026-05-04T16:23:30.826753082Z   "x-forwarded-proto": "https",
+2026-05-04T16:23:30.826755632Z   "x-request-start": "1777911810824768"
+2026-05-04T16:23:30.826757982Z }
+2026-05-04T16:23:30.826760392Z QUERY: {
+2026-05-04T16:23:30.826762872Z   "access_token": "e92c046f-0f13-4a2b-b8a2-1aa7383ad187",
+2026-05-04T16:23:30.826765242Z   "fields": "id,name,first_name,middle_name,last_name,link",
+2026-05-04T16:23:30.826767632Z   "format": "json",
+2026-05-04T16:23:30.826770172Z   "locale": "pt_BR",
+2026-05-04T16:23:30.826772612Z   "sdk": "android"
+2026-05-04T16:23:30.826775032Z }
+2026-05-04T16:23:30.827107821Z RESPOSTA ENVIADA: {
+2026-05-04T16:23:30.827112711Z   "id": "100067",
+2026-05-04T16:23:30.827116091Z   "name": "ViniPlayer",
+2026-05-04T16:23:30.827119551Z   "first_name": "Vini",
+2026-05-04T16:23:30.827122621Z   "last_name": "Player"
+2026-05-04T16:23:30.827125711Z }
+2026-05-04T16:23:30.827281935Z --- FIM DA REQUISIÇÃO ---
+2026-05-04T16:23:30.827302706Z 
+2026-05-04T16:23:31.440600668Z 
+2026-05-04T16:23:31.440621369Z --- [2026-05-04T16:23:31.439Z] NOVA REQUISIÇÃO ---
+2026-05-04T16:23:31.440625389Z MÉTODO: POST
+2026-05-04T16:23:31.440629369Z ROTA: /oauth/token/facebook/exchange
+2026-05-04T16:23:31.440632279Z HEADERS: {
+2026-05-04T16:23:31.440635349Z   "host": "vini-server.onrender.com",
+2026-05-04T16:23:31.440638679Z   "user-agent": "GarenaMSDK/3.0.17(SM-A145M ;Android 15;pt;BR;)",
+2026-05-04T16:23:31.440642389Z   "content-length": "232",
+2026-05-04T16:23:31.440645379Z   "accept-encoding": "gzip, br",
+2026-05-04T16:23:31.440648439Z   "cdn-loop": "cloudflare; loops=1",
+2026-05-04T16:23:31.440651439Z   "cf-connecting-ip": "160.20.201.170",
+2026-05-04T16:23:31.44065469Z   "cf-ipcountry": "BR",
+2026-05-04T16:23:31.44065741Z   "cf-ray": "9f68d9b2dd564a13-GRU",
+2026-05-04T16:23:31.44066065Z   "cf-visitor": "{\"scheme\":\"https\"}",
+2026-05-04T16:23:31.44066592Z   "content-type": "application/x-www-form-urlencoded",
+2026-05-04T16:23:31.44066903Z   "render-proxy-ttl": "4",
+2026-05-04T16:23:31.44067198Z   "rndr-id": "d42e9514-28ed-4f53",
+2026-05-04T16:23:31.44067486Z   "true-client-ip": "160.20.201.170",
+2026-05-04T16:23:31.44067762Z   "x-forwarded-for": "160.20.201.170, 104.22.10.203, 10.25.126.129",
+2026-05-04T16:23:31.44068069Z   "x-forwarded-proto": "https",
+2026-05-04T16:23:31.44068362Z   "x-request-start": "1777911811347987"
+2026-05-04T16:23:31.440686391Z }
+2026-05-04T16:23:31.440689431Z BODY: {
+2026-05-04T16:23:31.440692371Z   "redirect_uri": "gop100067://auth/",
+2026-05-04T16:23:31.440695331Z   "source": "2",
+2026-05-04T16:23:31.440698891Z   "client_secret": "2ee44819e9b4598845141067b281621874d0d5d7af9d8f7e00c1e54715b7d1e3",
+2026-05-04T16:23:31.440702011Z   "grant_type": "authorization_code",
+2026-05-04T16:23:31.440704991Z   "client_id": "100067",
+2026-05-04T16:23:31.440707961Z   "facebook_access_token": "e92c046f-0f13-4a2b-b8a2-1aa7383ad187"
+2026-05-04T16:23:31.440711001Z }
+2026-05-04T16:23:31.440713931Z RESPOSTA ENVIADA: {
+2026-05-04T16:23:31.440717281Z   "access_token": "e92c046f-0f13-4a2b-b8a2-1aa7383ad187",
+2026-05-04T16:23:31.440720111Z   "token": "e92c046f-0f13-4a2b-b8a2-1aa7383ad187",
+2026-05-04T16:23:31.440723272Z   "key": "e92c046f-0f13-4a2b-b8a2-1aa7383ad187",
+2026-05-04T16:23:31.440726052Z   "user_id": "100067",
+2026-05-04T16:23:31.440728981Z   "uid": "100067",
+2026-05-04T16:23:31.440732072Z   "id": "100067",
+2026-05-04T16:23:31.440735002Z   "application_id": "2036793259884297",
+2026-05-04T16:23:31.440737892Z   "expires_in": 5184000,
+2026-05-04T16:23:31.440740912Z   "expires_at": 1783095811439,
+2026-05-04T16:23:31.440743942Z   "last_refresh": 1777911811439,
+2026-05-04T16:23:31.440746802Z   "session_key": "e92c046f-0f13-4a2b-b8a2-1aa7383ad187",
+2026-05-04T16:23:31.440749732Z   "token_type": "bearer",
+2026-05-04T16:23:31.440752632Z   "permissions": [
+2026-05-04T16:23:31.440755582Z     "public_profile",
+2026-05-04T16:23:31.440758472Z     "email"
+2026-05-04T16:23:31.440761482Z   ],
+2026-05-04T16:23:31.440764462Z   "declined_permissions": [],
+2026-05-04T16:23:31.440767402Z   "status": 200,
+2026-05-04T16:23:31.440770453Z   "code": 0,
+2026-05-04T16:23:31.440773383Z   "msg": "success",
+2026-05-04T16:23:31.440776233Z   "data": {
+2026-05-04T16:23:31.440779303Z     "access_token": "e92c046f-0f13-4a2b-b8a2-1aa7383ad187",
+2026-05-04T16:23:31.440782203Z     "token": "e92c046f-0f13-4a2b-b8a2-1aa7383ad187",
+2026-05-04T16:23:31.440785033Z     "key": "e92c046f-0f13-4a2b-b8a2-1aa7383ad187",
+2026-05-04T16:23:31.440787983Z     "user_id": "100067",
+2026-05-04T16:23:31.440799623Z     "uid": "100067",
+2026-05-04T16:23:31.440802783Z     "id": "100067",
+2026-05-04T16:23:31.440805963Z     "application_id": "2036793259884297",
+2026-05-04T16:23:31.440809034Z     "expires_in": 5184000,
+2026-05-04T16:23:31.440811814Z     "expires_at": 1783095811439,
+2026-05-04T16:23:31.440814664Z     "last_refresh": 1777911811439,
+2026-05-04T16:23:31.440817524Z     "session_key": "e92c046f-0f13-4a2b-b8a2-1aa7383ad187",
+2026-05-04T16:23:31.440820304Z     "token_type": "bearer",
+2026-05-04T16:23:31.440823084Z     "permissions": [
+2026-05-04T16:23:31.440826064Z       "public_profile",
+2026-05-04T16:23:31.440828884Z       "email"
+2026-05-04T16:23:31.440831854Z     ],
+2026-05-04T16:23:31.440834604Z     "declined_permissions": [],
+2026-05-04T16:23:31.440837394Z     "status": 200,
+2026-05-04T16:23:31.440840504Z     "code": 0,
+2026-05-04T16:23:31.440843764Z     "msg": "success"
+2026-05-04T16:23:31.440846575Z   }
+2026-05-04T16:23:31.440849315Z }
+2026-05-04T16:23:31.440852235Z --- FIM DA REQUISIÇÃO ---
+2026-05-04T16:23:31.440855025Z 
+2026-05-04T16:23:43.688931961Z 
+2026-05-04T16:23:43.688967262Z --- [2026-05-04T16:23:43.688Z] NOVA REQUISIÇÃO ---
+2026-05-04T16:23:43.688970732Z MÉTODO: POST
+2026-05-04T16:23:43.688973982Z ROTA: /v2.5/2036793259884297/activities
+2026-05-04T16:23:43.688985883Z HEADERS: {
+2026-05-04T16:23:43.688988343Z   "host": "vini-server.onrender.com",
+2026-05-04T16:23:43.688990533Z   "user-agent": "FBAndroidSDK.4.9.0",
+2026-05-04T16:23:43.688993283Z   "transfer-encoding": "chunked",
+2026-05-04T16:23:43.688997943Z   "accept-encoding": "gzip, br",
+2026-05-04T16:23:43.689001483Z   "accept-language": "pt_BR",
+2026-05-04T16:23:43.689004753Z   "cdn-loop": "cloudflare; loops=1",
+2026-05-04T16:23:43.689008073Z   "cf-connecting-ip": "160.20.201.170",
+2026-05-04T16:23:43.689012003Z   "cf-ipcountry": "BR",
+2026-05-04T16:23:43.689015223Z   "cf-ray": "9f68da014f928a4f-IAD",
+2026-05-04T16:23:43.689018613Z   "cf-visitor": "{\"scheme\":\"https\"}",
+2026-05-04T16:23:43.689022993Z   "content-type": "multipart/form-data; boundary=3i2ndDfv2rTHiSisAbouNdArYfORhtTPEefj3q2f",
+2026-05-04T16:23:43.689025084Z   "render-proxy-ttl": "4",
+2026-05-04T16:23:43.689027134Z   "rndr-id": "9ea26c06-c283-4d3e",
+2026-05-04T16:23:43.689029264Z   "true-client-ip": "160.20.201.170",
+2026-05-04T16:23:43.689031774Z   "x-forwarded-for": "160.20.201.170, 104.23.209.107, 10.27.81.130",
+2026-05-04T16:23:43.689033734Z   "x-forwarded-proto": "https",
+2026-05-04T16:23:43.689035744Z   "x-request-start": "1777911823685069"
+2026-05-04T16:23:43.689037774Z }
+2026-05-04T16:23:43.689039794Z QUERY: {
+2026-05-04T16:23:43.689041784Z   "access_token": "",
+2026-05-04T16:23:43.689043764Z   "format": "json",
+2026-05-04T16:23:43.689045684Z   "locale": "pt_BR",
+2026-05-04T16:23:43.689047654Z   "sdk": "android"
+2026-05-04T16:23:43.689049584Z }
+2026-05-04T16:23:43.689103906Z RESPOSTA ENVIADA: {
+2026-05-04T16:23:43.689110026Z   "success": true
+2026-05-04T16:23:43.689112546Z }
+2026-05-04T16:23:43.689114846Z --- FIM DA REQUISIÇÃO ---
+2026-05-04T16:23:43.689116736Z 
