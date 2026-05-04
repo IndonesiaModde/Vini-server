@@ -13,18 +13,33 @@ app.use(express.urlencoded({ extended: true }));
 // Servir arquivos estáticos da pasta public
 app.use(express.static(path.join(__dirname, 'public')));
 
-// SISTEMA DE SUPER LOG
+// -----------------------------------------------------------------------
+// SUPER SCANNER DE LOGS (Monitoramento Avançado)
+// -----------------------------------------------------------------------
 app.use((req, res, next) => {
   const timestamp = new Date().toISOString();
-  console.log(`\n--- [${timestamp}] ${req.method} ${req.path} ---`);
+  console.log(`\n>>>>>>>> [${timestamp}] ${req.method} ${req.originalUrl} <<<<<<<<`);
+  
+  // Log de Headers (Importante para ver tokens de autenticação)
+  console.log("HEADERS:", JSON.stringify(req.headers));
+  
   if (Object.keys(req.query).length > 0) console.log("QUERY:", JSON.stringify(req.query));
   if (req.body && Object.keys(req.body).length > 0) console.log("BODY:", JSON.stringify(req.body));
   
   const oldJson = res.json;
   res.json = function(data) {
-    console.log("RESPOSTA:", JSON.stringify(data));
+    console.log("RESPOSTA JSON:", JSON.stringify(data));
     return oldJson.apply(res, arguments);
   };
+
+  const oldSend = res.send;
+  res.send = function(data) {
+    if (typeof data === 'string' && !data.startsWith('<!DOCTYPE')) {
+        console.log("RESPOSTA TEXTO:", data);
+    }
+    return oldSend.apply(res, arguments);
+  };
+
   next();
 });
 
@@ -82,26 +97,12 @@ app.all('/v2.5/:id', (req, res) => {
   });
 });
 
-// Facebook OAuth Redirect (CORREÇÃO: Signed Request em Base64)
 app.get('/v2.5/dialog/oauth', (req, res) => {
-  // Token simplificado (alfanumérico curto costuma ser mais estável em APKs antigos)
-  const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-  
-  // O signed_request do Facebook é composto por: HMAC.Payload (ambos em Base64)
-  // O SDK tenta decodificar o Payload para validar o login.
-  const payload = Buffer.from(JSON.stringify({
-    algorithm: "HMAC-SHA256",
-    issued_at: Math.floor(Date.now() / 1000),
-    user_id: PLAYER_UID
-  })).toString('base64').replace(/=/g, '');
-  
+  const token = Math.random().toString(36).substring(2, 15);
+  const payload = Buffer.from(JSON.stringify({ algorithm: "HMAC-SHA256", issued_at: Math.floor(Date.now() / 1000), user_id: PLAYER_UID })).toString('base64').replace(/=/g, '');
   const signedRequest = `vini_signature.${payload}`;
-  
   const params = `access_token=${token}&expires_in=5184000&user_id=${PLAYER_UID}&base_domain=onrender.com&return_scopes=true&signed_request=${signedRequest}`;
-  
-  const finalUrl = `fbconnect://success?${params}`;
-  console.log(`[OAuth] Redirecionando para: ${finalUrl}`);
-  res.redirect(302, finalUrl);
+  res.redirect(302, `fbconnect://success?${params}`);
 });
 
 app.post('/v2.5/:app_id/activities', (req, res) => {
@@ -109,7 +110,7 @@ app.post('/v2.5/:app_id/activities', (req, res) => {
 });
 
 // -----------------------------------------------------------------------
-// GARENA / BEETALK ENDPOINTS
+// GARENA / BEETALK / AUTH ENDPOINTS
 // -----------------------------------------------------------------------
 
 const createAuthResponse = (token, uid) => {
@@ -144,17 +145,22 @@ app.all([
 ], (req, res) => {
   const token = req.body.access_token || req.query.access_token || req.body.facebook_access_token || uuidv4();
   const response = createAuthResponse(token, PLAYER_UID);
-  
   if (req.path.includes('exchange') || req.path.includes('info/get')) {
     return res.json({ ...response, data: response });
   }
-  
   res.json(response);
+});
+
+// -----------------------------------------------------------------------
+// PLACEHOLDERS PARA LOBBY E GAMEPLAY (Captura de chamadas desconhecidas)
+// -----------------------------------------------------------------------
+app.all(['/game/*', '/api/v1/game/*', '/lobby/*', '/shop/*', '/user/*'], (req, res) => {
+  console.log(`[Lobby/Game] Chamada detectada em: ${req.path}`);
+  res.json({ status: 200, code: 0, msg: "success", data: {} });
 });
 
 app.all('/oauth/user/friends/get', (req, res) => res.json({ status: 200, data: { friends: [] } }));
 app.all('/pay/*', (req, res) => res.json({ status: 200, message: "success" }));
-app.all('/game/user/request/send', (req, res) => res.json({ status: 200, message: "success" }));
 
 // Rota para recursos /live/*
 app.get('/live/*', (req, res) => {
@@ -165,5 +171,14 @@ app.get('/live/*', (req, res) => {
   res.status(200).end();
 });
 
+// -----------------------------------------------------------------------
+// CAPTURA DE 404 (Rotas que o jogo tenta acessar e não existem)
+// -----------------------------------------------------------------------
+app.use((req, res) => {
+  console.error(`\n[!!! 404 NOT FOUND !!!] O jogo tentou acessar: ${req.method} ${req.originalUrl}`);
+  console.error("HEADERS DO 404:", JSON.stringify(req.headers));
+  res.status(404).json({ error: "Route not found", path: req.originalUrl });
+});
+
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V26 (Signed Request Fix) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Super Scanner Vini V27 na porta ${PORT}`));
