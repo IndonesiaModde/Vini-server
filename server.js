@@ -19,7 +19,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, res, next) => {
   const timestamp = new Date().toISOString();
   console.log(`\n>>>>>>>> [${timestamp}] ${req.method} ${req.originalUrl} <<<<<<<<`);
-  console.log("HEADERS:", JSON.stringify(req.headers));
   if (Object.keys(req.query).length > 0) console.log("QUERY:", JSON.stringify(req.query));
   if (req.body && Object.keys(req.body).length > 0) console.log("BODY:", JSON.stringify(req.body));
   
@@ -33,7 +32,7 @@ app.use((req, res, next) => {
 
 const VERSION = "1.26.0";
 const PLAYER_UID = "100067";
-const BASE_URL = config.baseUrl;
+const BASE_URL = config.baseUrl || 'https://vini-server.onrender.com';
 
 // Endpoints de Versão
 app.all(['/app/info/get', '/info/app/info/get'], (req, res) => {
@@ -95,17 +94,20 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
 });
 
 // -----------------------------------------------------------------------
-// GARENA / AUTH
+// GARENA / AUTH - CORREÇÃO DE IDs PARA LOBBY
 // -----------------------------------------------------------------------
 
 const sendAuthResponse = (res, token, uid) => {
   const now = Math.floor(Date.now() / 1000);
+  // O openId deve ser uma string única, muitas vezes diferente do UID numérico
+  const openId = `vini_${uid}`; 
+  
   const authData = {
     authToken: token,
     token: token,
     access_token: token,
     refreshToken: token,
-    openId: uid,
+    openId: openId,
     user_id: uid,
     uid: uid,
     account_id: uid,
@@ -119,7 +121,16 @@ const sendAuthResponse = (res, token, uid) => {
     code: 0,
     msg: "success"
   };
-  res.json({ ...authData, data: authData });
+
+  // Resposta com estrutura Garena completa
+  res.json({
+    ...authData,
+    data: {
+        ...authData,
+        session_key: token,
+        nickname: "ViniPlayer"
+    }
+  });
 };
 
 app.all([
@@ -136,9 +147,17 @@ app.all([
   sendAuthResponse(res, token, PLAYER_UID);
 });
 
+// Endpoint de Sessão (Alguns APKs pedem isso antes do Lobby)
+app.all('/api/v1/auth/session', (req, res) => {
+    res.json({ status: 200, code: 0, msg: "success", data: { user_id: PLAYER_UID, valid: true } });
+});
+
 // Outros endpoints
 app.all(['/game/*', '/api/v1/game/*', '/lobby/*', '/shop/*', '/user/*'], (req, res) => {
-  res.json({ status: 200, code: 0, msg: "success", data: {} });
+  res.json({ status: 200, code: 0, msg: "success", data: {
+      user_info: { uid: PLAYER_UID, nickname: "ViniPlayer", level: 70, exp: 999999 },
+      lobby_info: { server_status: "online", maintenance: false }
+  }});
 });
 
 app.all('/oauth/user/friends/get', (req, res) => res.json({ status: 200, data: { friends: [] } }));
@@ -153,4 +172,4 @@ app.get('/live/*', (req, res) => {
 });
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V29 (Config Sync) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V30 (Lobby Final Fix) na porta ${PORT}`));
