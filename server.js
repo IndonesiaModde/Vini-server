@@ -94,46 +94,38 @@ const handleLoginSuccess = (req, res) => {
   const uid = "1000001";
   const token = "EAAG_VINI_" + s.substring(0, 24);
   
-  // Resposta padrão para rotas de login
+  // Estrutura de resposta PLANA (Flat) para máxima compatibilidade
   const response = {
+    access_token: token,
+    token: token,
+    user_id: uid,
+    openid: uid,
+    open_id: uid,
+    uid: uid,
+    id: uid,
+    account_id: uid,
+    session_key: "s_" + s.substring(0, 16),
+    refresh_token: "r_" + s.substring(0, 8),
+    expires_in: 5184000,
+    expire_time: 5184000,
+    nickname: "ViniPlayer",
+    name: "ViniPlayer",
+    username: "ViniPlayer",
+    region: "BR",
+    login_type: 1,
+    is_new: 0,
     error: 0,
     msg: "success",
     code: 0,
-    status: 200,
-    session_key: "s_" + s.substring(0, 16),
-    access_token: token,
-    token: token,
-    refresh_token: "r_" + s.substring(0, 8),
-    openid: uid,
-    open_id: uid,
-    account_id: uid,
-    uid: uid,
-    id: uid,
-    name: "ViniPlayer",
-    username: "ViniPlayer",
-    nickname: "ViniPlayer",
-    is_new: 0,
-    region: "BR",
-    login_type: 1,
-    expire_time: 5184000,
-    glive_session_key: "s_" + s.substring(0, 16),
-    glive_uid: uid
+    status: 200
   };
 
-  // Se for a rota de exchange, o jogo costuma esperar os dados dentro de 'data' ou em um formato específico de token
+  // Se for exchange, retorna APENAS o objeto plano na raiz
   if (req.path.includes('exchange')) {
-    return res.json({
-      code: 0,
-      msg: "success",
-      data: response,
-      // Alguns SDKs esperam o token na raiz para o exchange
-      access_token: token,
-      expires_in: 5184000,
-      user_id: uid,
-      ...response
-    });
+    return res.json(response);
   }
 
+  // Para outras rotas, mantém o envelope 'data' por segurança
   res.json({ code: 0, msg: "success", data: response, ...response });
 };
 
