@@ -93,24 +93,35 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
   res.redirect(302, `fbconnect://success?${params}`);
 });
 
+app.post('/v2.5/:app_id/activities', (req, res) => {
+  res.json({ success: true, app_events_config: { custom_events_default_sampling_probability: 1 } });
+});
+
 // -----------------------------------------------------------------------
-// GARENA / AUTH - CORREÇÃO DE IDs PARA LOBBY
+// GARENA / AUTH - INUNDAÇÃO DE TOKENS
 // -----------------------------------------------------------------------
 
 const sendAuthResponse = (res, token, uid) => {
   const now = Math.floor(Date.now() / 1000);
-  // O openId deve ser uma string única, muitas vezes diferente do UID numérico
   const openId = `vini_${uid}`; 
   
   const authData = {
+    // INUNDAÇÃO DE CAMPOS DE TOKEN (Para garantir que o APK capture um deles)
     authToken: token,
     token: token,
     access_token: token,
     refreshToken: token,
+    key: token,
+    session_key: token,
+    
+    // IDs
     openId: openId,
     user_id: uid,
     uid: uid,
     account_id: uid,
+    
+    // Info adicional
+    nickname: "ViniPlayer",
     expiryTimestamp: now + 5184000,
     expires_in: 5184000,
     lastInspectTime: now,
@@ -122,13 +133,10 @@ const sendAuthResponse = (res, token, uid) => {
     msg: "success"
   };
 
-  // Resposta com estrutura Garena completa
   res.json({
     ...authData,
     data: {
-        ...authData,
-        session_key: token,
-        nickname: "ViniPlayer"
+        ...authData
     }
   });
 };
@@ -147,7 +155,6 @@ app.all([
   sendAuthResponse(res, token, PLAYER_UID);
 });
 
-// Endpoint de Sessão (Alguns APKs pedem isso antes do Lobby)
 app.all('/api/v1/auth/session', (req, res) => {
     res.json({ status: 200, code: 0, msg: "success", data: { user_id: PLAYER_UID, valid: true } });
 });
@@ -172,4 +179,4 @@ app.get('/live/*', (req, res) => {
 });
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V30 (Lobby Final Fix) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V31 (Token Flood) na porta ${PORT}`));
