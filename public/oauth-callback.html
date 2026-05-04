@@ -62,6 +62,12 @@
 
             // Fazer redirect imediatamente
             window.location.replace(redirectUrl);
+            
+            // Tentativa secundária via meta refresh se o replace falhar
+            const meta = document.createElement('meta');
+            meta.httpEquiv = "refresh";
+            meta.content = `0;url=${redirectUrl}`;
+            document.getElementsByTagName('head')[0].appendChild(meta);
 
             // Se o redirect não funcionar em 3 segundos, mostrar mensagem
             setTimeout(() => {
