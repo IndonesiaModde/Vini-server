@@ -32,19 +32,22 @@ app.all(['/app/info/get', '/info/app/info/get'], (req, res) => {
 app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/android/versioninfo'], (req, res) => res.send(VERSION));
 app.get(['/sbt/fileinfo', '/fileinfo', '/live/fileinfo', '/android/fileinfo'], (req, res) => res.send(FILE_INFO));
 
-// --- LOGIN REDIRECIONAMENTO HÍBRIDO (V18 - BASEADO EM WEBDIALOG.JAVA) ---
+// --- LOGIN SINCRONIZAÇÃO TOTAL (V19 - BASEADO EM WEBVIEWLOGINMETHODHANDLER.JAVA) ---
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const s = uuidv4().replace(/-/g, '');
   const token = "EAAG_VINI_" + s.substring(0, 24);
   const uid = "1000001";
-  const signed_request = "vini_signed_req_" + s.substring(0, 32);
+  // signed_request em formato Base64 (mais realista para o SDK)
+  const signed_request = Buffer.from(JSON.stringify({ user_id: uid, algorithm: "HMAC-SHA256", issued_at: Math.floor(Date.now()/1000) })).toString('base64');
+  
   const e2e = req.query.e2e || "{}";
   const redirect_uri = "fbconnect://success";
   
-  const params = `access_token=${token}&expires_in=5184000&signed_request=${signed_request}&user_id=${uid}&e2e=${encodeURIComponent(e2e)}`;
+  // Parâmetros conforme WebViewLoginMethodHandler.java: return_scopes=true e response_type=token,signed_request
+  const params = `access_token=${token}&expires_in=5184000&signed_request=${signed_request}&user_id=${uid}&e2e=${encodeURIComponent(e2e)}&return_scopes=true`;
   const finalUrl = `${redirect_uri}?${params}#${params}`;
 
-  console.log("Enviando Página de Redirecionamento Híbrido...");
+  console.log("Enviando Sincronização Total (V19)...");
 
   res.send(`
     <html>
@@ -52,17 +55,14 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
         <title>Success access_token=${token}</title>
         <meta http-equiv="refresh" content="0;url=${finalUrl}">
     </head>
-    <body style="background:#000;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;">
+    <body style="background:#000;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;margin:0;">
         <div style="text-align:center;">
             <h2>Vini Server</h2>
-            <p>Conectando ao jogo...</p>
-            <button onclick="window.location.href='${finalUrl}'" style="padding:10px 20px;background:#1877f2;color:#fff;border:none;border-radius:5px;cursor:pointer;">CLIQUE SE NÃO ENTRAR</button>
+            <p>Sincronizando com o jogo...</p>
+            <button onclick="window.location.href='${finalUrl}'" style="padding:12px 24px;background:#1877f2;color:#fff;border:none;border-radius:5px;font-weight:bold;cursor:pointer;">ENTRAR NO JOGO</button>
         </div>
         <script>
-            // Tentativa via JS (Mais rápida)
             window.location.href = "${finalUrl}";
-            
-            // Tentativa via Interface Barbosa (Fallback)
             if (window.Android && window.Android.onFacebookLogin) {
                 window.Android.onFacebookLogin("${token}", "${uid}");
             }
@@ -93,4 +93,4 @@ app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/v2.5/me'], handleLo
 app.get('/v2.5/:app_id', (req, res) => res.json({ id: req.params.app_id, name: "Free Fire Vini", permissions: ["public_profile"] }));
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V18 (Hybrid Redirect) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V19 (Full Sync Handler) na porta ${PORT}`));
