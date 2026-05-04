@@ -9,52 +9,49 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// --- SISTEMA DE SUPER LOG (MODO DEBUG FULL) ---
+// Middleware para capturar Body mesmo em multipart (simplificado para log)
+app.use((req, res, next) => {
+  if (req.headers['content-type'] && req.headers['content-type'].includes('multipart/form-data')) {
+    let data = '';
+    req.on('data', chunk => { data += chunk; });
+    req.on('end', () => {
+      req.rawBody = data;
+      next();
+    });
+  } else {
+    next();
+  }
+});
+
+// SISTEMA DE SUPER LOG
 app.use((req, res, next) => {
   const timestamp = new Date().toISOString();
-  console.log(`\n--- [${timestamp}] NOVA REQUISIÇÃO ---`);
-  console.log(`MÉTODO: ${req.method}`);
-  console.log(`ROTA: ${req.path}`);
+  console.log(`\n--- [${timestamp}] ${req.method} ${req.path} ---`);
+  if (Object.keys(req.query).length > 0) console.log("QUERY:", JSON.stringify(req.query));
+  if (req.body && Object.keys(req.body).length > 0) console.log("BODY:", JSON.stringify(req.body));
   
-  if (Object.keys(req.headers).length > 0) {
-    console.log("HEADERS:", JSON.stringify(req.headers, null, 2));
-  }
-  
-  if (Object.keys(req.query).length > 0) {
-    console.log("QUERY:", JSON.stringify(req.query, null, 2));
-  }
-  
-  if (req.method === 'POST' && Object.keys(req.body).length > 0) {
-    console.log("BODY:", JSON.stringify(req.body, null, 2));
-  }
-
-  // Capturar a resposta que o servidor envia
   const oldJson = res.json;
   res.json = function(data) {
-    console.log("RESPOSTA ENVIADA:", JSON.stringify(data, null, 2));
-    console.log(`--- FIM DA REQUISIÇÃO ---\n`);
+    console.log("RESPOSTA:", JSON.stringify(data));
     return oldJson.apply(res, arguments);
   };
-
   next();
 });
 
-// VERSÃO 1.25.3
 const VERSION = "1.25.3";
 const FILE_INFO = `gameassetbundles,GDgOUAbI0rGH7IYYozj+x4YAWiU=,5041,0,AJOItUGjSYdorK+4T8B4erfgUmo=,1487,True,0
 main/gameentry,aclCUq5ADSq/d37jcyeAUkr3Oek=,8417,0,d1gnbs/vs21V0wKzRU/I6JodIcI=,2561,True,0`;
 
-// Bypass Versão
 app.all(['/app/info/get', '/info/app/info/get'], (req, res) => {
   res.json({ status: 200, message: "success", data: { is_review: false, update_url: "", latest_version: VERSION, force_update: false } });
 });
 app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/android/versioninfo'], (req, res) => res.send(VERSION));
 app.get(['/sbt/fileinfo', '/fileinfo', '/live/fileinfo', '/android/fileinfo'], (req, res) => res.send(FILE_INFO));
 
-// Endpoints do Facebook
+// Endpoints Facebook
 app.all('/v2.5/:id', (req, res) => {
   const id = req.params.id;
-  const uid = "100067";
+  const uid = "1000001";
   if (id === 'me' || id === uid) {
     return res.json({ id: uid, name: "ViniPlayer", first_name: "Vini", last_name: "Player" });
   }
@@ -66,22 +63,21 @@ app.all('/v2.5/:id', (req, res) => {
   });
 });
 
-app.post('/v2.5/:app_id/activities', (req, res) => res.json({ success: true }));
+app.post('/v2.5/:app_id/activities', (req, res) => {
+  res.json({ success: true, app_events_config: { custom_events_default_sampling_probability: 1 } });
+});
 
-// --- DIÁLOGO DE LOGIN ---
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const token = uuidv4();
-  const uid = "100067";
-  const payload = Buffer.from(JSON.stringify({ user_id: uid, algorithm: "HMAC-SHA256" })).toString('base64');
-  const signed_request = "vini_sig." + payload;
-  const params = `access_token=${token}&expires_in=5184000&signed_request=${signed_request}&user_id=${uid}&base_domain=onrender.com&return_scopes=true`;
+  const uid = "1000001";
+  const params = `access_token=${token}&expires_in=5184000&user_id=${uid}&base_domain=onrender.com&return_scopes=true`;
   const finalUrl = `fbconnect://success#${params}`;
   res.send(`<html><script>window.location.href="${finalUrl}";</script></html>`);
 });
 
 const handleLoginSuccess = (req, res) => {
   const token = req.body.facebook_access_token || req.body.access_token || uuidv4();
-  const uid = "100067";
+  const uid = "1000001";
   const now = Date.now();
   
   const response = {
@@ -114,4 +110,4 @@ const handleLoginSuccess = (req, res) => {
 app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/oauth/token/facebook/exchange'], handleLoginSuccess);
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Super Log Mode) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Log & Sync Master) na porta ${PORT}`));
