@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const config = require('./config/config');
 
@@ -16,61 +15,34 @@ app.use((req, res, next) => {
   next();
 });
 
-// --- NOVO DIÁLOGO DE LOGIN (CALLBACK DIRETO) ---
+// --- REDIRECIONAMENTO DIRETO (PULA A TELA DE LOGIN) ---
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const token = 'vini_fb_token_' + uuidv4().replace(/-/g, '');
   const uid = '1000001';
   
-  // HTML que tenta injetar o token de todas as formas possíveis
-  res.send(`
-    <html><body style="background:#000;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;">
-    <div style="text-align:center;">
-        <h2>Vini Server</h2>
-        <p>Autenticando conta...</p>
-        <div id="status">Aguarde...</div>
-    </div>
-    <script>
-      const token = "${token}";
-      const uid = "${uid}";
-      const renderUrl = "https://vini-server-1.onrender.com";
-
-      function finish() {
-        // 1. Tentar Interface Java do MSDK
-        if (window.Android && window.Android.onFacebookLogin) {
-            window.Android.onFacebookLogin(token, uid);
-        }
-        
-        // 2. Tentar Redirecionamento de Protocolo
-        window.location.href = "fbconnect://success?access_token=" + token + "&user_id=" + uid;
-        
-        // 3. Tentar Redirecionamento para o Servidor (Callback)
-        setTimeout(() => {
-            window.location.href = renderUrl + "/auth/login_callback?token=" + token + "&uid=" + uid;
-        }, 1000);
-      }
-      
-      document.getElementById('status').innerText = "Enviando credenciais...";
-      setTimeout(finish, 1500);
-    </script></body></html>
-  `);
+  console.log("Forçando redirecionamento de login direto...");
+  
+  // Em vez de HTML, enviamos um redirecionamento HTTP 302 direto para o esquema do jogo
+  // Isso funciona mesmo se o JS estiver desativado na WebView
+  const redirectUrl = `fbconnect://success?access_token=${token}&user_id=${uid}&expires_in=5184000`;
+  res.redirect(302, redirectUrl);
 });
 
-// Rota de Callback para processar o login após o diálogo
-app.get('/auth/login_callback', (req, res) => {
-    console.log("Login callback received for UID:", req.query.uid);
-    handleLoginSuccess(req, res);
-});
-
-// Validação de App ID
+// Validação de App ID (Também responde com sucesso)
 app.get('/v2.5/:app_id', (req, res) => {
-  res.json({ id: req.params.app_id, name: "Free Fire Vini", permissions: ["public_profile"] });
+  res.json({ 
+    id: req.params.app_id, 
+    name: "Free Fire Vini", 
+    permissions: ["public_profile"],
+    status: "active"
+  });
 });
 
 // --- BYPASS DE VERSÃO ---
 app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo'], (req, res) => res.send('1.17.1'));
 app.get(['/sbt/fileinfo', '/fileinfo'], (req, res) => res.send(''));
 
-// --- RESPOSTA DE LOGIN MESTRE (ULTRA COMPAT) ---
+// --- RESPOSTA DE LOGIN MESTRE ---
 const handleLoginSuccess = (req, res) => {
   const s = uuidv4().replace(/-/g, '');
   const response = {
@@ -84,10 +56,8 @@ const handleLoginSuccess = (req, res) => {
     is_new: 0, region: "BR", login_type: 1, expire_time: 5184000
   };
 
-  if (req.path.includes('api') || req.query.token) {
-      return res.json({ code: 0, msg: "success", data: response });
-  }
-  res.json(response);
+  // Suporte para o formato 'data' que o MSDK gosta
+  res.json({ code: 0, msg: "success", data: response, ...response });
 };
 
 app.all([
@@ -95,14 +65,14 @@ app.all([
   '/app/info/get', '/info/app/info/get'
 ], handleLoginSuccess);
 
-// --- ROTAS ORIGINAIS ---
+// --- INTEGRAÇÃO COM ROTAS ORIGINAIS ---
 const apiPrefix = config.api.prefix;
 app.use(`${apiPrefix}/auth`, require('./routes/auth'));
 app.use(`${apiPrefix}/user`, require('./routes/user'));
 app.use(`${apiPrefix}/game`, require('./routes/game'));
 
-app.get('/health', (req, res) => res.json({ status: 'ok', version: '4.1.0-fixed-v5' }));
+app.get('/health', (req, res) => res.json({ status: 'ok', version: '4.1.0-fixed-v6' }));
 app.use((req, res) => res.status(404).json({ error: '404', path: req.path }));
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V5 (Callback Master) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V6 (Direct Redirect) na porta ${PORT}`));
