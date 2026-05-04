@@ -36,9 +36,9 @@ const BASE_URL = config.baseUrl || 'https://vini-server.onrender.com';
 const DOMAIN = "vini-server.onrender.com";
 
 // -----------------------------------------------------------------------
-// ENDPOINTS DE VERSÃO E ATUALIZAÇÃO
+// ENDPOINTS DE VERSÃO E ATUALIZAÇÃO - MEGA FULL
 // -----------------------------------------------------------------------
-const versionResponse = (req, res) => {
+const megaVersionResponse = (req, res) => {
   res.json({
     status: 200,
     message: "success",
@@ -47,14 +47,22 @@ const versionResponse = (req, res) => {
       update_url: "",
       latest_version: VERSION,
       force_update: false,
-      content_url: `${BASE_URL}/live/`
+      content_url: `${BASE_URL}/live/`,
+      patch_url: `${BASE_URL}/live/`,
+      version_list: [VERSION]
     }
   });
 };
 
-app.all(['/app/info/get', '/info/app/info/get', '/api/v1/app/info/get', '/v1/app/info/get', '/api/v2/app/info/get'], versionResponse);
+app.all([
+    '/app/info/get', '/info/app/info/get', '/api/v1/app/info/get', 
+    '/v1/app/info/get', '/api/v2/app/info/get', '/v2/app/info/get'
+], megaVersionResponse);
 
-app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/android/versioninfo', '/api/v1/versioninfo', '/android/ver.php'], (req, res) => {
+app.get([
+    '/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', 
+    '/android/versioninfo', '/api/v1/versioninfo', '/android/ver.php', '/ios/ver.php'
+], (req, res) => {
   const myUrl = `${BASE_URL}/live/`;
   if (req.path.includes('ver.php')) {
     return res.send(`${VERSION},${myUrl},${myUrl},${myUrl}`);
@@ -63,7 +71,7 @@ app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/and
 });
 
 // -----------------------------------------------------------------------
-// FACEBOOK API v2.5 - EMULAÇÃO TOTAL
+// FACEBOOK API v2.5 - EMULAÇÃO MEGA ULTRA FULL
 // -----------------------------------------------------------------------
 app.get('/v2.5/me', (req, res) => {
   res.json({ 
@@ -73,7 +81,11 @@ app.get('/v2.5/me', (req, res) => {
     last_name: "Player",
     email: "vini@player.com",
     link: `https://www.facebook.com/app_scoped_user_id/${PLAYER_UID}/`,
-    picture: { data: { url: "https://vini-server.onrender.com/avatar.png", is_silhouette: false } }
+    picture: { data: { url: "https://vini-server.onrender.com/avatar.png", is_silhouette: false, width: 200, height: 200 } },
+    gender: "male",
+    locale: "pt_BR",
+    timezone: -3,
+    updated_time: new Date().toISOString()
   });
 });
 
@@ -83,7 +95,9 @@ app.get('/v2.5/me/permissions', (req, res) => {
       { permission: "public_profile", status: "granted" }, 
       { permission: "email", status: "granted" },
       { permission: "user_friends", status: "granted" },
-      { permission: "publish_actions", status: "granted" }
+      { permission: "publish_actions", status: "granted" },
+      { permission: "user_posts", status: "granted" },
+      { permission: "user_photos", status: "granted" }
     ] 
   });
 });
@@ -118,13 +132,13 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
   const user_id = PLAYER_UID;
   const expires_in = 5184000;
   
-  // Payload robusto para o signed_request
   const payloadData = {
     algorithm: "HMAC-SHA256",
     issued_at: Math.floor(Date.now() / 1000),
     user_id: user_id,
     expires: Math.floor(Date.now() / 1000) + expires_in,
-    oauth_token: token
+    oauth_token: token,
+    app_id: "2036793259884297"
   };
   
   const payload = Buffer.from(JSON.stringify(payloadData)).toString('base64').replace(/=/g, '');
@@ -134,11 +148,12 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
 });
 
 app.post('/v2.5/:id/activities', (req, res) => res.json({ success: true }));
+app.all('/v2.5/:id/friends', (req, res) => res.json({ data: [], summary: { total_count: 0 } }));
 
 // -----------------------------------------------------------------------
-// GARENA / AUTH - RESPOSTA ULTRA ROBUSTA
+// GARENA / AUTH - RESPOSTA MEGA ULTRA FULL
 // -----------------------------------------------------------------------
-const sendAuthResponse = (res, token, uid) => {
+const sendMegaAuthResponse = (res, token, uid) => {
   const now = Math.floor(Date.now() / 1000);
   res.json({
     status: 200,
@@ -163,7 +178,9 @@ const sendAuthResponse = (res, token, uid) => {
         level: 70,
         exp: 999999,
         diamonds: 999999,
-        gold: 999999
+        gold: 999999,
+        vip_level: 10,
+        is_guest: 0
     }
   });
 };
@@ -171,16 +188,17 @@ const sendAuthResponse = (res, token, uid) => {
 app.all([
   '/oauth/guest/register', '/oauth/token/inspect', '/oauth/user/info/get',
   '/oauth/token/facebook/exchange', '/api/v1/auth/*', '/auth/*', '/conn/*', '/sso/*',
-  '/api/v1/oauth/*', '/v1/oauth/*', '/oauth/token/vk/exchange', '/oauth/token/line/exchange'
+  '/api/v1/oauth/*', '/v1/oauth/*', '/oauth/token/vk/exchange', '/oauth/token/line/exchange',
+  '/api/v2/oauth/*', '/v2/oauth/*'
 ], (req, res) => {
   const token = req.body.access_token || req.query.access_token || req.body.facebook_access_token || uuidv4();
-  sendAuthResponse(res, token, PLAYER_UID);
+  sendMegaAuthResponse(res, token, PLAYER_UID);
 });
 
 // -----------------------------------------------------------------------
-// NETWORK / CONFIG - FILTRO TOTAL DE CONEXÃO
+// NETWORK / CONFIG - FILTRO MEGA ULTRA FULL
 // -----------------------------------------------------------------------
-app.all(['/network/config', '/api/v1/network/config', '/v1/network/config', '/api/v2/network/config'], (req, res) => {
+app.all(['/network/config', '/api/v1/network/config', '/v1/network/config', '/api/v2/network/config', '/v2/network/config'], (req, res) => {
     res.json({
         status: 200, code: 0, msg: "success",
         data: {
@@ -196,6 +214,8 @@ app.all(['/network/config', '/api/v1/network/config', '/v1/network/config', '/ap
             api_server: DOMAIN,
             pay_server: DOMAIN,
             voice_server: DOMAIN,
+            chat_server: DOMAIN,
+            friend_server: DOMAIN,
             client_config: {
                 show_loading: true,
                 skip_tutorial: true,
@@ -204,22 +224,27 @@ app.all(['/network/config', '/api/v1/network/config', '/v1/network/config', '/ap
                 reconnect_interval: 5,
                 max_reconnect_times: 3,
                 anti_cheat: false,
-                force_update: false
+                force_update: false,
+                debug_mode: true
             },
             servers: [
                 { name: "Vini Server", ip: DOMAIN, port: 443, ssl: true, status: 1, load: 0, region: "BR" }
             ],
             regions: [
                 { id: "BR", name: "Brasil", domain: DOMAIN, port: 443, ssl: true }
-            ]
+            ],
+            emergency_config: {
+                disable_shop: false,
+                disable_lobby: false
+            }
         }
     });
 });
 
 // -----------------------------------------------------------------------
-// LOBBY / GAMEPLAY / USER - COBERTURA ABSOLUTA
+// LOBBY / GAMEPLAY / USER - COBERTURA MEGA ULTRA FULL
 // -----------------------------------------------------------------------
-const genericSuccessResponse = (req, res) => {
+const megaSuccessResponse = (req, res) => {
     res.json({
         status: 200, code: 0, msg: "success",
         data: {
@@ -239,7 +264,10 @@ const genericSuccessResponse = (req, res) => {
             message: "Operation successful",
             items: [],
             friends: [],
-            stats: { wins: 1000, kills: 5000, games: 2000 }
+            clans: [],
+            mail: [],
+            stats: { wins: 1000, kills: 5000, games: 2000, headshots: 2500, damage: 9999999 },
+            settings: { music: 100, sound: 100, sensitivity: 50 }
         }
     });
 };
@@ -248,37 +276,39 @@ app.all([
     '/api/v1/user/profile', '/user/profile', '/game/user/info', '/api/v1/game/user/info',
     '/v1/user/profile', '/v1/game/user/info', '/api/v1/lobby/*', '/lobby/*', '/shop/*', 
     '/api/v1/shop/*', '/user/*', '/api/v1/user/*', '/api/v1/game/*', '/game/*', '/v1/*', 
-    '/api/v1/*', '/api/v2/*', '/conn/*', '/sso/*', '/pay/*', '/api/v1/pay/*', '/v2.5/me/friends'
-], genericSuccessResponse);
+    '/api/v1/*', '/api/v2/*', '/conn/*', '/sso/*', '/pay/*', '/api/v1/pay/*', '/v2.5/me/friends',
+    '/api/v1/user/inventory', '/api/v1/user/stats', '/api/v1/user/settings'
+], megaSuccessResponse);
 
 app.all(['/oauth/user/friends/get', '/api/v1/oauth/user/friends/get'], (req, res) => res.json({ status: 200, data: { friends: [] } }));
 
 // -----------------------------------------------------------------------
-// LIVE RESOURCES - REDIRECIONAMENTO INTELIGENTE
+// LIVE RESOURCES - REDIRECIONAMENTO MEGA ULTRA FULL
 // -----------------------------------------------------------------------
-app.get(['/live/*', '/android/live/*', '/ios/live/*'], (req, res) => {
+app.get(['/live/*', '/android/live/*', '/ios/live/*', '/live/patch/*'], (req, res) => {
   const resourcePath = req.params[0];
-  if (resourcePath && resourcePath.length > 5) {
+  if (resourcePath && resourcePath.length > 3) {
     return res.redirect(302, `https://freefiremobile-a.akamaihd.net/live/${resourcePath}`);
   }
   res.status(200).end();
 });
 
 // -----------------------------------------------------------------------
-// TRATAMENTO DE ERROS E 404 - FILTRO ABSOLUTO
+// FILTRO ABSOLUTO DE SEGURANÇA E COMPATIBILIDADE
 // -----------------------------------------------------------------------
 app.use((req, res, next) => {
-    // Responder sucesso para qualquer rota de API/Game para evitar travamentos
-    if (req.originalUrl.match(/\/(api|oauth|game|user|lobby|shop|v1|v2|conn|sso|pay|v2.5)\//i)) {
+    // Captura qualquer rota de sistema do jogo e responde sucesso
+    const gamePatterns = /\/(api|oauth|game|user|lobby|shop|v1|v2|conn|sso|pay|v2.5|info|network)\//i;
+    if (req.originalUrl.match(gamePatterns)) {
         return res.json({ status: 200, code: 0, msg: "success", data: {} });
     }
     next();
 });
 
 app.use((err, req, res, next) => {
-  console.error("ERRO CRÍTICO:", err);
-  res.status(200).json({ status: 200, code: 0, msg: "success", error: "Handled error" });
+  console.error("ERRO MEGA CRÍTICO:", err);
+  res.status(200).json({ status: 200, code: 0, msg: "success", data: {}, error: "Handled" });
 });
 
 const PORT = process.env.PORT || config.port || 3000;
-app.listen(PORT, () => console.log(`✅ SERVIDOR VINI V34 OPERACIONAL EM MODO ABSOLUTO NA PORTA ${PORT}`));
+app.listen(PORT, () => console.log(`✅ SERVIDOR VINI V34 OPERACIONAL EM MODO MEGA ULTRA FULL NA PORTA ${PORT}`));
