@@ -1,50 +1,50 @@
-2026-05-04T18:29:54.812336963Z ==> Checking out commit 77adb391d55a7e391a12b7a96bfa9195e2ed2db8 in branch master
-2026-05-04T18:29:56.636921805Z ==> Using Node.js version 24.14.1 (default)
-2026-05-04T18:29:56.679759633Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
-2026-05-04T18:29:59.275226447Z ==> Running build command 'npm install'...
-2026-05-04T18:30:14.754810355Z 
-2026-05-04T18:30:14.754839316Z added 231 packages, and audited 232 packages in 15s
-2026-05-04T18:30:14.754864277Z 
-2026-05-04T18:30:14.754930861Z 35 packages are looking for funding
-2026-05-04T18:30:14.754979083Z   run `npm fund` for details
-2026-05-04T18:30:14.762104617Z 
-2026-05-04T18:30:14.762121038Z 8 vulnerabilities (2 low, 1 moderate, 5 high)
-2026-05-04T18:30:14.762125328Z 
-2026-05-04T18:30:14.762130128Z To address all issues (including breaking changes), run:
-2026-05-04T18:30:14.762135039Z   npm audit fix --force
-2026-05-04T18:30:14.762139069Z 
-2026-05-04T18:30:14.762143539Z Run `npm audit` for details.
-2026-05-04T18:30:23.646345895Z ==> Uploading build...
-2026-05-04T18:30:27.860669559Z ==> Uploaded in 2.4s. Compression took 1.8s
-2026-05-04T18:30:27.883632762Z ==> Build successful 🎉
-2026-05-04T18:31:12.12727419Z ==> Deploying...
-2026-05-04T18:31:12.281524433Z ==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
-2026-05-04T18:31:19.849539864Z ==> Running 'npm start'
-2026-05-04T18:31:20.961136971Z 
-2026-05-04T18:31:20.961176772Z > barbosa-server@4.1.0 start
-2026-05-04T18:31:20.961181852Z > node server.js
-2026-05-04T18:31:20.961183952Z 
-2026-05-04T18:31:22.053347004Z ✅ Servidor Vini V26 (Signed Request Fix) na porta 3000
-2026-05-04T18:31:22.697695536Z 
-2026-05-04T18:31:22.697724977Z --- [2026-05-04T18:31:22.697Z] HEAD / ---
-2026-05-04T18:31:23.656967404Z ==> Your service is live 🎉
-2026-05-04T18:31:23.749418358Z 
-2026-05-04T18:31:23.749448659Z --- [2026-05-04T18:31:23.749Z] GET / ---
-2026-05-04T18:31:23.855875584Z ==> 
-2026-05-04T18:31:23.85904453Z ==> ///////////////////////////////////////////////////////////
-2026-05-04T18:31:23.862212265Z ==> 
-2026-05-04T18:31:23.865686767Z ==> Available at your primary URL https://vini-server.onrender.com
-2026-05-04T18:31:23.868666438Z ==> 
-2026-05-04T18:31:23.871515066Z ==> ///////////////////////////////////////////////////////////
-2026-05-04T18:31:31.866944766Z 
-2026-05-04T18:31:31.866976347Z --- [2026-05-04T18:31:31.866Z] GET /v2.5/dialog/oauth ---
-2026-05-04T18:31:31.867196473Z QUERY: {"client_id":"2036793259884297","e2e":"{\"init\":1777919491048}","sdk":"android-4.9.0","scope":"public_profile,user_friends,email","default_audience":"friends","redirect_uri":"fbconnect://success","display":"touch","response_type":"token,signed_request","return_scopes":"true"}
-2026-05-04T18:31:31.867480312Z [OAuth] Redirecionando para: fbconnect://success?access_token=zurq89cfpgw02udpspw8&expires_in=5184000&user_id=100067&base_domain=onrender.com&return_scopes=true&signed_request=vini_signature.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImlzc3VlZF9hdCI6MTc3NzkxOTQ5MSwidXNlcl9pZCI6IjEwMDA2NyJ9
-2026-05-04T18:31:32.199079277Z 
-2026-05-04T18:31:32.199113868Z --- [2026-05-04T18:31:32.198Z] GET /v2.5/me ---
-2026-05-04T18:31:32.199124728Z QUERY: {"access_token":"zurq89cfpgw02udpspw8","fields":"id,name,first_name,middle_name,last_name,link","format":"json","locale":"pt_BR","sdk":"android"}
-2026-05-04T18:31:32.199326914Z RESPOSTA: {"id":"100067","name":"ViniPlayer","first_name":"Vini","last_name":"Player"}
-2026-05-04T18:31:32.520074722Z 
-2026-05-04T18:31:32.520105483Z --- [2026-05-04T18:31:32.519Z] POST /oauth/token/facebook/exchange ---
-2026-05-04T18:31:32.520112133Z BODY: {"redirect_uri":"gop100067://auth/","source":"2","client_secret":"2ee44819e9b4598845141067b281621874d0d5d7af9d8f7e00c1e54715b7d1e3","grant_type":"authorization_code","client_id":"100067","facebook_access_token":"zurq89cfpgw02udpspw8"}
-2026-05-04T18:31:32.52033046Z RESPOSTA: {"authToken":"zurq89cfpgw02udpspw8","token":"zurq89cfpgw02udpspw8","access_token":"zurq89cfpgw02udpspw8","refreshToken":"zurq89cfpgw02udpspw8","openId":"100067","user_id":"100067","uid":"100067","expiryTimestamp":1783103492,"expires_in":5184000,"lastInspectTime":1777919492,"tokenProvider":0,"status":200,"code":0,"msg":"success","data":{"authToken":"zurq89cfpgw02udpspw8","token":"zurq89cfpgw02udpspw8","access_token":"zurq89cfpgw02udpspw8","refreshToken":"zurq89cfpgw02udpspw8","openId":"100067","user_id":"100067","uid":"100067","expiryTimestamp":1783103492,"expires_in":5184000,"lastInspectTime":1777919492,"tokenProvider":0,"status":200,"code":0,"msg":"success"}}
+2026-05-04T18:46:18.607351664Z 
+2026-05-04T18:46:18.60746046Z 35 packages are looking for funding
+2026-05-04T18:46:18.607535594Z   run `npm fund` for details
+2026-05-04T18:46:18.612380036Z 
+2026-05-04T18:46:18.612389567Z 8 vulnerabilities (2 low, 1 moderate, 5 high)
+2026-05-04T18:46:18.612393507Z 
+2026-05-04T18:46:18.612397927Z To address all issues (including breaking changes), run:
+2026-05-04T18:46:18.612402257Z   npm audit fix --force
+2026-05-04T18:46:18.612405927Z 
+2026-05-04T18:46:18.612410437Z Run `npm audit` for details.
+2026-05-04T18:46:26.812401256Z ==> Uploading build...
+2026-05-04T18:46:30.036192765Z ==> Uploaded in 2.2s. Compression took 1.0s
+2026-05-04T18:46:30.057414127Z ==> Build successful 🎉
+2026-05-04T18:46:35.505990212Z ==> Deploying...
+2026-05-04T18:46:35.62639954Z ==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
+2026-05-04T18:46:51.546816363Z ==> Running 'npm start'
+2026-05-04T18:46:52.664349415Z 
+2026-05-04T18:46:52.664384535Z > barbosa-server@4.1.0 start
+2026-05-04T18:46:52.664390026Z > node server.js
+2026-05-04T18:46:52.664393056Z 
+2026-05-04T18:46:53.750601641Z ✅ Super Scanner Vini V27 na porta 3000
+2026-05-04T18:46:53.926072654Z 
+2026-05-04T18:46:53.926100644Z >>>>>>>> [2026-05-04T18:46:53.925Z] HEAD / <<<<<<<<
+2026-05-04T18:46:53.92632936Z HEADERS: {"host":"vini-server.onrender.com","user-agent":"Go-http-client/1.1"}
+2026-05-04T18:46:53.926974615Z 
+2026-05-04T18:46:53.926981895Z [!!! 404 NOT FOUND !!!] O jogo tentou acessar: HEAD /
+2026-05-04T18:46:53.927023226Z HEADERS DO 404: {"host":"vini-server.onrender.com","user-agent":"Go-http-client/1.1"}
+2026-05-04T18:46:53.927357173Z RESPOSTA JSON: {"error":"Route not found","path":"/"}
+2026-05-04T18:46:53.929938813Z RESPOSTA TEXTO: {"error":"Route not found","path":"/"}
+2026-05-04T18:46:56.790006609Z ==> Your service is live 🎉
+2026-05-04T18:46:56.935030431Z ==> 
+2026-05-04T18:46:56.938230067Z ==> ///////////////////////////////////////////////////////////
+2026-05-04T18:46:56.941211399Z ==> 
+2026-05-04T18:46:56.944408945Z ==> Available at your primary URL https://vini-server.onrender.com
+2026-05-04T18:46:56.947415047Z ==> 
+2026-05-04T18:46:56.949878185Z ==> ///////////////////////////////////////////////////////////
+2026-05-04T18:46:57.213370221Z 
+2026-05-04T18:46:57.213399432Z >>>>>>>> [2026-05-04T18:46:57.213Z] GET / <<<<<<<<
+2026-05-04T18:46:57.214172659Z 
+2026-05-04T18:46:57.21418456Z [!!! 404 NOT FOUND !!!] O jogo tentou acessar: GET /
+2026-05-04T18:46:57.21419099Z HEADERS DO 404: {"host":"vini-server.onrender.com","user-agent":"Go-http-client/2.0","accept-encoding":"gzip, br","cdn-loop":"cloudflare; loops=1","cf-connecting-ip":"35.197.117.9","cf-ipcountry":"US","cf-ray":"9f69abcd4b64ebc4-SEA","cf-visitor":"{\"scheme\":\"https\"}","render-proxy-ttl":"4","rndr-id":"a7791eca-d527-4716","true-client-ip":"35.197.117.9","x-forwarded-for":"35.197.117.9, 172.71.146.225, 10.26.249.2","x-forwarded-proto":"https","x-request-start":"1777920417210567"}
+2026-05-04T18:46:57.21420276Z HEADERS: {"host":"vini-server.onrender.com","user-agent":"Go-http-client/2.0","accept-encoding":"gzip, br","cdn-loop":"cloudflare; loops=1","cf-connecting-ip":"35.197.117.9","cf-ipcountry":"US","cf-ray":"9f69abcd4b64ebc4-SEA","cf-visitor":"{\"scheme\":\"https\"}","render-proxy-ttl":"4","rndr-id":"a7791eca-d527-4716","true-client-ip":"35.197.117.9","x-forwarded-for":"35.197.117.9, 172.71.146.225, 10.26.249.2","x-forwarded-proto":"https","x-request-start":"1777920417210567"}
+2026-05-04T18:46:57.21421776Z RESPOSTA JSON: {"error":"Route not found","path":"/"}
+2026-05-04T18:46:57.214223261Z RESPOSTA TEXTO: {"error":"Route not found","path":"/"}
+2026-05-04T18:47:23.547684814Z 
+2026-05-04T18:47:23.547708704Z >>>>>>>> [2026-05-04T18:47:23.547Z] POST /oauth/token/facebook/exchange <<<<<<<<
+2026-05-04T18:47:23.548286088Z HEADERS: {"host":"vini-server.onrender.com","user-agent":"GarenaMSDK/3.0.17(SM-A145M ;Android 15;pt;BR;)","content-length":"215","accept-encoding":"gzip, br","cdn-loop":"cloudflare; loops=1","cf-connecting-ip":"160.20.201.170","cf-ipcountry":"BR","cf-ray":"9f69ac73382758f7-IAD","cf-visitor":"{\"scheme\":\"https\"}","content-type":"application/x-www-form-urlencoded","render-proxy-ttl":"4","rndr-id":"f8ec8f30-0e3b-4447","true-client-ip":"160.20.201.170","x-forwarded-for":"160.20.201.170, 162.158.79.95, 10.27.81.130","x-forwarded-proto":"https","x-request-start":"1777920443463716"}
+2026-05-04T18:47:23.548423881Z BODY: {"redirect_uri":"gop100067://auth/","source":"2","client_secret":"2ee44819e9b4598845141067b281621874d0d5d7af9d8f7e00c1e54715b7d1e3","grant_type":"authorization_code","client_id":"100067","facebook_access_token":"tvgut8261jovfsxlzq6"}
+2026-05-04T18:47:23.548926272Z RESPOSTA JSON: {"authToken":"tvgut8261jovfsxlzq6","token":"tvgut8261jovfsxlzq6","access_token":"tvgut8261jovfsxlzq6","refreshToken":"tvgut8261jovfsxlzq6","openId":"100067","user_id":"100067","uid":"100067","expiryTimestamp":1783104443,"expires_in":5184000,"lastInspectTime":1777920443,"tokenProvider":0,"status":200,"code":0,"msg":"success","data":{"authToken":"tvgut8261jovfsxlzq6","token":"tvgut8261jovfsxlzq6","access_token":"tvgut8261jovfsxlzq6","refreshToken":"tvgut8261jovfsxlzq6","openId":"100067","user_id":"100067","uid":"100067","expiryTimestamp":1783104443,"expires_in":5184000,"lastInspectTime":1777920443,"tokenProvider":0,"status":200,"code":0,"msg":"success"}}
+2026-05-04T18:47:23.554035321Z RESPOSTA TEXTO: {"authToken":"tvgut8261jovfsxlzq6","token":"tvgut8261jovfsxlzq6","access_token":"tvgut8261jovfsxlzq6","refreshToken":"tvgut8261jovfsxlzq6","openId":"100067","user_id":"100067","uid":"100067","expiryTimestamp":1783104443,"expires_in":5184000,"lastInspectTime":1777920443,"tokenProvider":0,"status":200,"code":0,"msg":"success","data":{"authToken":"tvgut8261jovfsxlzq6","token":"tvgut8261jovfsxlzq6","access_token":"tvgut8261jovfsxlzq6","refreshToken":"tvgut8261jovfsxlzq6","openId":"100067","user_id":"100067","uid":"100067","expiryTimestamp":1783104443,"expires_in":5184000,"lastInspectTime":1777920443,"tokenProvider":0,"status":200,"code":0,"msg":"success"}}
