@@ -33,6 +33,7 @@ app.use((req, res, next) => {
 
 const VERSION = "1.26.0";
 const PLAYER_UID = "100067";
+const BASE_URL = config.baseUrl;
 
 // Endpoints de Versão
 app.all(['/app/info/get', '/info/app/info/get'], (req, res) => {
@@ -44,13 +45,13 @@ app.all(['/app/info/get', '/info/app/info/get'], (req, res) => {
       update_url: "",
       latest_version: VERSION,
       force_update: false,
-      content_url: "https://vini-server.onrender.com/live/"
+      content_url: `${BASE_URL}/live/`
     }
   });
 });
 
 app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/android/versioninfo'], (req, res) => {
-  const myUrl = "https://vini-server.onrender.com/live/";
+  const myUrl = `${BASE_URL}/live/`;
   if (req.path.includes('ver.php')) {
     return res.send(`${VERSION},${myUrl},${myUrl},${myUrl}`);
   }
@@ -80,7 +81,7 @@ app.all('/v2.5/:id', (req, res) => {
     name: "Free Fire Vini",
     supports_implicit_sdk_logging: true,
     gdpv4_nux_enabled: false,
-    android_dialog_configs: { oauth: { url: "https://vini-server.onrender.com/v2.5/dialog/oauth" } },
+    android_dialog_configs: { oauth: { url: `${BASE_URL}/v2.5/dialog/oauth` } },
     android_sdk_error_categories: [{ name: "login_recoverable", items: [{ code: 102, message: "Login recoverable" }] }]
   });
 });
@@ -94,7 +95,7 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
 });
 
 // -----------------------------------------------------------------------
-// GARENA / AUTH - RESPOSTA PADRONIZADA
+// GARENA / AUTH
 // -----------------------------------------------------------------------
 
 const sendAuthResponse = (res, token, uid) => {
@@ -112,18 +113,13 @@ const sendAuthResponse = (res, token, uid) => {
     expires_in: 5184000,
     lastInspectTime: now,
     tokenProvider: 0,
-    login_type: 2, // Facebook
+    login_type: 2,
     is_guest: false,
     status: 200,
     code: 0,
     msg: "success"
   };
-
-  // Retorna o objeto puro E também dentro de 'data' para garantir compatibilidade
-  res.json({
-    ...authData,
-    data: authData
-  });
+  res.json({ ...authData, data: authData });
 };
 
 app.all([
@@ -157,4 +153,4 @@ app.get('/live/*', (req, res) => {
 });
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V28 (Lobby Fix) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V29 (Config Sync) na porta ${PORT}`));
