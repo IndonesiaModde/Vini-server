@@ -94,31 +94,27 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
 });
 
 // -----------------------------------------------------------------------
-// GARENA / AUTH - RESPOSTA MESTRA
+// GARENA / AUTH - RESPOSTA MINIMALISTA
 // -----------------------------------------------------------------------
 
 const sendAuthResponse = (res, token, uid) => {
   const now = Math.floor(Date.now() / 1000);
-  const openId = `vini_${uid}`; 
   
-  const authData = {
-    // TOKENS
-    authToken: token, token: token, access_token: token, refreshToken: token, key: token, session_key: token,
-    // IDs
-    openId: openId, user_id: uid, uid: uid, account_id: uid,
-    // INFO
-    nickname: "ViniPlayer",
-    expiryTimestamp: now + 5184000, expires_in: 5184000, lastInspectTime: now,
-    tokenProvider: 0, login_type: 2, is_guest: false,
-    // STATUS (Múltiplos formatos para garantir)
-    status: 200, code: 0, error: 0, message: "success", msg: "success", result: "success"
-  };
-
+  // Resposta limpa, sem campos duplicados na raiz
   res.json({
-    ...authData,
+    status: 200,
+    code: 0,
+    msg: "success",
     data: {
-        ...authData,
-        account: { uid: uid, nickname: "ViniPlayer", openId: openId }
+        access_token: token,
+        refreshToken: token,
+        openId: `vini_${uid}`,
+        user_id: uid,
+        uid: uid,
+        nickname: "ViniPlayer",
+        expiryTimestamp: now + 5184000,
+        tokenProvider: 0,
+        login_type: 2
     }
   });
 };
@@ -141,8 +137,7 @@ app.all(['/network/config', '/api/v1/network/config'], (req, res) => {
         data: {
             lobby_server: "vini-server.onrender.com",
             lobby_port: 443,
-            use_ssl: true,
-            game_servers: [{ ip: "vini-server.onrender.com", port: 443, label: "ViniServer" }]
+            use_ssl: true
         }
     });
 });
@@ -151,13 +146,9 @@ app.all(['/api/v1/user/profile', '/user/profile', '/game/user/info'], (req, res)
     res.json({
         status: 200, code: 0, msg: "success",
         data: {
-            uid: PLAYER_UID, nickname: "ViniPlayer", level: 70, exp: 999999, diamonds: 999999, gold: 999999, rank: 25
+            uid: PLAYER_UID, nickname: "ViniPlayer", level: 70, exp: 999999, diamonds: 999999, gold: 999999
         }
     });
-});
-
-app.all('/api/v1/auth/session', (req, res) => {
-    res.json({ status: 200, code: 0, msg: "success", data: { user_id: PLAYER_UID, valid: true } });
 });
 
 app.all(['/game/*', '/api/v1/game/*', '/lobby/*', '/shop/*', '/user/*'], (req, res) => {
@@ -176,4 +167,4 @@ app.get('/live/*', (req, res) => {
 });
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V33 (Master Response) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V34 (Minimal Response) na porta ${PORT}`));
