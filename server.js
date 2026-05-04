@@ -222,11 +222,14 @@ app.all(['/network/config', '/api/v1/network/config', '/v1/network/config', '/ap
     res.json({
         status: 200, code: 0, msg: "success",
         data: {
-            lobby_server: DOMAIN,
-            lobby_port: 443,
-            use_ssl: true,
-            gate_server: DOMAIN,
-            gate_port: 443,
+            // IP do Termux (Local) e porta do seu Game Server
+            lobby_server: "127.0.0.1",
+            lobby_port: 10001, 
+            use_ssl: false, // Desligamos SSL pois o Termux usa TCP puro
+            
+            gate_server: "127.0.0.1",
+            gate_port: 10001,
+            
             cdn_url: `${BASE_URL}/live/`,
             update_url: `${BASE_URL}/live/`,
             file_server: DOMAIN,
@@ -245,10 +248,11 @@ app.all(['/network/config', '/api/v1/network/config', '/v1/network/config', '/ap
                 force_update: false
             },
             servers: [
-                { name: "Vini Server", ip: DOMAIN, port: 443, ssl: true, status: 1, load: 0, region: "BR" }
+                // Aqui é onde aparece a lista de servidores no início
+                { name: "Vini Server (Termux)", ip: "127.0.0.1", port: 10001, ssl: false, status: 1, load: 0, region: "BR" }
             ],
             regions: [
-                { id: "BR", name: "Brasil", domain: DOMAIN, port: 443, ssl: true }
+                { id: "BR", name: "Brasil", domain: "127.0.0.1", port: 10001, ssl: false }
             ]
         }
     });
