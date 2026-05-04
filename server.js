@@ -38,11 +38,11 @@ app.get('/v2.5/:app_id', (req, res) => {
   const appId = req.params.app_id;
   if (appId === 'me') {
     return res.json({
-      id: "1000001",
+      id: "100067",
       name: "ViniPlayer",
       first_name: "Vini",
       last_name: "Player",
-      link: "https://facebook.com/1000001"
+      link: "https://facebook.com/100067"
     });
   }
   res.json({
@@ -62,18 +62,16 @@ app.get('/v2.5/:app_id', (req, res) => {
   });
 });
 
-// --- DIÁLOGO DE LOGIN (V21 - EXCLUSIVO POR FRAGMENTO #) ---
+// --- DIÁLOGO DE LOGIN ---
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const token = uuidv4();
-  const uid = "1000001";
+  const uid = "100067";
   const payload = Buffer.from(JSON.stringify({ user_id: uid, algorithm: "HMAC-SHA256" })).toString('base64');
   const signed_request = "vini_sig." + payload;
   const e2e = req.query.e2e || "{}";
   
   const params = `access_token=${token}&expires_in=5184000&signed_request=${signed_request}&user_id=${uid}&e2e=${encodeURIComponent(e2e)}&return_scopes=true&glive_uid=${uid}`;
   const finalUrl = `fbconnect://success#${params}`;
-
-  console.log("Enviando Fragment Redirect (V21) com UUID...");
 
   res.send(`
     <html><head><title>Success access_token=${token}</title></head>
@@ -89,11 +87,13 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
 });
 
 const handleLoginSuccess = (req, res) => {
-  const token = uuidv4();
-  const uid = "1000001";
+  // Pega o token enviado pelo jogo ou gera um novo UUID
+  const token = req.body.facebook_access_token || req.body.access_token || uuidv4();
+  // Pega o client_id enviado ou usa o padrão
+  const uid = req.body.client_id || "100067";
   
   const response = {
-    key: token, // Campo 'key' que você mencionou
+    key: token,
     access_token: token,
     token: token,
     user_id: uid,
@@ -102,7 +102,7 @@ const handleLoginSuccess = (req, res) => {
     uid: uid,
     id: uid,
     account_id: uid,
-    session_key: token, // Session key igual ao token/key
+    session_key: token,
     refresh_token: uuidv4().substring(0, 8),
     expires_in: 5184000,
     expire_time: 5184000,
@@ -118,8 +118,9 @@ const handleLoginSuccess = (req, res) => {
     status: 200
   };
 
-  // Resposta PLANA para exchange, incluindo o campo 'key'
+  // Se for exchange, responde no formato plano usando os dados que o jogo enviou
   if (req.path.includes('exchange')) {
+    console.log(`[Exchange Success] Token: ${token}, UID: ${uid}`);
     return res.json(response);
   }
 
@@ -133,4 +134,4 @@ app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/v2.5/me', '/oauth/t
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Key Master) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Sync Master) na porta ${PORT}`));
