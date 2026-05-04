@@ -34,10 +34,10 @@ app.all(['/app/info/get', '/info/app/info/get'], (req, res) => {
 app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/android/versioninfo'], (req, res) => res.send(VERSION));
 app.get(['/sbt/fileinfo', '/fileinfo', '/live/fileinfo', '/android/fileinfo'], (req, res) => res.send(FILE_INFO));
 
-// Endpoints Facebook (Configuração completa para SDK 4.9.0)
+// Endpoints Facebook
 app.all('/v2.5/:id', (req, res) => {
   const id = req.params.id;
-  const uid = "100067";
+  const uid = "100067"; // Sincronizado com o client_id do APK
   
   if (id === 'me' || id === uid) {
     return res.json({ id: uid, name: "ViniPlayer", first_name: "Vini", last_name: "Player" });
@@ -65,31 +65,15 @@ app.post('/v2.5/:app_id/activities', (req, res) => {
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const token = uuidv4();
   const uid = "100067";
-  const payload = Buffer.from(JSON.stringify({ user_id: uid, algorithm: "HMAC-SHA256" })).toString('base64');
-  const signed_request = "vini_sig." + payload;
-  // Fragmento completo para garantir que o SDK capture o token
-  const params = `access_token=${token}&expires_in=5184000&signed_request=${signed_request}&user_id=${uid}&base_domain=onrender.com&return_scopes=true&state=vini_state`;
+  const params = `access_token=${token}&expires_in=5184000&user_id=${uid}&base_domain=onrender.com&return_scopes=true`;
   const finalUrl = `fbconnect://success#${params}`;
-  
-  res.send(`
-    <html>
-    <body style="background:#000;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;">
-        <div style="text-align:center;">
-            <h2>Vini Server</h2>
-            <p>Sincronizando...</p>
-            <script>
-                window.location.href = "${finalUrl}";
-                setTimeout(() => { window.location.href = "${finalUrl}"; }, 1000);
-            </script>
-        </div>
-    </body>
-    </html>
-  `);
+  res.send(`<html><script>window.location.href="${finalUrl}";</script></html>`);
 });
 
 const handleLoginSuccess = (req, res) => {
   const token = req.body.facebook_access_token || req.body.access_token || uuidv4();
   const uid = "100067";
+  const appId = "100067"; // Sincronizado com o client_id do APK para evitar erro de autenticação
   const now = Date.now();
   
   const response = {
@@ -99,7 +83,7 @@ const handleLoginSuccess = (req, res) => {
     user_id: uid,
     uid: uid,
     id: uid,
-    application_id: "2036793259884297",
+    application_id: appId,
     expires_in: 5184000,
     expires_at: now + 5184000000,
     last_refresh: now,
@@ -123,4 +107,4 @@ const handleLoginSuccess = (req, res) => {
 app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/oauth/token/facebook/exchange'], handleLoginSuccess);
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (SDK Master) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Final Sync Master) na porta ${PORT}`));
