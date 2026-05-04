@@ -1,65 +1,49 @@
-2026-05-04T19:39:51.088361957Z ==> Cloning from https://github.com/IndonesiaModde/Vini-server
-2026-05-04T19:39:51.346537959Z ==> Checking out commit 85cfb5438fa733101da9cf85594b2cf3cf5a13f0 in branch master
-2026-05-04T19:39:52.264576353Z ==> Using Node.js version 24.14.1 (default)
-2026-05-04T19:39:52.293576231Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
-2026-05-04T19:39:54.400150772Z ==> Running build command 'npm install'...
-2026-05-04T19:40:11.059958573Z 
-2026-05-04T19:40:11.059985715Z added 231 packages, and audited 232 packages in 17s
-2026-05-04T19:40:11.059997526Z 
-2026-05-04T19:40:11.060095733Z 35 packages are looking for funding
-2026-05-04T19:40:11.060147687Z   run `npm fund` for details
-2026-05-04T19:40:11.065512335Z 
-2026-05-04T19:40:11.065524966Z 8 vulnerabilities (2 low, 1 moderate, 5 high)
-2026-05-04T19:40:11.065529286Z 
-2026-05-04T19:40:11.065533687Z To address all issues (including breaking changes), run:
-2026-05-04T19:40:11.065537997Z   npm audit fix --force
-2026-05-04T19:40:11.065541717Z 
-2026-05-04T19:40:11.065547408Z Run `npm audit` for details.
-2026-05-04T19:40:12.165487866Z ==> Uploading build...
-2026-05-04T19:40:15.96776084Z ==> Uploaded in 2.8s. Compression took 1.0s
-2026-05-04T19:40:15.985230093Z ==> Build successful 🎉
-2026-05-04T19:40:18.433320579Z ==> Deploying...
-2026-05-04T19:40:18.554548132Z ==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
-2026-05-04T19:40:26.125082597Z ==> Running 'npm start'
-2026-05-04T19:40:27.347540982Z 
-2026-05-04T19:40:27.347570453Z > barbosa-server@4.1.0 start
-2026-05-04T19:40:27.347574613Z > node server.js
-2026-05-04T19:40:27.347577143Z 
-2026-05-04T19:40:28.425891042Z ✅ Servidor Vini V34 (Minimal Response) na porta 3000
-2026-05-04T19:40:29.164967688Z 
-2026-05-04T19:40:29.165016049Z >>>>>>>> [2026-05-04T19:40:29.164Z] HEAD / <<<<<<<<
-2026-05-04T19:40:29.855980729Z ==> Your service is live 🎉
-2026-05-04T19:40:29.856759652Z 
-2026-05-04T19:40:29.856786323Z >>>>>>>> [2026-05-04T19:40:29.856Z] GET / <<<<<<<<
-2026-05-04T19:40:29.973033789Z ==> 
-2026-05-04T19:40:29.97563391Z ==> ///////////////////////////////////////////////////////////
-2026-05-04T19:40:29.977923674Z ==> 
-2026-05-04T19:40:29.981648161Z ==> Available at your primary URL https://vini-server.onrender.com
-2026-05-04T19:40:29.98420181Z ==> 
-2026-05-04T19:40:29.986884013Z ==> ///////////////////////////////////////////////////////////
-2026-05-04T19:41:00.616492641Z 
-2026-05-04T19:41:00.616527182Z >>>>>>>> [2026-05-04T19:41:00.616Z] GET /app/info/get?client_type=4352&client_version=2018120316&app_id=100067 <<<<<<<<
-2026-05-04T19:41:00.616703127Z QUERY: {"client_type":"4352","client_version":"2018120316","app_id":"100067"}
-2026-05-04T19:41:00.617025136Z RESPOSTA JSON: {"status":200,"message":"success","data":{"is_review":false,"update_url":"","latest_version":"1.26.0","force_update":false,"content_url":"https://vini-server.onrender.com/live/"}}
-2026-05-04T19:41:01.42982221Z 
-2026-05-04T19:41:01.429854571Z >>>>>>>> [2026-05-04T19:41:01.429Z] GET /v2.5/2036793259884297?fields=supports_implicit_sdk_logging%2Cgdpv4_nux_content%2Cgdpv4_nux_enabled%2Candroid_dialog_configs%2Candroid_sdk_error_categories&format=json&locale=pt_BR&sdk=android <<<<<<<<
-2026-05-04T19:41:01.429877352Z QUERY: {"fields":"supports_implicit_sdk_logging,gdpv4_nux_content,gdpv4_nux_enabled,android_dialog_configs,android_sdk_error_categories","format":"json","locale":"pt_BR","sdk":"android"}
-2026-05-04T19:41:01.430220791Z RESPOSTA JSON: {"id":"2036793259884297","name":"Free Fire Vini","supports_implicit_sdk_logging":true,"gdpv4_nux_enabled":false,"android_dialog_configs":{"oauth":{"url":"https://vini-server.onrender.com/v2.5/dialog/oauth"}},"android_sdk_error_categories":[{"name":"login_recoverable","items":[{"code":102,"message":"Login recoverable"}]}]}
-2026-05-04T19:41:01.648921719Z 
-2026-05-04T19:41:01.64894529Z >>>>>>>> [2026-05-04T19:41:01.648Z] GET /v2.5/2036793259884297?fields=supports_implicit_sdk_logging%2Cgdpv4_nux_content%2Cgdpv4_nux_enabled%2Candroid_dialog_configs%2Candroid_sdk_error_categories&format=json&locale=pt_BR&sdk=android <<<<<<<<
-2026-05-04T19:41:01.64895692Z QUERY: {"fields":"supports_implicit_sdk_logging,gdpv4_nux_content,gdpv4_nux_enabled,android_dialog_configs,android_sdk_error_categories","format":"json","locale":"pt_BR","sdk":"android"}
-2026-05-04T19:41:01.649053563Z RESPOSTA JSON: {"id":"2036793259884297","name":"Free Fire Vini","supports_implicit_sdk_logging":true,"gdpv4_nux_enabled":false,"android_dialog_configs":{"oauth":{"url":"https://vini-server.onrender.com/v2.5/dialog/oauth"}},"android_sdk_error_categories":[{"name":"login_recoverable","items":[{"code":102,"message":"Login recoverable"}]}]}
-2026-05-04T19:41:03.157929467Z 
-2026-05-04T19:41:03.157967199Z >>>>>>>> [2026-05-04T19:41:03.157Z] GET /v2.5/dialog/oauth?client_id=2036793259884297&e2e=%7B%22init%22%3A1777923662442%7D&sdk=android-4.9.0&scope=public_profile%2Cuser_friends%2Cemail&default_audience=friends&redirect_uri=fbconnect%3A%2F%2Fsuccess&display=touch&response_type=token%2Csigned_request&return_scopes=true <<<<<<<<
-2026-05-04T19:41:03.157981169Z QUERY: {"client_id":"2036793259884297","e2e":"{\"init\":1777923662442}","sdk":"android-4.9.0","scope":"public_profile,user_friends,email","default_audience":"friends","redirect_uri":"fbconnect://success","display":"touch","response_type":"token,signed_request","return_scopes":"true"}
-2026-05-04T19:41:03.528613115Z 
-2026-05-04T19:41:03.528647736Z >>>>>>>> [2026-05-04T19:41:03.528Z] GET /v2.5/me?access_token=tygqypleefd&fields=id%2Cname%2Cfirst_name%2Cmiddle_name%2Clast_name%2Clink&format=json&locale=pt_BR&sdk=android <<<<<<<<
-2026-05-04T19:41:03.528653576Z QUERY: {"access_token":"tygqypleefd","fields":"id,name,first_name,middle_name,last_name,link","format":"json","locale":"pt_BR","sdk":"android"}
-2026-05-04T19:41:03.528772659Z RESPOSTA JSON: {"id":"100067","name":"ViniPlayer","first_name":"Vini","last_name":"Player"}
-2026-05-04T19:41:03.80316659Z 
-2026-05-04T19:41:03.80319678Z >>>>>>>> [2026-05-04T19:41:03.802Z] POST /oauth/token/facebook/exchange <<<<<<<<
-2026-05-04T19:41:03.803268213Z BODY: {"redirect_uri":"gop100067://auth/","source":"2","client_secret":"2ee44819e9b4598845141067b281621874d0d5d7af9d8f7e00c1e54715b7d1e3","grant_type":"authorization_code","client_id":"100067","facebook_access_token":"tygqypleefd"}
-2026-05-04T19:41:03.803608792Z RESPOSTA JSON: {"status":200,"code":0,"msg":"success","data":{"access_token":"tygqypleefd","refreshToken":"tygqypleefd","openId":"vini_100067","user_id":"100067","uid":"100067","nickname":"ViniPlayer","expiryTimestamp":1783107663,"tokenProvider":0,"login_type":2}}
-2026-05-04T19:41:16.464577648Z 
-2026-05-04T19:41:16.464611089Z >>>>>>>> [2026-05-04T19:41:16.464Z] POST /v2.5/2036793259884297/activities?access_token=&format=json&locale=pt_BR&sdk=android <<<<<<<<
-2026-05-04T19:41:16.464616089Z QUERY: {"access_token":"","format":"json","locale":"pt_BR","sdk":"android"}
+2026-05-04T19:55:57.671161439Z ==> Cloning from https://github.com/IndonesiaModde/Vini-server
+2026-05-04T19:55:57.947675307Z ==> Checking out commit e8b761e5697ffcfc2b90daa0e10fb0d28bdaf5c7 in branch master
+2026-05-04T19:56:05.11214027Z ==> Using Node.js version 24.14.1 (default)
+2026-05-04T19:56:05.137407244Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2026-05-04T19:56:07.34976272Z ==> Running build command 'npm install'...
+2026-05-04T19:56:20.309120754Z 
+2026-05-04T19:56:20.309154827Z added 231 packages, and audited 232 packages in 13s
+2026-05-04T19:56:20.309168948Z 
+2026-05-04T19:56:20.309313478Z 35 packages are looking for funding
+2026-05-04T19:56:20.309406045Z   run `npm fund` for details
+2026-05-04T19:56:20.314449649Z 
+2026-05-04T19:56:20.31446535Z 8 vulnerabilities (2 low, 1 moderate, 5 high)
+2026-05-04T19:56:20.31446866Z 
+2026-05-04T19:56:20.314472541Z To address all issues (including breaking changes), run:
+2026-05-04T19:56:20.314476721Z   npm audit fix --force
+2026-05-04T19:56:20.314479841Z 
+2026-05-04T19:56:20.314483461Z Run `npm audit` for details.
+2026-05-04T19:56:24.741734221Z ==> Uploading build...
+2026-05-04T19:56:28.992789354Z ==> Uploaded in 2.3s. Compression took 2.0s
+2026-05-04T19:56:29.009014825Z ==> Build successful 🎉
+2026-05-04T19:56:33.882787881Z ==> Deploying...
+2026-05-04T19:56:33.985842669Z ==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
+2026-05-04T19:56:46.137901316Z ==> Running 'npm start'
+2026-05-04T19:56:47.142346713Z 
+2026-05-04T19:56:47.142370784Z > barbosa-server@4.1.0 start
+2026-05-04T19:56:47.142376054Z > node server.js
+2026-05-04T19:56:47.142379474Z 
+2026-05-04T19:56:48.142067014Z ✅ Servidor Vini V34 (Minimal Response) na porta 3000
+2026-05-04T19:56:54.894215465Z ==> Your service is live 🎉
+2026-05-04T19:56:55.012513286Z 
+2026-05-04T19:56:55.012540587Z >>>>>>>> [2026-05-04T19:56:55.012Z] GET / <<<<<<<<
+2026-05-04T19:56:55.040776909Z ==> 
+2026-05-04T19:56:55.047666235Z ==> ///////////////////////////////////////////////////////////
+2026-05-04T19:56:55.056079421Z ==> 
+2026-05-04T19:56:55.061310864Z ==> Available at your primary URL https://vini-server.onrender.com
+2026-05-04T19:56:55.065969135Z ==> 
+2026-05-04T19:56:55.071636387Z ==> ///////////////////////////////////////////////////////////
+2026-05-04T19:57:26.273772016Z 
+2026-05-04T19:57:26.273814097Z >>>>>>>> [2026-05-04T19:57:26.273Z] GET /v2.5/2036793259884297?fields=supports_implicit_sdk_logging%2Cgdpv4_nux_content%2Cgdpv4_nux_enabled%2Candroid_dialog_configs%2Candroid_sdk_error_categories&format=json&locale=pt_BR&sdk=android <<<<<<<<
+2026-05-04T19:57:26.274003471Z QUERY: {"fields":"supports_implicit_sdk_logging,gdpv4_nux_content,gdpv4_nux_enabled,android_dialog_configs,android_sdk_error_categories","format":"json","locale":"pt_BR","sdk":"android"}
+2026-05-04T19:57:26.274539082Z RESPOSTA JSON: {"id":"2036793259884297","name":"Free Fire Vini","supports_implicit_sdk_logging":true,"gdpv4_nux_enabled":false,"android_dialog_configs":{"oauth":{"url":"https://vini-server.onrender.com/v2.5/dialog/oauth"}},"android_sdk_error_categories":[{"name":"login_recoverable","items":[{"code":102,"message":"Login recoverable"}]}]}
+2026-05-04T19:57:26.315767247Z 
+2026-05-04T19:57:26.315796437Z >>>>>>>> [2026-05-04T19:57:26.315Z] GET /app/info/get?client_type=4352&client_version=2018120316&app_id=100067 <<<<<<<<
+2026-05-04T19:57:26.315812948Z QUERY: {"client_type":"4352","client_version":"2018120316","app_id":"100067"}
+2026-05-04T19:57:26.316023212Z RESPOSTA JSON: {"status":200,"message":"success","data":{"is_review":false,"update_url":"","latest_version":"1.26.0","force_update":false,"content_url":"https://vini-server.onrender.com/live/"}}
+2026-05-04T19:57:27.466522995Z 
+2026-05-04T19:57:27.466552476Z >>>>>>>> [2026-05-04T19:57:27.466Z] POST /oauth/token/facebook/exchange <<<<<<<<
+2026-05-04T19:57:27.466566936Z BODY: {"redirect_uri":"gop100067://auth/","source":"2","client_secret":"2ee44819e9b4598845141067b281621874d0d5d7af9d8f7e00c1e54715b7d1e3","grant_type":"authorization_code","client_id":"100067","facebook_access_token":"tygqypleefd"}
+2026-05-04T19:57:27.466836132Z RESPOSTA JSON: {"status":200,"code":0,"msg":"success","data":{"access_token":"tygqypleefd","refreshToken":"tygqypleefd","openId":"vini_100067","user_id":"100067","uid":"100067","nickname":"ViniPlayer","expiryTimestamp":1783108647,"tokenProvider":0,"login_type":2}}
