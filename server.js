@@ -36,7 +36,7 @@ const BASE_URL = config.baseUrl || 'https://vini-server.onrender.com';
 const DOMAIN = "vini-server.onrender.com";
 
 // -----------------------------------------------------------------------
-// ENDPOINTS DE VERSÃO E ATUALIZAÇÃO (COBERTURA TOTAL)
+// ENDPOINTS DE VERSÃO E ATUALIZAÇÃO
 // -----------------------------------------------------------------------
 const versionResponse = (req, res) => {
   res.json({
@@ -63,7 +63,7 @@ app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/and
 });
 
 // -----------------------------------------------------------------------
-// FACEBOOK API v2.5 - EMULAÇÃO ABSOLUTA
+// FACEBOOK API v2.5 - EMULAÇÃO TOTAL
 // -----------------------------------------------------------------------
 app.get('/v2.5/me', (req, res) => {
   res.json({ 
@@ -83,8 +83,7 @@ app.get('/v2.5/me/permissions', (req, res) => {
       { permission: "public_profile", status: "granted" }, 
       { permission: "email", status: "granted" },
       { permission: "user_friends", status: "granted" },
-      { permission: "publish_actions", status: "granted" },
-      { permission: "user_posts", status: "granted" }
+      { permission: "publish_actions", status: "granted" }
     ] 
   });
 });
@@ -174,7 +173,7 @@ app.all([
 });
 
 // -----------------------------------------------------------------------
-// NETWORK / CONFIG - FILTRO TOTAL E DEFINITIVO
+// NETWORK / CONFIG - FILTRO TOTAL DE CONEXÃO
 // -----------------------------------------------------------------------
 app.all(['/network/config', '/api/v1/network/config', '/v1/network/config', '/api/v2/network/config'], (req, res) => {
     res.json({
@@ -244,7 +243,7 @@ app.all([
     '/api/v1/user/profile', '/user/profile', '/game/user/info', '/api/v1/game/user/info',
     '/v1/user/profile', '/v1/game/user/info', '/api/v1/lobby/*', '/lobby/*', '/shop/*', 
     '/api/v1/shop/*', '/user/*', '/api/v1/user/*', '/api/v1/game/*', '/game/*', '/v1/*', 
-    '/api/v1/*', '/api/v2/*', '/conn/*', '/sso/*', '/pay/*', '/api/v1/pay/*'
+    '/api/v1/*', '/api/v2/*', '/conn/*', '/sso/*', '/pay/*', '/api/v1/pay/*', '/v2.5/me/friends'
 ], genericSuccessResponse);
 
 app.all(['/oauth/user/friends/get', '/api/v1/oauth/user/friends/get'], (req, res) => res.json({ status: 200, data: { friends: [] } }));
@@ -265,7 +264,7 @@ app.get(['/live/*', '/android/live/*', '/ios/live/*'], (req, res) => {
 // -----------------------------------------------------------------------
 app.use((req, res, next) => {
     // Responder sucesso para qualquer rota de API/Game para evitar travamentos
-    if (req.originalUrl.match(/\/(api|oauth|game|user|lobby|shop|v1|v2|conn|sso|pay)\//i)) {
+    if (req.originalUrl.match(/\/(api|oauth|game|user|lobby|shop|v1|v2|conn|sso|pay|v2.5)\//i)) {
         return res.json({ status: 200, code: 0, msg: "success", data: {} });
     }
     next();
