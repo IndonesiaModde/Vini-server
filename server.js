@@ -9,11 +9,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Logging
+// Logging simplificado para performance
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  if (Object.keys(req.query).length > 0) console.log("Query:", JSON.stringify(req.query));
-  if (req.method === 'POST' && Object.keys(req.body).length > 0) console.log("Body:", JSON.stringify(req.body));
+  if (req.method === 'POST' && req.body.facebook_access_token) {
+    console.log("FB Token:", req.body.facebook_access_token);
+  }
   next();
 });
 
@@ -33,61 +34,69 @@ app.all(['/app/info/get', '/info/app/info/get'], (req, res) => {
 app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/android/versioninfo'], (req, res) => res.send(VERSION));
 app.get(['/sbt/fileinfo', '/fileinfo', '/live/fileinfo', '/android/fileinfo'], (req, res) => res.send(FILE_INFO));
 
-// Resposta de App ID
-app.get('/v2.5/:app_id', (req, res) => {
-  const appId = req.params.app_id;
-  if (appId === 'me') {
+// Endpoints do Facebook (V2.5)
+app.get('/v2.5/:id', (req, res) => {
+  const id = req.params.id;
+  const uid = "1000001";
+  
+  // Se pedir 'me' ou o próprio UID, retorna o perfil do jogador
+  if (id === 'me' || id === uid) {
     return res.json({
-      id: "1000001",
-      name: "ViniPlayer"
+      id: uid,
+      name: "ViniPlayer",
+      first_name: "Vini",
+      last_name: "Player",
+      link: `https://facebook.com/${uid}`
     });
   }
+  
+  // Caso contrário, retorna a config do App
   res.json({
-    id: appId,
+    id: id,
     name: "Free Fire Vini",
     supports_implicit_sdk_logging: true,
-    gdpv4_nux_enabled: false,
-    gdpv4_nux_content: "",
     android_dialog_configs: {
       oauth: { url: "https://vini-server.onrender.com/v2.5/dialog/oauth" }
-    },
-    android_sdk_error_categories: [
-      { name: "login_recoverable", items: [{ code: 102, message: "Login recoverable" }] }
-    ]
+    }
   });
 });
 
-// Atividades
 app.post('/v2.5/:app_id/activities', (req, res) => res.json({ success: true }));
+
+// --- DIÁLOGO DE LOGIN ---
+app.get('/v2.5/dialog/oauth', (req, res) => {
+  const token = uuidv4();
+  const uid = "1000001";
+  const params = `access_token=${token}&expires_in=5184000&user_id=${uid}&return_scopes=true`;
+  const finalUrl = `fbconnect://success#${params}`;
+  res.send(`<html><script>window.location.href="${finalUrl}";</script></html>`);
+});
 
 const handleLoginSuccess = (req, res) => {
   const token = req.body.facebook_access_token || req.body.access_token || uuidv4();
-  const uid = "1000001"; // ID de Usuário (Diferente do App ID)
-  const appId = "2036793259884297";
-  const now = Date.now(); // Milissegundos (Padrão Java/Android)
-  const expires_in = 5184000;
-  const expires_at = now + (expires_in * 1000);
+  const uid = "1000001";
+  const now = Date.now();
   
   const response = {
     access_token: token,
     token: token,
     key: token,
     user_id: uid,
-    openid: uid,
     uid: uid,
-    application_id: appId,
-    expires_in: expires_in,
-    expires_at: expires_at,
+    id: uid,
+    openid: uid,
+    application_id: "2036793259884297",
+    expires_in: 5184000,
+    expires_at: now + 5184000000,
     last_refresh: now,
-    permissions: ["public_profile", "email"],
-    declined_permissions: [],
     session_key: token,
-    token_type: "bearer"
+    token_type: "bearer",
+    permissions: ["public_profile", "email"],
+    declined_permissions: []
   };
 
   if (req.path.includes('exchange')) {
-    console.log(`[Exchange Success] Token: ${token}, UID: ${uid}`);
-    // Resposta LIMPA apenas com os campos de sucesso que o APK quer
+    console.log(`[Exchange Success] UID: ${uid}`);
     return res.json(response);
   }
 
@@ -95,10 +104,10 @@ const handleLoginSuccess = (req, res) => {
 };
 
 // Rotas unificadas
-app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/v2.5/me', '/oauth/token/facebook/exchange', '/v2.5/dialog/oauth/confirm', '/v2.5/oauth/token/facebook/exchange'], handleLoginSuccess);
+app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/oauth/token/facebook/exchange'], handleLoginSuccess);
 
 // Favicon
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Loop Breaker) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Speed Master) na porta ${PORT}`));
