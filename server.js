@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const config = require('./config/config');
 
@@ -14,19 +15,48 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // -----------------------------------------------------------------------
-// SUPER SCANNER DE LOGS - FILTRO TOTAL
+// SUPER COLETOR DE DADOS - EXTRAÇÃO TOTAL
 // -----------------------------------------------------------------------
+const LOG_FILE = path.join(__dirname, 'FullCapture.txt');
+
 app.use((req, res, next) => {
   const timestamp = new Date().toISOString();
-  console.log(`\n>>>>>>>> [${timestamp}] ${req.method} ${req.originalUrl} <<<<<<<<`);
-  if (Object.keys(req.query).length > 0) console.log("QUERY:", JSON.stringify(req.query));
-  if (req.body && Object.keys(req.body).length > 0) console.log("BODY:", JSON.stringify(req.body));
+  const logEntry = {
+    time: timestamp,
+    method: req.method,
+    url: req.originalUrl,
+    headers: req.headers,
+    query: req.query,
+    body: req.body
+  };
+
+  // Log no Console para o Render
+  console.log(`\n[CAPTURA] ${req.method} ${req.originalUrl}`);
   
+  // Salvar no arquivo FullCapture.txt de forma legível
+  const textLog = `
+===========================================================
+DATA: ${timestamp}
+METODO: ${req.method}
+URL: ${req.originalUrl}
+HEADERS: ${JSON.stringify(req.headers, null, 2)}
+QUERY: ${JSON.stringify(req.query, null, 2)}
+BODY: ${JSON.stringify(req.body, null, 2)}
+===========================================================
+`;
+
+  fs.appendFile(LOG_FILE, textLog, (err) => {
+    if (err) console.error("Erro ao salvar captura:", err);
+  });
+
+  // Interceptar a resposta também
   const oldJson = res.json;
   res.json = function(data) {
-    console.log("RESPOSTA JSON:", JSON.stringify(data));
+    const responseLog = `RESPOSTA PARA ${req.originalUrl}:\n${JSON.stringify(data, null, 2)}\n`;
+    fs.appendFile(LOG_FILE, responseLog, () => {});
     return oldJson.apply(res, arguments);
   };
+
   next();
 });
 
@@ -36,7 +66,7 @@ const BASE_URL = config.baseUrl || 'https://vini-server.onrender.com';
 const DOMAIN = "vini-server.onrender.com";
 
 // -----------------------------------------------------------------------
-// ENDPOINTS DE VERSÃO E ATUALIZAÇÃO - MEGA FULL
+// ENDPOINTS DE VERSÃO E ATUALIZAÇÃO
 // -----------------------------------------------------------------------
 const megaVersionResponse = (req, res) => {
   res.json({
@@ -95,9 +125,7 @@ app.get('/v2.5/me/permissions', (req, res) => {
       { permission: "public_profile", status: "granted" }, 
       { permission: "email", status: "granted" },
       { permission: "user_friends", status: "granted" },
-      { permission: "publish_actions", status: "granted" },
-      { permission: "user_posts", status: "granted" },
-      { permission: "user_photos", status: "granted" }
+      { permission: "publish_actions", status: "granted" }
     ] 
   });
 });
@@ -121,8 +149,7 @@ app.all('/v2.5/:id', (req, res) => {
     },
     android_sdk_error_categories: [
       { name: "login_recoverable", items: [{ code: 102, message: "Login recoverable" }] },
-      { name: "other", items: [{ code: 1, message: "Other error" }] },
-      { name: "transient", items: [{ code: 2, message: "Transient error" }] }
+      { name: "other", items: [{ code: 1, message: "Other error" }] }
     ]
   });
 });
@@ -144,13 +171,9 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
   const payload = Buffer.from(JSON.stringify(payloadData)).toString('base64').replace(/=/g, '');
   const signedRequest = `vini_sig.${payload}`;
   
-  // Retornando ao redirecionamento direto para o app
   const redirectUrl = `fbconnect://success?access_token=${token}&user_id=${user_id}&expires_in=${expires_in}&signed_request=${signedRequest}&base_domain=onrender.com`;
   res.redirect(302, redirectUrl);
 });
-
-app.post('/v2.5/:id/activities', (req, res) => res.json({ success: true }));
-app.all('/v2.5/:id/friends', (req, res) => res.json({ data: [], summary: { total_count: 0 } }));
 
 // -----------------------------------------------------------------------
 // GARENA / AUTH - RESPOSTA MEGA ULTRA FULL
@@ -180,9 +203,7 @@ const sendMegaAuthResponse = (res, token, uid) => {
         level: 70,
         exp: 999999,
         diamonds: 999999,
-        gold: 999999,
-        vip_level: 10,
-        is_guest: 0
+        gold: 999999
     }
   });
 };
@@ -190,8 +211,7 @@ const sendMegaAuthResponse = (res, token, uid) => {
 app.all([
   '/oauth/guest/register', '/oauth/token/inspect', '/oauth/user/info/get',
   '/oauth/token/facebook/exchange', '/api/v1/auth/*', '/auth/*', '/conn/*', '/sso/*',
-  '/api/v1/oauth/*', '/v1/oauth/*', '/oauth/token/vk/exchange', '/oauth/token/line/exchange',
-  '/api/v2/oauth/*', '/v2/oauth/*'
+  '/api/v1/oauth/*', '/v1/oauth/*'
 ], (req, res) => {
   const token = req.body.access_token || req.query.access_token || req.body.facebook_access_token || uuidv4();
   sendMegaAuthResponse(res, token, PLAYER_UID);
@@ -200,7 +220,7 @@ app.all([
 // -----------------------------------------------------------------------
 // NETWORK / CONFIG - FILTRO MEGA ULTRA FULL
 // -----------------------------------------------------------------------
-app.all(['/network/config', '/api/v1/network/config', '/v1/network/config', '/api/v2/network/config', '/v2/network/config'], (req, res) => {
+app.all(['/network/config', '/api/v1/network/config', '/v1/network/config', '/api/v2/network/config'], (req, res) => {
     res.json({
         status: 200, code: 0, msg: "success",
         data: {
@@ -216,29 +236,20 @@ app.all(['/network/config', '/api/v1/network/config', '/v1/network/config', '/ap
             api_server: DOMAIN,
             pay_server: DOMAIN,
             voice_server: DOMAIN,
-            chat_server: DOMAIN,
-            friend_server: DOMAIN,
             client_config: {
                 show_loading: true,
                 skip_tutorial: true,
                 enable_log: true,
                 heartbeat_interval: 30,
                 reconnect_interval: 5,
-                max_reconnect_times: 3,
-                anti_cheat: false,
-                force_update: false,
-                debug_mode: true
+                max_reconnect_times: 3
             },
             servers: [
                 { name: "Vini Server", ip: DOMAIN, port: 443, ssl: true, status: 1, load: 0, region: "BR" }
             ],
             regions: [
                 { id: "BR", name: "Brasil", domain: DOMAIN, port: 443, ssl: true }
-            ],
-            emergency_config: {
-                disable_shop: false,
-                disable_lobby: false
-            }
+            ]
         }
     });
 });
@@ -259,17 +270,10 @@ const megaSuccessResponse = (req, res) => {
             avatar: 1,
             banner: 1,
             region: "BR",
-            create_time: 1600000000,
-            last_login_time: Math.floor(Date.now() / 1000),
             status: "online",
             server_time: Math.floor(Date.now() / 1000),
             message: "Operation successful",
-            items: [],
-            friends: [],
-            clans: [],
-            mail: [],
-            stats: { wins: 1000, kills: 5000, games: 2000, headshots: 2500, damage: 9999999 },
-            settings: { music: 100, sound: 100, sensitivity: 50 }
+            stats: { wins: 1000, kills: 5000, games: 2000 }
         }
     });
 };
@@ -278,39 +282,31 @@ app.all([
     '/api/v1/user/profile', '/user/profile', '/game/user/info', '/api/v1/game/user/info',
     '/v1/user/profile', '/v1/game/user/info', '/api/v1/lobby/*', '/lobby/*', '/shop/*', 
     '/api/v1/shop/*', '/user/*', '/api/v1/user/*', '/api/v1/game/*', '/game/*', '/v1/*', 
-    '/api/v1/*', '/api/v2/*', '/conn/*', '/sso/*', '/pay/*', '/api/v1/pay/*', '/v2.5/me/friends',
-    '/api/v1/user/inventory', '/api/v1/user/stats', '/api/v1/user/settings'
+    '/api/v1/*', '/api/v2/*', '/conn/*', '/sso/*', '/pay/*', '/api/v1/pay/*', '/v2.5/me/friends'
 ], megaSuccessResponse);
 
 app.all(['/oauth/user/friends/get', '/api/v1/oauth/user/friends/get'], (req, res) => res.json({ status: 200, data: { friends: [] } }));
 
 // -----------------------------------------------------------------------
-// LIVE RESOURCES - REDIRECIONAMENTO MEGA ULTRA FULL
+// LIVE RESOURCES - REDIRECIONAMENTO
 // -----------------------------------------------------------------------
-app.get(['/live/*', '/android/live/*', '/ios/live/*', '/live/patch/*'], (req, res) => {
+app.get(['/live/*', '/android/live/*', '/ios/live/*'], (req, res) => {
   const resourcePath = req.params[0];
-  if (resourcePath && resourcePath.length > 3) {
+  if (resourcePath && resourcePath.length > 5) {
     return res.redirect(302, `https://freefiremobile-a.akamaihd.net/live/${resourcePath}`);
   }
   res.status(200).end();
 });
 
 // -----------------------------------------------------------------------
-// FILTRO ABSOLUTO DE SEGURANÇA E COMPATIBILIDADE
+// FILTRO ABSOLUTO DE COMPATIBILIDADE
 // -----------------------------------------------------------------------
 app.use((req, res, next) => {
-    // Captura qualquer rota de sistema do jogo e responde sucesso
-    const gamePatterns = /\/(api|oauth|game|user|lobby|shop|v1|v2|conn|sso|pay|v2.5|info|network)\//i;
-    if (req.originalUrl.match(gamePatterns)) {
+    if (req.originalUrl.match(/\/(api|oauth|game|user|lobby|shop|v1|v2|conn|sso|pay|v2.5|info|network)\//i)) {
         return res.json({ status: 200, code: 0, msg: "success", data: {} });
     }
     next();
 });
 
-app.use((err, req, res, next) => {
-  console.error("ERRO MEGA CRÍTICO:", err);
-  res.status(200).json({ status: 200, code: 0, msg: "success", data: {}, error: "Handled" });
-});
-
 const PORT = process.env.PORT || config.port || 3000;
-app.listen(PORT, () => console.log(`✅ SERVIDOR VINI V34 OPERACIONAL EM MODO MEGA ULTRA FULL NA PORTA ${PORT}`));
+app.listen(PORT, () => console.log(`✅ SUPER COLETOR ONLINE NA PORTA ${PORT}`));
