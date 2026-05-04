@@ -12,6 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 // Logging
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  if (Object.keys(req.query).length > 0) console.log("Query:", JSON.stringify(req.query));
   next();
 });
 
@@ -24,43 +25,32 @@ avatar/assetindexer,dx9nCl5JEKVr91IZSJPUrMpkhO0=,1612502,0,2SXNGYkHwORkHO85KGzbD
 optionalab_1,t+TEi174DHckEJxXOBYBHJ11Mgo=,14531942,0,CbfhgvmWCYZa4a/FG1lmxB+GXpw=,7435643,True,1
 optionalab_2,vc30vlPssnNtIg/9kRxRlxn0Blk=,9218238,0,jHwcy6KIhow3W7icBu4EqHAQ0AA=,4351697,True,1`;
 
-// --- BYPASS DE VERSÃO ---
+// Bypass Versão
 app.all(['/app/info/get', '/info/app/info/get'], (req, res) => {
   res.json({ status: 200, message: "success", data: { is_review: false, update_url: "", latest_version: VERSION } });
 });
 app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/android/versioninfo'], (req, res) => res.send(VERSION));
 app.get(['/sbt/fileinfo', '/fileinfo', '/live/fileinfo', '/android/fileinfo'], (req, res) => res.send(FILE_INFO));
 
-// --- LOGIN SDK 4.9.0 (V14) ---
+// --- LOGIN REDIRECIONAMENTO DIRETO (V15) ---
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const s = uuidv4().replace(/-/g, '');
   const token = "EAAG_VINI_" + s.substring(0, 24);
   const uid = "1000001";
-  // O signed_request é obrigatório para o SDK 4.9.0
   const signed_request = "vini_signed_req_" + s.substring(0, 32);
   
-  res.send(`
-    <html><head><title>Success access_token=${token}</title></head>
-    <body style="background:#000;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;">
-        <div style="text-align:center;"><h2>Vini Server</h2><p>Autenticando SDK 4.9.0...</p></div>
-        <script>
-            const t = "${token}"; const u = "${uid}"; const sr = "${signed_request}";
-            // Formato exato que o SDK 4.9.0 monitora no fragmento e no redirecionamento
-            const params = "access_token=" + t + "&user_id=" + u + "&signed_request=" + sr + "&expires_in=5184000";
-            window.location.hash = params;
-            
-            if (window.Android && window.Android.onFacebookLogin) window.Android.onFacebookLogin(t, u);
-            
-            setTimeout(() => {
-                window.location.href = "fbconnect://success?" + params;
-                setTimeout(() => { window.close(); }, 500);
-            }, 800);
-        </script>
-    </body></html>
-  `);
+  // Captura o redirect_uri do jogo ou usa o padrão fbconnect
+  const redirect_uri = req.query.redirect_uri || "fbconnect://success";
+  
+  console.log("Forçando Redirecionamento 302 para:", redirect_uri);
+  
+  // Monta os parâmetros no formato estrito do SDK 4.9.0
+  const params = `access_token=${token}&expires_in=5184000&signed_request=${signed_request}&user_id=${uid}`;
+  
+  // Responde com redirecionamento de rede puro (302)
+  res.redirect(302, `${redirect_uri}?${params}#${params}`);
 });
 
-// Resposta de Login Mestre (MSDK Barbosa)
 const handleLoginSuccess = (req, res) => {
   const s = uuidv4().replace(/-/g, '');
   const uid = "1000001";
@@ -73,8 +63,7 @@ const handleLoginSuccess = (req, res) => {
     openid: uid, open_id: uid, account_id: uid, uid: uid,
     username: "ViniPlayer", nickname: "ViniPlayer",
     is_new: 0, region: "BR", login_type: 1, expire_time: 5184000,
-    glive_session_key: "s_" + s.substring(0, 16), glive_uid: uid,
-    session_key_expiry_time: 5184000
+    glive_session_key: "s_" + s.substring(0, 16), glive_uid: uid
   };
   res.json({ code: 0, msg: "success", data: response, ...response });
 };
@@ -83,4 +72,4 @@ app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/v2.5/me'], handleLo
 app.get('/v2.5/:app_id', (req, res) => res.json({ id: req.params.app_id, name: "Free Fire Vini" }));
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V14 (SDK 4.9.0 Fix) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V15 (Direct 302) na porta ${PORT}`));
