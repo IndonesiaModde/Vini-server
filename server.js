@@ -37,9 +37,19 @@ app.get('/v2.5/:app_id', (req, res) => {
   const appId = req.params.app_id;
   if (appId === 'me') return res.json({ id: "1000001", name: "ViniPlayer" });
   res.json({
-    id: appId, name: "Free Fire Vini", supports_implicit_sdk_logging: true, gdpv4_nux_enabled: false,
-    android_dialog_configs: { oauth: { url: "https://vini-server.onrender.com/v2.5/dialog/oauth" } },
-    android_sdk_error_categories: [{ name: "login_recoverable", items: [{ code: 102, message: "Login recoverable" }] }]
+    id: appId,
+    name: "Free Fire Vini",
+    supports_implicit_sdk_logging: true,
+    gdpv4_nux_enabled: false,
+    gdpv4_nux_content: "",
+    android_dialog_configs: {
+      oauth: { url: "https://vini-server.onrender.com/v2.5/dialog/oauth" }
+    },
+    android_sdk_error_categories: [
+      { name: "login_recoverable", items: [{ code: 102, message: "Login recoverable" }] },
+      { name: "other", items: [{ code: 1, message: "Other error" }] },
+      { name: "transient", items: [{ code: 2, message: "Transient error" }] }
+    ]
   });
 });
 
@@ -76,18 +86,35 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
 const handleLoginSuccess = (req, res) => {
   const s = uuidv4().replace(/-/g, '');
   const uid = "1000001";
+  const token = "EAAG_VINI_" + s.substring(0, 24);
   const response = {
-    error: 0, msg: "success", code: 0, status: 200,
-    session_key: "s_" + s.substring(0, 16), access_token: "EAAG_" + s.substring(0, 24),
-    token: "EAAG_" + s.substring(0, 24), refresh_token: "r_" + s.substring(0, 8),
-    openid: uid, open_id: uid, account_id: uid, uid: uid,
-    username: "ViniPlayer", nickname: "ViniPlayer", is_new: 0, region: "BR", login_type: 1, expire_time: 5184000,
-    glive_session_key: "s_" + s.substring(0, 16), glive_uid: uid
+    error: 0,
+    msg: "success",
+    code: 0,
+    status: 200,
+    session_key: "s_" + s.substring(0, 16),
+    access_token: token,
+    token: token,
+    refresh_token: "r_" + s.substring(0, 8),
+    openid: uid,
+    open_id: uid,
+    account_id: uid,
+    uid: uid,
+    id: uid,
+    name: "ViniPlayer",
+    username: "ViniPlayer",
+    nickname: "ViniPlayer",
+    is_new: 0,
+    region: "BR",
+    login_type: 1,
+    expire_time: 5184000,
+    glive_session_key: "s_" + s.substring(0, 16),
+    glive_uid: uid
   };
   res.json({ code: 0, msg: "success", data: response, ...response });
 };
 
-app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/v2.5/me'], handleLoginSuccess);
+app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/v2.5/me', '/oauth/token/facebook/exchange', '/v2.5/dialog/oauth/confirm'], handleLoginSuccess);
 
 const PORT = process.env.PORT || config.port;
 app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Fragment Master) na porta ${PORT}`));
