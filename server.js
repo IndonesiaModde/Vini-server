@@ -62,42 +62,18 @@ app.get('/v2.5/:app_id', (req, res) => {
   });
 });
 
-// Endpoint de Atividades do Facebook (necessário para o SDK não dar erro)
+// Endpoint de Atividades do Facebook
 app.post('/v2.5/:app_id/activities', (req, res) => {
   res.json({ success: true });
 });
 
-// --- DIÁLOGO DE LOGIN ---
-app.get('/v2.5/dialog/oauth', (req, res) => {
-  const token = uuidv4();
-  const uid = "100067";
-  const payload = Buffer.from(JSON.stringify({ user_id: uid, algorithm: "HMAC-SHA256" })).toString('base64');
-  const signed_request = "vini_sig." + payload;
-  const e2e = req.query.e2e || "{}";
-  
-  const params = `access_token=${token}&expires_in=5184000&signed_request=${signed_request}&user_id=${uid}&e2e=${encodeURIComponent(e2e)}&return_scopes=true&glive_uid=${uid}`;
-  const finalUrl = `fbconnect://success#${params}`;
-
-  res.send(`
-    <html><head><title>Success access_token=${token}</title></head>
-    <body style="background:#000;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;">
-        <div style="text-align:center;"><h2>Vini Server</h2><p>Sincronizando...</p></div>
-        <script>
-            window.location.href = "${finalUrl}";
-            if (window.Android && window.Android.onFacebookLogin) window.Android.onFacebookLogin("${token}", "${uid}");
-            setTimeout(() => { window.location.href = "${finalUrl}"; }, 1000);
-        </script>
-    </body></html>
-  `);
-});
-
 const handleLoginSuccess = (req, res) => {
-  // Pega o token enviado pelo jogo ou gera um novo UUID
   const token = req.body.facebook_access_token || req.body.access_token || uuidv4();
-  // Pega o client_id enviado ou usa o padrão
   const uid = req.body.client_id || "100067";
+  const now = Math.floor(Date.now() / 1000);
   
   const response = {
+    // Campos principais
     key: token,
     access_token: token,
     token: token,
@@ -107,16 +83,28 @@ const handleLoginSuccess = (req, res) => {
     uid: uid,
     id: uid,
     account_id: uid,
+    
+    // Campos de sessão e tempo
     session_key: token,
     refresh_token: uuidv4().substring(0, 8),
     expires_in: 5184000,
     expire_time: 5184000,
+    issued_at: now,
+    
+    // Perfil
     nickname: "ViniPlayer",
     name: "ViniPlayer",
     username: "ViniPlayer",
+    first_name: "Vini",
+    last_name: "Player",
+    
+    // Configurações
     region: "BR",
     login_type: 1,
     is_new: 0,
+    scope: "public_profile,email,user_friends",
+    
+    // Status
     error: 0,
     msg: "success",
     code: 0,
@@ -125,7 +113,11 @@ const handleLoginSuccess = (req, res) => {
 
   if (req.path.includes('exchange')) {
     console.log(`[Exchange Success] Token: ${token}, UID: ${uid}`);
-    return res.json(response);
+    // Retorna o objeto plano com campos extras de tempo e escopo
+    return res.json({
+      ...response,
+      token_type: "bearer"
+    });
   }
 
   res.json({ code: 0, msg: "success", data: response, ...response });
@@ -138,4 +130,4 @@ app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/v2.5/me', '/oauth/t
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Activities Master) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Final Master) na porta ${PORT}`));
