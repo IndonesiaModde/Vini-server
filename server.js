@@ -1,81 +1,138 @@
-import express from "express";
-import { createServer as createViteServer } from "vite";
-import path from "path";
-import { fileURLToPath } from "url";
-import cors from "cors";
+const express = require('express');
+const cors = require('cors');
+const { v4: uuidv4 } = require('uuid');
+const config = require('./config/config');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const app = express();
 
-async function startServer() {
-  const app = express();
-  const PORT = process.env.PORT || 3000;
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-  app.use(cors()); // Permite conexões de qualquer origem
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+// SISTEMA DE SUPER LOG
+app.use((req, res, next) => {
+  const timestamp = new Date().toISOString();
+  console.log(`\n--- [${timestamp}] ${req.method} ${req.path} ---`);
+  if (Object.keys(req.query).length > 0) console.log("QUERY:", JSON.stringify(req.query));
+  if (req.body && Object.keys(req.body).length > 0) console.log("BODY:", JSON.stringify(req.body));
+  
+  const oldJson = res.json;
+  res.json = function(data) {
+    console.log("RESPOSTA:", JSON.stringify(data));
+    return oldJson.apply(res, arguments);
+  };
+  next();
+});
 
-  // Logs para depuração no Render
-  app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-    next();
+const VERSION = "1.26.0";
+const FILE_INFO = `gameassetbundles,mzZtylZ1fawV5N8D8XikRyF+5mY=,12060,0
+main/gameentry,DZlCrLRuzwyuNzUZrh+p0QxJCcI=,2018,0
+localization/loc,gWXz0dDNM8MJyFcAFhzbqWWqvrY=,632921,0
+ingame/avatarmanager,Tjb+QEzOiGwy+DBpxlLrVBZRphA=,1915,0
+config/resconf,ysnx0NubzKPaLVGszrP45y9WQH0=,34896,0
+avatar/assetindexer,IbV74Hqrb07rdlrKYQx6JZIhZ5M=,74343,0
+avatar/uma_dcs,BSJQtQt6qEeFdLv8gsrVtPDQubo=,14523,0`;
+
+// Endpoints de Versão e Recursos
+app.all(['/app/info/get', '/info/app/info/get'], (req, res) => {
+  res.json({ status: 200, message: "success", data: { is_review: false, update_url: "", latest_version: VERSION, force_update: false } });
+});
+app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/android/versioninfo'], (req, res) => {
+  // Formato de URL para o ver.php que funcionou
+  if (req.path.includes('ver.php')) {
+    const myUrl = "https://vini-server.onrender.com/live/";
+    return res.send(`${VERSION},${myUrl},${myUrl},${myUrl}`);
+  }
+  res.send(VERSION);
+});
+app.get(['/sbt/fileinfo', '/fileinfo', '/live/fileinfo', '/android/fileinfo'], (req, res) => res.send(FILE_INFO));
+
+// Endpoints Facebook (Lógica de ID corrigida)
+app.all('/v2.5/:id', (req, res) => {
+  const id = req.params.id;
+  const uid = "100067";
+  
+  // Se for 'me' ou o UID do usuário, retorna perfil
+  if (id === 'me' || id === uid) {
+    return res.json({ id: uid, name: "ViniPlayer", first_name: "Vini", last_name: "Player" });
+  }
+  
+  // Caso contrário, assume que é um App ID e retorna configurações
+  res.json({
+    id: id,
+    name: "Free Fire Vini",
+    supports_implicit_sdk_logging: true,
+    gdpv4_nux_enabled: false,
+    gdpv4_nux_content: "",
+    android_dialog_configs: {
+      oauth: { url: "https://vini-server.onrender.com/v2.5/dialog/oauth" }
+    },
+    android_sdk_error_categories: [
+      { name: "login_recoverable", items: [{ code: 102, message: "Login recoverable" }] }
+    ]
   });
+});
 
-  // 1. OAuth Dialog - Correção do Redirecionamento
-  app.get("/v2.5/dialog/oauth", (req, res) => {
-    const { redirect_uri, state } = req.query;
-    const mockToken = "EAAW2ZBZA8ZBZA8BAO7pZBZA8ZBZA8ZBZA8ZBZA8ZBZA8ZBZA8ZBZA8ZBZA8ZBZA8ZBZA8ZBZA8ZBZA8ZBZA8ZBZA8ZBZA";
-    
-    if (redirect_uri && typeof redirect_uri === 'string') {
-      if (redirect_uri.startsWith("fbconnect://success")) {
-        const fragment = `access_token=${mockToken}&expires_in=3600${state ? `&state=${state}` : ""}`;
-        return res.redirect(`${redirect_uri}#${fragment}`);
-      }
-    }
-    res.json({ success: true, message: "Mock OAuth active" });
-  });
+app.post('/v2.5/:app_id/activities', (req, res) => {
+  res.json({ success: true, app_events_config: { custom_events_default_sampling_probability: 1 } });
+});
 
-  // 2. Configurações do App (Importante para o SDK não dar erro de conexão)
-  app.get("/v2.5/:appId", (req, res, next) => {
-    const { appId } = req.params;
-    if (appId === "me") return next(); // Passa para o endpoint de usuário
+app.get('/v2.5/dialog/oauth', (req, res) => {
+  const token = uuidv4();
+  const uid = "100067";
+  const params = `access_token=${token}&expires_in=5184000&user_id=${uid}&base_domain=onrender.com&return_scopes=true`;
+  const finalUrl = `fbconnect://success#${params}`;
+  
+  console.log(`[OAuth] Redirecionando para: ${finalUrl}`);
+  // Redirecionamento 302 é mais estável que script HTML para o SDK Android
+  res.redirect(302, finalUrl);
+});
 
-    res.json({
-      id: appId,
-      name: "Vini Server",
-      supports_implicit_sdk_logging: true,
-      app_events_feature_bitmask: 63
-    });
-  });
+const handleLoginSuccess = (req, res) => {
+  const token = req.body.facebook_access_token || req.body.access_token || uuidv4();
+  const uid = "100067";
+  const appId = req.body.client_id || "2036793259884297";
+  const now = Date.now();
+  
+  const response = {
+    access_token: token,
+    token: token,
+    key: token,
+    user_id: uid,
+    uid: uid,
+    id: uid,
+    application_id: appId,
+    expires_in: 5184000,
+    expires_at: now + 5184000000,
+    last_refresh: now,
+    session_key: token,
+    token_type: "bearer",
+    permissions: ["public_profile", "email"],
+    declined_permissions: [],
+    status: 200,
+    code: 0,
+    msg: "success"
+  };
 
-  // 3. Log de Atividades
-  app.post("/v2.5/:appId/activities", (req, res) => {
-    res.json({ success: true });
-  });
-
-  // 4. Dados do Usuário (O que o jogo mostra após logar)
-  app.get("/v2.5/me", (req, res) => {
-    res.json({
-      id: "100000000000001",
-      name: "Vini Modder",
-      email: "vini@example.com",
-      picture: { data: { url: "https://placehold.co/100x100?text=Vini" } }
-    });
-  });
-
-  // Configuração para servir o frontend (Vite)
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({ server: { middlewareMode: true }, appType: "spa" });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
-    app.get("*", (req, res) => res.sendFile(path.join(distPath, "index.html")));
+  if (req.path.includes('exchange')) {
+    console.log(`[Exchange Success] UID: ${uid}`);
+    return res.json({ ...response, data: response });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Servidor ativo na porta ${PORT}`);
-  });
-}
+  res.json({ code: 0, msg: "success", data: response, ...response });
+};
 
-startServer().catch(console.error);
+app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/oauth/token/facebook/exchange'], handleLoginSuccess);
+
+// Rota para recursos /live/* (CDN Redirection)
+app.get('/live/*', (req, res) => {
+  const resourcePath = req.params[0];
+  if (resourcePath.length > 20) {
+    const garenaCDN = `https://freefiremobile-a.akamaihd.net/live/${resourcePath}`;
+    return res.redirect(302, garenaCDN);
+  }
+  res.status(200).end();
+});
+
+const PORT = process.env.PORT || config.port;
+app.listen(PORT, () => console.log(`✅ Servidor Vini V22 (FB Fix) na porta ${PORT}`));
