@@ -222,21 +222,21 @@ app.all(['/network/config', '/api/v1/network/config', '/v1/network/config', '/ap
     res.json({
         status: 200, code: 0, msg: "success",
         data: {
-            lobby_server: "127.0.0.1",
+            lobby_server: "192.168.0.193",
             lobby_port: 10001, 
             use_ssl: false,
-            gate_server: "127.0.0.1",
+            gate_server: "192.168.0.193",
             gate_port: 10001,
             cdn_url: `${BASE_URL}/live/`,
             update_url: `${BASE_URL}/live/`,
-            file_server: "127.0.0.1", // Alterado
-            log_server: "127.0.0.1",  // Alterado
-            api_server: "127.0.0.1",  // Alterado
+            file_server: "192.168.0.193", // Alterado
+            log_server: "192.168.0.193",  // Alterado
+            api_server: "192.168.0.193",  // Alterado
             
             servers: [
                 { 
                     name: "Vini Termux", 
-                    ip: "127.0.0.1", 
+                    ip: "192.168.0.193", 
                     port: 10001, 
                     ssl: false, 
                     status: 1 
@@ -246,7 +246,7 @@ app.all(['/network/config', '/api/v1/network/config', '/v1/network/config', '/ap
                 { 
                     id: "BR", 
                     name: "Brasil", 
-                    domain: "127.0.0.1", 
+                    domain: "192.168.0.193", 
                     port: 10001, 
                     ssl: false 
                 }
