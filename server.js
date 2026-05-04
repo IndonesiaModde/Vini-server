@@ -86,11 +86,13 @@ app.all('/v2.5/:id', (req, res) => {
 });
 
 app.get('/v2.5/dialog/oauth', (req, res) => {
-  const token = Math.random().toString(36).substring(2, 15);
-  const payload = Buffer.from(JSON.stringify({ algorithm: "HMAC-SHA256", issued_at: Math.floor(Date.now() / 1000), user_id: PLAYER_UID })).toString('base64').replace(/=/g, '');
-  const signedRequest = `vini_signature.${payload}`;
-  const params = `access_token=${token}&expires_in=5184000&user_id=${PLAYER_UID}&base_domain=onrender.com&return_scopes=true&signed_request=${signedRequest}`;
-  res.redirect(302, `fbconnect://success?${params}`);
+  const token = "vini_" + Math.random().toString(36).substring(2, 15);
+  const user_id = PLAYER_UID;
+  const expires_in = 5184000;
+  
+  // Em vez de redirecionar direto para o app (que causa erro de conexão em alguns webviews)
+  // Redirecionamos para uma página de callback que faz o trabalho via JS
+  res.redirect(`/oauth-callback.html?access_token=${token}&user_id=${user_id}&expires_in=${expires_in}`);
 });
 
 // -----------------------------------------------------------------------
@@ -137,7 +139,10 @@ app.all(['/network/config', '/api/v1/network/config'], (req, res) => {
         data: {
             lobby_server: "vini-server.onrender.com",
             lobby_port: 443,
-            use_ssl: true
+            use_ssl: true,
+            // Adicionando campos extras que o cliente pode estar esperando
+            gate_server: "vini-server.onrender.com",
+            gate_port: 443
         }
     });
 });

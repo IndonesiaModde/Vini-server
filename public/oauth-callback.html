@@ -56,8 +56,11 @@
             // Tentar redirecionar para o protocolo customizado do app
             const redirectUrl = `fbconnect://success?access_token=${access_token}&user_id=${user_id}&expires_in=${expires_in}`;
             
+            // Log para debug no console do navegador
+            console.log("Redirecionando para:", redirectUrl);
+
             // Fazer redirect imediatamente
-            window.location.href = redirectUrl;
+            window.location.replace(redirectUrl);
 
             // Se o redirect não funcionar em 3 segundos, mostrar mensagem
             setTimeout(() => {
