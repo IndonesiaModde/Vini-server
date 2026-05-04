@@ -93,78 +93,70 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
   res.redirect(302, `fbconnect://success?${params}`);
 });
 
-app.post('/v2.5/:app_id/activities', (req, res) => {
-  res.json({ success: true, app_events_config: { custom_events_default_sampling_probability: 1 } });
-});
-
 // -----------------------------------------------------------------------
-// GARENA / AUTH - INUNDAÇÃO DE TOKENS
+// GARENA / AUTH
 // -----------------------------------------------------------------------
 
 const sendAuthResponse = (res, token, uid) => {
   const now = Math.floor(Date.now() / 1000);
   const openId = `vini_${uid}`; 
-  
   const authData = {
-    // INUNDAÇÃO DE CAMPOS DE TOKEN (Para garantir que o APK capture um deles)
-    authToken: token,
-    token: token,
-    access_token: token,
-    refreshToken: token,
-    key: token,
-    session_key: token,
-    
-    // IDs
-    openId: openId,
-    user_id: uid,
-    uid: uid,
-    account_id: uid,
-    
-    // Info adicional
-    nickname: "ViniPlayer",
-    expiryTimestamp: now + 5184000,
-    expires_in: 5184000,
-    lastInspectTime: now,
-    tokenProvider: 0,
-    login_type: 2,
-    is_guest: false,
-    status: 200,
-    code: 0,
-    msg: "success"
+    authToken: token, token: token, access_token: token, refreshToken: token, key: token, session_key: token,
+    openId: openId, user_id: uid, uid: uid, account_id: uid, nickname: "ViniPlayer",
+    expiryTimestamp: now + 5184000, expires_in: 5184000, lastInspectTime: now,
+    tokenProvider: 0, login_type: 2, is_guest: false, status: 200, code: 0, msg: "success"
   };
-
-  res.json({
-    ...authData,
-    data: {
-        ...authData
-    }
-  });
+  res.json({ ...authData, data: { ...authData } });
 };
 
 app.all([
-  '/oauth/guest/register',
-  '/oauth/token/inspect',
-  '/oauth/user/info/get',
-  '/oauth/token/facebook/exchange',
-  '/api/v1/auth/*',
-  '/auth/*',
-  '/conn/*',
-  '/sso/*'
+  '/oauth/guest/register', '/oauth/token/inspect', '/oauth/user/info/get',
+  '/oauth/token/facebook/exchange', '/api/v1/auth/*', '/auth/*', '/conn/*', '/sso/*'
 ], (req, res) => {
   const token = req.body.access_token || req.query.access_token || req.body.facebook_access_token || uuidv4();
   sendAuthResponse(res, token, PLAYER_UID);
+});
+
+// -----------------------------------------------------------------------
+// LOBBY / GAMEPLAY / NETWORK
+// -----------------------------------------------------------------------
+
+// Configuração de Rede (Vital para o jogo saber onde se conectar)
+app.all(['/network/config', '/api/v1/network/config'], (req, res) => {
+    res.json({
+        status: 200, code: 0, msg: "success",
+        data: {
+            lobby_server: "vini-server.onrender.com",
+            lobby_port: 443,
+            use_ssl: true,
+            game_servers: [{ ip: "vini-server.onrender.com", port: 443, label: "ViniServer" }]
+        }
+    });
+});
+
+// Perfil do Usuário (Nível, Diamantes, Ouro)
+app.all(['/api/v1/user/profile', '/user/profile', '/game/user/info'], (req, res) => {
+    res.json({
+        status: 200, code: 0, msg: "success",
+        data: {
+            uid: PLAYER_UID,
+            nickname: "ViniPlayer",
+            level: 70,
+            exp: 999999,
+            diamonds: 999999,
+            gold: 999999,
+            badges: 100,
+            rank: 25 // Mestre
+        }
+    });
 });
 
 app.all('/api/v1/auth/session', (req, res) => {
     res.json({ status: 200, code: 0, msg: "success", data: { user_id: PLAYER_UID, valid: true } });
 });
 
-// Outros endpoints
 app.all(['/game/*', '/api/v1/game/*', '/lobby/*', '/shop/*', '/user/*'], (req, res) => {
-  res.json({ status: 200, code: 0, msg: "success", data: {
-      user_info: { uid: PLAYER_UID, nickname: "ViniPlayer", level: 70, exp: 999999 },
-      lobby_info: { server_status: "online", maintenance: false }
-  }});
+  res.json({ status: 200, code: 0, msg: "success", data: { status: "online" } });
 });
 
 app.all('/oauth/user/friends/get', (req, res) => res.json({ status: 200, data: { friends: [] } }));
@@ -179,4 +171,4 @@ app.get('/live/*', (req, res) => {
 });
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V31 (Token Flood) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V32 (Network Config) na porta ${PORT}`));
