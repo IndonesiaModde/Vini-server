@@ -15,14 +15,10 @@ app.use((req, res, next) => {
   next();
 });
 
-const VERSION = "1.26.0";
+// VERSÃO AJUSTADA PARA 1.25.3 CONFORME APK
+const VERSION = "1.25.3";
 const FILE_INFO = `gameassetbundles,GDgOUAbI0rGH7IYYozj+x4YAWiU=,5041,0,AJOItUGjSYdorK+4T8B4erfgUmo=,1487,True,0
-main/gameentry,aclCUq5ADSq/d37jcyeAUkr3Oek=,8417,0,d1gnbs/vs21V0wKzRU/I6JodIcI=,2561,True,0
-localization/lochotfix,yFaLPL2idbOrU8Q8uWQZ2CKIgAU=,4497,0,cwdTsYEsIdH/IBDJHuhlCwwcEHs=,893,True,0
-config/resconf,4wESPGAAHI4mUm1OdzBwN7yElZ0=,755422,0,+yfgCC37OG8jAkggbD0uCT1bGXU=,79966,True,0
-avatar/assetindexer,dx9nCl5JEKVr91IZSJPUrMpkhO0=,1612502,0,2SXNGYkHwORkHO85KGzbDrbTolo=,241406,True,0
-optionalab_1,t+TEi174DHckEJxXOBYBHJ11Mgo=,14531942,0,CbfhgvmWCYZa4a/FG1lmxB+GXpw=,7435643,True,1
-optionalab_2,vc30vlPssnNtIg/9kRxRlxn0Blk=,9218238,0,jHwcy6KIhow3W7icBu4EqHAQ0AA=,4351697,True,1`;
+main/gameentry,aclCUq5ADSq/d37jcyeAUkr3Oek=,8417,0,d1gnbs/vs21V0wKzRU/I6JodIcI=,2561,True,0`;
 
 // Bypass Versão
 app.all(['/app/info/get', '/info/app/info/get'], (req, res) => {
@@ -34,7 +30,7 @@ app.get(['/sbt/fileinfo', '/fileinfo', '/live/fileinfo', '/android/fileinfo'], (
 // Endpoints do Facebook
 app.all('/v2.5/:id', (req, res) => {
   const id = req.params.id;
-  const uid = "100067"; // Sincronizado com o client_id do APK
+  const uid = "100067";
   if (id === 'me' || id === uid) {
     return res.json({
       id: uid,
@@ -95,7 +91,6 @@ const handleLoginSuccess = (req, res) => {
 
   if (req.path.includes('exchange')) {
     console.log(`[Exchange Success] UID: ${uid}`);
-    // Resposta Híbrida (Raiz + Data) para compatibilidade universal
     return res.json({
       ...response,
       data: response
@@ -108,4 +103,4 @@ const handleLoginSuccess = (req, res) => {
 app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/oauth/token/facebook/exchange'], handleLoginSuccess);
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Universal Master) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Version 1.25.3 Master) na porta ${PORT}`));
