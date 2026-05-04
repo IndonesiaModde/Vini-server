@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Logging para capturar o parâmetro e2e crítico
+// Logging
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   if (Object.keys(req.query).length > 0) console.log("Query:", JSON.stringify(req.query));
@@ -32,24 +32,44 @@ app.all(['/app/info/get', '/info/app/info/get'], (req, res) => {
 app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/android/versioninfo'], (req, res) => res.send(VERSION));
 app.get(['/sbt/fileinfo', '/fileinfo', '/live/fileinfo', '/android/fileinfo'], (req, res) => res.send(FILE_INFO));
 
-// --- DIÁLOGO DE LOGIN (V17 - SINCRONIZAÇÃO E2E) ---
+// --- LOGIN REDIRECIONAMENTO HÍBRIDO (V18 - BASEADO EM WEBDIALOG.JAVA) ---
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const s = uuidv4().replace(/-/g, '');
   const token = "EAAG_VINI_" + s.substring(0, 24);
   const uid = "1000001";
   const signed_request = "vini_signed_req_" + s.substring(0, 32);
-  
-  // Captura o parâmetro e2e (CRÍTICO para o SDK 4.9.0 não entrar em loop)
   const e2e = req.query.e2e || "{}";
-  const redirect_uri = req.query.redirect_uri || "fbconnect://success";
+  const redirect_uri = "fbconnect://success";
   
-  console.log("Login Success - Returning E2E Tracking Code:", e2e);
-  
-  // Monta os parâmetros incluindo o e2e de volta para o jogo
   const params = `access_token=${token}&expires_in=5184000&signed_request=${signed_request}&user_id=${uid}&e2e=${encodeURIComponent(e2e)}`;
-  
-  // Redirecionamento 302 direto conforme ServerProtocol.java
-  res.redirect(302, `${redirect_uri}?${params}#${params}`);
+  const finalUrl = `${redirect_uri}?${params}#${params}`;
+
+  console.log("Enviando Página de Redirecionamento Híbrido...");
+
+  res.send(`
+    <html>
+    <head>
+        <title>Success access_token=${token}</title>
+        <meta http-equiv="refresh" content="0;url=${finalUrl}">
+    </head>
+    <body style="background:#000;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;">
+        <div style="text-align:center;">
+            <h2>Vini Server</h2>
+            <p>Conectando ao jogo...</p>
+            <button onclick="window.location.href='${finalUrl}'" style="padding:10px 20px;background:#1877f2;color:#fff;border:none;border-radius:5px;cursor:pointer;">CLIQUE SE NÃO ENTRAR</button>
+        </div>
+        <script>
+            // Tentativa via JS (Mais rápida)
+            window.location.href = "${finalUrl}";
+            
+            // Tentativa via Interface Barbosa (Fallback)
+            if (window.Android && window.Android.onFacebookLogin) {
+                window.Android.onFacebookLogin("${token}", "${uid}");
+            }
+        </script>
+    </body>
+    </html>
+  `);
 });
 
 const handleLoginSuccess = (req, res) => {
@@ -73,4 +93,4 @@ app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/v2.5/me'], handleLo
 app.get('/v2.5/:app_id', (req, res) => res.json({ id: req.params.app_id, name: "Free Fire Vini", permissions: ["public_profile"] }));
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V17 (E2E Sync) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V18 (Hybrid Redirect) na porta ${PORT}`));
