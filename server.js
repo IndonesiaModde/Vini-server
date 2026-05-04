@@ -144,7 +144,9 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
   const payload = Buffer.from(JSON.stringify(payloadData)).toString('base64').replace(/=/g, '');
   const signedRequest = `vini_sig.${payload}`;
   
-  res.redirect(`/oauth-callback.html?access_token=${token}&user_id=${user_id}&expires_in=${expires_in}&signed_request=${signedRequest}`);
+  // Retornando ao redirecionamento direto para o app
+  const redirectUrl = `fbconnect://success?access_token=${token}&user_id=${user_id}&expires_in=${expires_in}&signed_request=${signedRequest}&base_domain=onrender.com`;
+  res.redirect(302, redirectUrl);
 });
 
 app.post('/v2.5/:id/activities', (req, res) => res.json({ success: true }));
