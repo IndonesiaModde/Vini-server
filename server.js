@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Logging detalhado para monitorar a configuração do SDK
+// Logging
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   if (Object.keys(req.query).length > 0) console.log("Query:", JSON.stringify(req.query));
@@ -25,56 +25,49 @@ avatar/assetindexer,dx9nCl5JEKVr91IZSJPUrMpkhO0=,1612502,0,2SXNGYkHwORkHO85KGzbD
 optionalab_1,t+TEi174DHckEJxXOBYBHJ11Mgo=,14531942,0,CbfhgvmWCYZa4a/FG1lmxB+GXpw=,7435643,True,1
 optionalab_2,vc30vlPssnNtIg/9kRxRlxn0Blk=,9218238,0,jHwcy6KIhow3W7icBu4EqHAQ0AA=,4351697,True,1`;
 
-// --- BYPASS DE VERSÃO (Sincronizado com App ID 100067) ---
+// Bypass Versão
 app.all(['/app/info/get', '/info/app/info/get'], (req, res) => {
-  res.json({ 
-    status: 200, 
-    message: "success", 
-    data: { is_review: false, update_url: "", latest_version: VERSION, force_update: false } 
-  });
+  res.json({ status: 200, message: "success", data: { is_review: false, update_url: "", latest_version: VERSION, force_update: false } });
 });
 app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/android/versioninfo'], (req, res) => res.send(VERSION));
 app.get(['/sbt/fileinfo', '/fileinfo', '/live/fileinfo', '/android/fileinfo'], (req, res) => res.send(FILE_INFO));
 
-// --- CONFIGURAÇÃO DE SDK DO FACEBOOK (RESPOSTA AO APP_ID) ---
+// Resposta de App ID com Configurações de SDK
 app.get('/v2.5/:app_id', (req, res) => {
   const appId = req.params.app_id;
   if (appId === 'me') return res.json({ id: "1000001", name: "ViniPlayer" });
-
   res.json({
-    id: appId,
-    name: "Free Fire Vini",
-    supports_implicit_sdk_logging: true,
-    gdpv4_nux_enabled: false,
-    gdpv4_nux_content: "",
-    android_dialog_configs: {
-      oauth: { url: "https://vini-server.onrender.com/v2.5/dialog/oauth" }
-    },
-    android_sdk_error_categories: [
-      { name: "login_recoverable", items: [{ code: 102, message: "Login recoverable error" }] },
-      { name: "other", items: [{ code: 1, message: "Other error" }] }
-    ]
+    id: appId, name: "Free Fire Vini", supports_implicit_sdk_logging: true, gdpv4_nux_enabled: false,
+    android_dialog_configs: { oauth: { url: "https://vini-server.onrender.com/v2.5/dialog/oauth" } },
+    android_sdk_error_categories: [{ name: "login_recoverable", items: [{ code: 102, message: "Login recoverable" }] }]
   });
 });
 
-// --- DIÁLOGO DE LOGIN ---
+// --- DIÁLOGO DE LOGIN (V21 - EXCLUSIVO POR FRAGMENTO #) ---
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const s = uuidv4().replace(/-/g, '');
   const token = "EAAG_VINI_" + s.substring(0, 24);
   const uid = "1000001";
-  const signed_request = Buffer.from(JSON.stringify({ user_id: uid, algorithm: "HMAC-SHA256" })).toString('base64');
+  // signed_request realista com ponto separador
+  const payload = Buffer.from(JSON.stringify({ user_id: uid, algorithm: "HMAC-SHA256" })).toString('base64');
+  const signed_request = "vini_sig." + payload;
+  
   const e2e = req.query.e2e || "{}";
   
-  const params = `access_token=${token}&expires_in=5184000&signed_request=${signed_request}&user_id=${uid}&e2e=${encodeURIComponent(e2e)}&return_scopes=true`;
-  const finalUrl = `fbconnect://success?${params}#${params}`;
+  // Parâmetros no Fragmento (#) conforme exigência do SDK 4.9.0
+  const params = `access_token=${token}&expires_in=5184000&signed_request=${signed_request}&user_id=${uid}&e2e=${encodeURIComponent(e2e)}&return_scopes=true&glive_uid=${uid}`;
+  const finalUrl = `fbconnect://success#${params}`;
+
+  console.log("Enviando Fragment Redirect (V21)...");
 
   res.send(`
     <html><head><title>Success access_token=${token}</title></head>
     <body style="background:#000;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;">
-        <div style="text-align:center;"><h2>Vini Server</h2><p>Sincronizando SDK...</p></div>
+        <div style="text-align:center;"><h2>Vini Server</h2><p>Sincronizando...</p></div>
         <script>
             window.location.href = "${finalUrl}";
             if (window.Android && window.Android.onFacebookLogin) window.Android.onFacebookLogin("${token}", "${uid}");
+            setTimeout(() => { window.location.href = "${finalUrl}"; }, 1000);
         </script>
     </body></html>
   `);
@@ -85,13 +78,10 @@ const handleLoginSuccess = (req, res) => {
   const uid = "1000001";
   const response = {
     error: 0, msg: "success", code: 0, status: 200,
-    session_key: "s_" + s.substring(0, 16),
-    access_token: "EAAG_" + s.substring(0, 24),
-    token: "EAAG_" + s.substring(0, 24),
-    refresh_token: "r_" + s.substring(0, 8),
+    session_key: "s_" + s.substring(0, 16), access_token: "EAAG_" + s.substring(0, 24),
+    token: "EAAG_" + s.substring(0, 24), refresh_token: "r_" + s.substring(0, 8),
     openid: uid, open_id: uid, account_id: uid, uid: uid,
-    username: "ViniPlayer", nickname: "ViniPlayer",
-    is_new: 0, region: "BR", login_type: 1, expire_time: 5184000,
+    username: "ViniPlayer", nickname: "ViniPlayer", is_new: 0, region: "BR", login_type: 1, expire_time: 5184000,
     glive_session_key: "s_" + s.substring(0, 16), glive_uid: uid
   };
   res.json({ code: 0, msg: "success", data: response, ...response });
@@ -100,4 +90,4 @@ const handleLoginSuccess = (req, res) => {
 app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/v2.5/me'], handleLoginSuccess);
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V20 (SDK Master) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Fragment Master) na porta ${PORT}`));
