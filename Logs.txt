@@ -1,50 +1,50 @@
-2026-05-04T20:41:21.560184138Z 
-2026-05-04T20:41:21.560322865Z 35 packages are looking for funding
-2026-05-04T20:41:21.560401179Z   run `npm fund` for details
-2026-05-04T20:41:21.565272962Z 
-2026-05-04T20:41:21.565287003Z 8 vulnerabilities (2 low, 1 moderate, 5 high)
-2026-05-04T20:41:21.565291233Z 
-2026-05-04T20:41:21.565296023Z To address all issues (including breaking changes), run:
-2026-05-04T20:41:21.565300613Z   npm audit fix --force
-2026-05-04T20:41:21.565304503Z 
-2026-05-04T20:41:21.565309093Z Run `npm audit` for details.
-2026-05-04T20:41:22.158830402Z ==> Uploading build...
-2026-05-04T20:41:25.862161266Z ==> Uploaded in 2.7s. Compression took 1.0s
-2026-05-04T20:41:25.879034701Z ==> Build successful 🎉
-2026-05-04T20:41:29.381050788Z ==> Deploying...
-2026-05-04T20:41:29.497129749Z ==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
-2026-05-04T20:41:40.092264481Z ==> Running 'npm start'
-2026-05-04T20:41:41.283901028Z 
-2026-05-04T20:41:41.283937919Z > barbosa-server@4.1.0 start
-2026-05-04T20:41:41.283942549Z > node server.js
-2026-05-04T20:41:41.283945319Z 
-2026-05-04T20:41:42.388720862Z ✅ SERVIDOR VINI V34 OPERACIONAL EM MODO ABSOLUTO NA PORTA 3000
-2026-05-04T20:41:42.985088491Z 
-2026-05-04T20:41:42.985120401Z >>>>>>>> [2026-05-04T20:41:42.984Z] HEAD / <<<<<<<<
-2026-05-04T20:41:50.4835736Z ==> Your service is live 🎉
-2026-05-04T20:41:50.606158231Z 
-2026-05-04T20:41:50.606190092Z >>>>>>>> [2026-05-04T20:41:50.605Z] GET / <<<<<<<<
-2026-05-04T20:41:50.638472446Z ==> 
-2026-05-04T20:41:50.642205278Z ==> ///////////////////////////////////////////////////////////
-2026-05-04T20:41:50.64539874Z ==> 
-2026-05-04T20:41:50.649389196Z ==> Available at your primary URL https://vini-server.onrender.com
-2026-05-04T20:41:50.652382064Z ==> 
-2026-05-04T20:41:50.655720058Z ==> ///////////////////////////////////////////////////////////
-2026-05-04T20:41:55.555629009Z 
-2026-05-04T20:41:55.55566004Z >>>>>>>> [2026-05-04T20:41:55.555Z] GET /v2.5/2036793259884297?fields=supports_implicit_sdk_logging%2Cgdpv4_nux_content%2Cgdpv4_nux_enabled%2Candroid_dialog_configs%2Candroid_sdk_error_categories&format=json&locale=pt_BR&sdk=android <<<<<<<<
-2026-05-04T20:41:55.555912017Z QUERY: {"fields":"supports_implicit_sdk_logging,gdpv4_nux_content,gdpv4_nux_enabled,android_dialog_configs,android_sdk_error_categories","format":"json","locale":"pt_BR","sdk":"android"}
-error - 2026-05-04T20:41:55.55639578Z RESPOSTA JSON: {"id":"2036793259884297","name":"Free Fire Vini","supports_implicit_sdk_logging":true,"gdpv4_nux_enabled":false,"gdpv4_nux_content":"","android_dialog_configs":{"oauth":{"url":"https://vini-server.onrender.com/v2.5/dialog/oauth"}},"android_sdk_error_categories":[{"name":"login_recoverable","items":[{"code":102,"message":"Login recoverable"}]},{"name":"other","items":[{"code":1,"message":"Other error"}]},{"name":"transient","items":[{"code":2,"message":"Transient error"}]}]}
-2026-05-04T20:41:56.960605381Z 
-2026-05-04T20:41:56.960649582Z >>>>>>>> [2026-05-04T20:41:56.960Z] GET /v2.5/dialog/oauth?client_id=2036793259884297&e2e=%7B%22init%22%3A1777927316552%7D&sdk=android-4.9.0&scope=public_profile%2Cuser_friends%2Cemail&default_audience=friends&redirect_uri=fbconnect%3A%2F%2Fsuccess&display=touch&response_type=token%2Csigned_request&return_scopes=true <<<<<<<<
-2026-05-04T20:41:56.960662452Z QUERY: {"client_id":"2036793259884297","e2e":"{\"init\":1777927316552}","sdk":"android-4.9.0","scope":"public_profile,user_friends,email","default_audience":"friends","redirect_uri":"fbconnect://success","display":"touch","response_type":"token,signed_request","return_scopes":"true"}
-2026-05-04T20:42:10.487618368Z 
-2026-05-04T20:42:10.487646799Z >>>>>>>> [2026-05-04T20:42:10.487Z] POST /v2.5/2036793259884297/activities?access_token=&format=json&locale=pt_BR&sdk=android <<<<<<<<
-2026-05-04T20:42:10.487660199Z QUERY: {"access_token":"","format":"json","locale":"pt_BR","sdk":"android"}
-2026-05-04T20:42:10.487807263Z RESPOSTA JSON: {"success":true}
-2026-05-04T20:42:17.626896153Z 
-2026-05-04T20:42:17.626940894Z >>>>>>>> [2026-05-04T20:42:17.626Z] GET /v2.5/dialog/oauth?client_id=2036793259884297&e2e=%7B%22init%22%3A1777927338138%7D&sdk=android-4.9.0&scope=public_profile%2Cuser_friends%2Cemail&default_audience=friends&redirect_uri=fbconnect%3A%2F%2Fsuccess&display=touch&response_type=token%2Csigned_request&return_scopes=true <<<<<<<<
-2026-05-04T20:42:17.626958635Z QUERY: {"client_id":"2036793259884297","e2e":"{\"init\":1777927338138}","sdk":"android-4.9.0","scope":"public_profile,user_friends,email","default_audience":"friends","redirect_uri":"fbconnect://success","display":"touch","response_type":"token,signed_request","return_scopes":"true"}
-2026-05-04T20:42:41.138439786Z 
-2026-05-04T20:42:41.138482357Z >>>>>>>> [2026-05-04T20:42:41.137Z] POST /v2.5/2036793259884297/activities?access_token=&format=json&locale=pt_BR&sdk=android <<<<<<<<
-2026-05-04T20:42:41.138489197Z QUERY: {"access_token":"","format":"json","locale":"pt_BR","sdk":"android"}
-2026-05-04T20:42:41.138496117Z RESPOSTA JSON: {"success":true}
+2026-05-04T20:46:54.524101522Z 8 vulnerabilities (2 low, 1 moderate, 5 high)
+2026-05-04T20:46:54.524106362Z 
+2026-05-04T20:46:54.524112372Z To address all issues (including breaking changes), run:
+2026-05-04T20:46:54.524117543Z   npm audit fix --force
+2026-05-04T20:46:54.524121483Z 
+2026-05-04T20:46:54.524126973Z Run `npm audit` for details.
+2026-05-04T20:46:55.55808387Z ==> Uploading build...
+2026-05-04T20:46:59.168737151Z ==> Uploaded in 2.2s. Compression took 1.4s
+2026-05-04T20:46:59.184282186Z ==> Build successful 🎉
+2026-05-04T20:47:04.604592664Z ==> Deploying...
+2026-05-04T20:47:04.711646643Z ==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
+2026-05-04T20:47:12.604277967Z ==> Running 'npm start'
+2026-05-04T20:47:13.606803694Z 
+2026-05-04T20:47:13.606837045Z > barbosa-server@4.1.0 start
+2026-05-04T20:47:13.606843535Z > node server.js
+2026-05-04T20:47:13.606847385Z 
+2026-05-04T20:47:14.606821195Z ✅ SERVIDOR VINI V34 OPERACIONAL EM MODO ABSOLUTO NA PORTA 3000
+2026-05-04T20:47:15.129112567Z 
+2026-05-04T20:47:15.129134227Z >>>>>>>> [2026-05-04T20:47:15.128Z] HEAD / <<<<<<<<
+2026-05-04T20:47:16.392250056Z ==> Your service is live 🎉
+2026-05-04T20:47:16.492559874Z 
+2026-05-04T20:47:16.492579795Z >>>>>>>> [2026-05-04T20:47:16.492Z] GET / <<<<<<<<
+2026-05-04T20:47:16.553586749Z ==> 
+2026-05-04T20:47:16.556226121Z ==> ///////////////////////////////////////////////////////////
+2026-05-04T20:47:16.558895874Z ==> 
+2026-05-04T20:47:16.56127605Z ==> Available at your primary URL https://vini-server.onrender.com
+2026-05-04T20:47:16.563733439Z ==> 
+2026-05-04T20:47:16.566180846Z ==> ///////////////////////////////////////////////////////////
+2026-05-04T20:47:44.545047247Z 
+2026-05-04T20:47:44.545082328Z >>>>>>>> [2026-05-04T20:47:44.544Z] GET /app/info/get?client_type=4352&client_version=2018120316&app_id=100067 <<<<<<<<
+2026-05-04T20:47:44.545273972Z QUERY: {"client_type":"4352","client_version":"2018120316","app_id":"100067"}
+2026-05-04T20:47:44.545568669Z RESPOSTA JSON: {"status":200,"message":"success","data":{"is_review":false,"update_url":"","latest_version":"1.26.0","force_update":false,"content_url":"https://vini-server.onrender.com/live/"}}
+2026-05-04T20:47:44.778501321Z 
+2026-05-04T20:47:44.778587234Z >>>>>>>> [2026-05-04T20:47:44.778Z] GET /v2.5/2036793259884297?fields=supports_implicit_sdk_logging%2Cgdpv4_nux_content%2Cgdpv4_nux_enabled%2Candroid_dialog_configs%2Candroid_sdk_error_categories&format=json&locale=pt_BR&sdk=android <<<<<<<<
+2026-05-04T20:47:44.778613534Z QUERY: {"fields":"supports_implicit_sdk_logging,gdpv4_nux_content,gdpv4_nux_enabled,android_dialog_configs,android_sdk_error_categories","format":"json","locale":"pt_BR","sdk":"android"}
+2026-05-04T20:47:44.779075224Z RESPOSTA JSON: {"id":"2036793259884297","name":"Free Fire Vini","supports_implicit_sdk_logging":true,"gdpv4_nux_enabled":false,"gdpv4_nux_content":"","android_dialog_configs":{"oauth":{"url":"https://vini-server.onrender.com/v2.5/dialog/oauth"}},"android_sdk_error_categories":[{"name":"login_recoverable","items":[{"code":102,"message":"Login recoverable"}]},{"name":"other","items":[{"code":1,"message":"Other error"}]},{"name":"transient","items":[{"code":2,"message":"Transient error"}]}]}
+2026-05-04T20:47:47.506402303Z 
+2026-05-04T20:47:47.506433043Z >>>>>>>> [2026-05-04T20:47:47.506Z] GET /v2.5/dialog/oauth?client_id=2036793259884297&e2e=%7B%22init%22%3A1777927666911%7D&sdk=android-4.9.0&scope=public_profile%2Cuser_friends%2Cemail&default_audience=friends&redirect_uri=fbconnect%3A%2F%2Fsuccess&display=touch&response_type=token%2Csigned_request&return_scopes=true <<<<<<<<
+2026-05-04T20:47:47.506440944Z QUERY: {"client_id":"2036793259884297","e2e":"{\"init\":1777927666911}","sdk":"android-4.9.0","scope":"public_profile,user_friends,email","default_audience":"friends","redirect_uri":"fbconnect://success","display":"touch","response_type":"token,signed_request","return_scopes":"true"}
+2026-05-04T20:48:00.532028642Z 
+2026-05-04T20:48:00.532065363Z >>>>>>>> [2026-05-04T20:48:00.531Z] GET /v2.5/dialog/oauth?client_id=2036793259884297&e2e=%7B%22init%22%3A1777927681045%7D&sdk=android-4.9.0&scope=public_profile%2Cuser_friends%2Cemail&default_audience=friends&redirect_uri=fbconnect%3A%2F%2Fsuccess&display=touch&response_type=token%2Csigned_request&return_scopes=true <<<<<<<<
+2026-05-04T20:48:00.532082583Z QUERY: {"client_id":"2036793259884297","e2e":"{\"init\":1777927681045}","sdk":"android-4.9.0","scope":"public_profile,user_friends,email","default_audience":"friends","redirect_uri":"fbconnect://success","display":"touch","response_type":"token,signed_request","return_scopes":"true"}
+2026-05-04T20:48:00.943007396Z 
+2026-05-04T20:48:00.943039606Z >>>>>>>> [2026-05-04T20:48:00.942Z] POST /v2.5/2036793259884297/activities?access_token=&format=json&locale=pt_BR&sdk=android <<<<<<<<
+2026-05-04T20:48:00.943050917Z QUERY: {"access_token":"","format":"json","locale":"pt_BR","sdk":"android"}
+2026-05-04T20:48:00.943151649Z RESPOSTA JSON: {"success":true}
+2026-05-04T20:48:15.902965393Z 
+2026-05-04T20:48:15.903000204Z >>>>>>>> [2026-05-04T20:48:15.902Z] POST /v2.5/2036793259884297/activities?access_token=&format=json&locale=pt_BR&sdk=android <<<<<<<<
+2026-05-04T20:48:15.90324313Z QUERY: {"access_token":"","format":"json","locale":"pt_BR","sdk":"android"}
+2026-05-04T20:48:15.90325512Z RESPOSTA JSON: {"success":true}
