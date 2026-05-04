@@ -70,26 +70,36 @@ app.post('/v2.5/:app_id/activities', (req, res) => {
 const handleLoginSuccess = (req, res) => {
   const token = req.body.facebook_access_token || req.body.access_token || uuidv4();
   const uid = req.body.client_id || "100067";
+  const appId = "2036793259884297"; // ID do Facebook App que aparece nos logs
   const now = Math.floor(Date.now() / 1000);
+  const future = now + 5184000;
   
+  // Resposta ULTRA-COMPATÍVEL baseada na engenharia reversa do APK
   const response = {
-    // Campos principais
-    key: token,
+    // Tokens
     access_token: token,
     token: token,
+    key: token,
+    
+    // Identificadores
     user_id: uid,
     openid: uid,
     open_id: uid,
     uid: uid,
     id: uid,
     account_id: uid,
+    application_id: appId,
     
-    // Campos de sessão e tempo
-    session_key: token,
-    refresh_token: uuidv4().substring(0, 8),
+    // Datas e Tempos (Formato Long/Timestamp conforme código do APK)
     expires_in: 5184000,
     expire_time: 5184000,
+    expires_at: future,
+    last_refresh: now,
     issued_at: now,
+    
+    // Permissões (Arrays conforme SDK do Facebook)
+    permissions: ["public_profile", "email", "user_friends"],
+    declined_permissions: [],
     
     // Perfil
     nickname: "ViniPlayer",
@@ -98,26 +108,22 @@ const handleLoginSuccess = (req, res) => {
     first_name: "Vini",
     last_name: "Player",
     
-    // Configurações
-    region: "BR",
-    login_type: 1,
-    is_new: 0,
-    scope: "public_profile,email,user_friends",
+    // Configurações de Sessão
+    session_key: token,
+    refresh_token: uuidv4().substring(0, 8),
+    token_type: "bearer",
+    source: "FACEBOOK_APPLICATION_WEB",
+    version: "1.0",
     
-    // Status
-    error: 0,
-    msg: "success",
+    // Status de Sucesso (Sem campos de erro para não confundir o APK)
     code: 0,
-    status: 200
+    status: 200,
+    msg: "success"
   };
 
   if (req.path.includes('exchange')) {
     console.log(`[Exchange Success] Token: ${token}, UID: ${uid}`);
-    // Retorna o objeto plano com campos extras de tempo e escopo
-    return res.json({
-      ...response,
-      token_type: "bearer"
-    });
+    return res.json(response);
   }
 
   res.json({ code: 0, msg: "success", data: response, ...response });
@@ -130,4 +136,4 @@ app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/v2.5/me', '/oauth/t
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Final Master) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Engine Master) na porta ${PORT}`));
