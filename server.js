@@ -56,7 +56,6 @@ app.get(['/sbt/fileinfo', '/fileinfo', '/live/fileinfo', '/android/fileinfo'], (
 // FACEBOOK API v2.5
 // -----------------------------------------------------------------------
 
-// Perfil e Permissões
 app.get('/v2.5/me', (req, res) => {
   res.json({ id: PLAYER_UID, name: "ViniPlayer", first_name: "Vini", last_name: "Player" });
 });
@@ -65,17 +64,14 @@ app.get('/v2.5/me/permissions', (req, res) => {
   res.json({ data: [{ permission: "public_profile", status: "granted" }, { permission: "email", status: "granted" }] });
 });
 
-// App Config e Perfil Genérico
 app.all('/v2.5/:id', (req, res) => {
   const id = req.params.id;
   const fields = req.query.fields || '';
   
-  // Se for pedido de perfil
   if (id === PLAYER_UID || (fields.includes('name') && !fields.includes('android_dialog_configs'))) {
     return res.json({ id: PLAYER_UID, name: "ViniPlayer", first_name: "Vini", last_name: "Player" });
   }
 
-  // Se for pedido de config do App
   res.json({
     id: id,
     name: "Free Fire Vini",
@@ -86,11 +82,21 @@ app.all('/v2.5/:id', (req, res) => {
   });
 });
 
-// Facebook OAuth Redirect (CORREÇÃO: Query String + Signed Request)
+// Facebook OAuth Redirect (CORREÇÃO: Signed Request em Base64)
 app.get('/v2.5/dialog/oauth', (req, res) => {
-  const token = uuidv4();
-  // signed_request fake para satisfazer o SDK
-  const signedRequest = "vini_signed_request_data";
+  // Token simplificado (alfanumérico curto costuma ser mais estável em APKs antigos)
+  const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  
+  // O signed_request do Facebook é composto por: HMAC.Payload (ambos em Base64)
+  // O SDK tenta decodificar o Payload para validar o login.
+  const payload = Buffer.from(JSON.stringify({
+    algorithm: "HMAC-SHA256",
+    issued_at: Math.floor(Date.now() / 1000),
+    user_id: PLAYER_UID
+  })).toString('base64').replace(/=/g, '');
+  
+  const signedRequest = `vini_signature.${payload}`;
+  
   const params = `access_token=${token}&expires_in=5184000&user_id=${PLAYER_UID}&base_domain=onrender.com&return_scopes=true&signed_request=${signedRequest}`;
   
   const finalUrl = `fbconnect://success?${params}`;
@@ -160,4 +166,4 @@ app.get('/live/*', (req, res) => {
 });
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V25 (Final Fix) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V26 (Signed Request Fix) na porta ${PORT}`));
