@@ -36,7 +36,7 @@ const BASE_URL = config.baseUrl || 'https://vini-server.onrender.com';
 const DOMAIN = "vini-server.onrender.com";
 
 // -----------------------------------------------------------------------
-// ENDPOINTS DE VERSÃO E ATUALIZAÇÃO (SUPORTE AMPLO)
+// ENDPOINTS DE VERSÃO E ATUALIZAÇÃO (COBERTURA TOTAL)
 // -----------------------------------------------------------------------
 const versionResponse = (req, res) => {
   res.json({
@@ -52,9 +52,9 @@ const versionResponse = (req, res) => {
   });
 };
 
-app.all(['/app/info/get', '/info/app/info/get', '/api/v1/app/info/get', '/v1/app/info/get'], versionResponse);
+app.all(['/app/info/get', '/info/app/info/get', '/api/v1/app/info/get', '/v1/app/info/get', '/api/v2/app/info/get'], versionResponse);
 
-app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/android/versioninfo', '/api/v1/versioninfo'], (req, res) => {
+app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/android/versioninfo', '/api/v1/versioninfo', '/android/ver.php'], (req, res) => {
   const myUrl = `${BASE_URL}/live/`;
   if (req.path.includes('ver.php')) {
     return res.send(`${VERSION},${myUrl},${myUrl},${myUrl}`);
@@ -63,7 +63,7 @@ app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/and
 });
 
 // -----------------------------------------------------------------------
-// FACEBOOK API v2.5 - EMULAÇÃO COMPLETA
+// FACEBOOK API v2.5 - EMULAÇÃO ABSOLUTA
 // -----------------------------------------------------------------------
 app.get('/v2.5/me', (req, res) => {
   res.json({ 
@@ -72,7 +72,8 @@ app.get('/v2.5/me', (req, res) => {
     first_name: "Vini", 
     last_name: "Player",
     email: "vini@player.com",
-    link: `https://www.facebook.com/app_scoped_user_id/${PLAYER_UID}/`
+    link: `https://www.facebook.com/app_scoped_user_id/${PLAYER_UID}/`,
+    picture: { data: { url: "https://vini-server.onrender.com/avatar.png", is_silhouette: false } }
   });
 });
 
@@ -82,7 +83,8 @@ app.get('/v2.5/me/permissions', (req, res) => {
       { permission: "public_profile", status: "granted" }, 
       { permission: "email", status: "granted" },
       { permission: "user_friends", status: "granted" },
-      { permission: "publish_actions", status: "granted" }
+      { permission: "publish_actions", status: "granted" },
+      { permission: "user_posts", status: "granted" }
     ] 
   });
 });
@@ -127,13 +129,10 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
   res.redirect(`/oauth-callback.html?access_token=${token}&user_id=${user_id}&expires_in=${expires_in}&signed_request=${signedRequest}`);
 });
 
-// Suporte para activities do Facebook (comum em logs)
-app.post('/v2.5/:id/activities', (req, res) => {
-  res.json({ success: true });
-});
+app.post('/v2.5/:id/activities', (req, res) => res.json({ success: true }));
 
 // -----------------------------------------------------------------------
-// GARENA / AUTH - RESPOSTA ROBUSTA E COMPLETA
+// GARENA / AUTH - RESPOSTA ULTRA ROBUSTA
 // -----------------------------------------------------------------------
 const sendAuthResponse = (res, token, uid) => {
   const now = Math.floor(Date.now() / 1000);
@@ -155,7 +154,12 @@ const sendAuthResponse = (res, token, uid) => {
         is_new: 0,
         gender: 1,
         birth: "2000-01-01",
-        email: "vini@player.com"
+        email: "vini@player.com",
+        region: "BR",
+        level: 70,
+        exp: 999999,
+        diamonds: 999999,
+        gold: 999999
     }
   });
 };
@@ -163,16 +167,16 @@ const sendAuthResponse = (res, token, uid) => {
 app.all([
   '/oauth/guest/register', '/oauth/token/inspect', '/oauth/user/info/get',
   '/oauth/token/facebook/exchange', '/api/v1/auth/*', '/auth/*', '/conn/*', '/sso/*',
-  '/api/v1/oauth/*', '/v1/oauth/*'
+  '/api/v1/oauth/*', '/v1/oauth/*', '/oauth/token/vk/exchange', '/oauth/token/line/exchange'
 ], (req, res) => {
   const token = req.body.access_token || req.query.access_token || req.body.facebook_access_token || uuidv4();
   sendAuthResponse(res, token, PLAYER_UID);
 });
 
 // -----------------------------------------------------------------------
-// NETWORK / CONFIG - FILTRO TOTAL DE CONEXÃO
+// NETWORK / CONFIG - FILTRO TOTAL E DEFINITIVO
 // -----------------------------------------------------------------------
-app.all(['/network/config', '/api/v1/network/config', '/v1/network/config'], (req, res) => {
+app.all(['/network/config', '/api/v1/network/config', '/v1/network/config', '/api/v2/network/config'], (req, res) => {
     res.json({
         status: 200, code: 0, msg: "success",
         data: {
@@ -187,28 +191,31 @@ app.all(['/network/config', '/api/v1/network/config', '/v1/network/config'], (re
             log_server: DOMAIN,
             api_server: DOMAIN,
             pay_server: DOMAIN,
+            voice_server: DOMAIN,
             client_config: {
                 show_loading: true,
                 skip_tutorial: true,
                 enable_log: true,
                 heartbeat_interval: 30,
                 reconnect_interval: 5,
-                max_reconnect_times: 3
+                max_reconnect_times: 3,
+                anti_cheat: false,
+                force_update: false
             },
             servers: [
-                { name: "Vini Server", ip: DOMAIN, port: 443, ssl: true, status: 1, load: 0 }
+                { name: "Vini Server", ip: DOMAIN, port: 443, ssl: true, status: 1, load: 0, region: "BR" }
             ],
             regions: [
-                { id: "BR", name: "Brasil", domain: DOMAIN }
+                { id: "BR", name: "Brasil", domain: DOMAIN, port: 443, ssl: true }
             ]
         }
     });
 });
 
 // -----------------------------------------------------------------------
-// LOBBY / GAMEPLAY / USER - SUPORTE AMPLO
+// LOBBY / GAMEPLAY / USER - COBERTURA ABSOLUTA
 // -----------------------------------------------------------------------
-const userProfileResponse = (req, res) => {
+const genericSuccessResponse = (req, res) => {
     res.json({
         status: 200, code: 0, msg: "success",
         data: {
@@ -223,43 +230,29 @@ const userProfileResponse = (req, res) => {
             region: "BR",
             create_time: 1600000000,
             last_login_time: Math.floor(Date.now() / 1000),
-            stats: {
-                wins: 1000,
-                kills: 5000,
-                games: 2000
-            }
+            status: "online",
+            server_time: Math.floor(Date.now() / 1000),
+            message: "Operation successful",
+            items: [],
+            friends: [],
+            stats: { wins: 1000, kills: 5000, games: 2000 }
         }
     });
 };
 
 app.all([
     '/api/v1/user/profile', '/user/profile', '/game/user/info', '/api/v1/game/user/info',
-    '/v1/user/profile', '/v1/game/user/info'
-], userProfileResponse);
-
-app.all([
-    '/game/*', '/api/v1/game/*', '/lobby/*', '/shop/*', '/user/*', '/api/v1/*', '/v1/*',
-    '/api/v1/lobby/*', '/api/v1/shop/*', '/api/v1/user/*'
-], (req, res) => {
-  res.json({ 
-    status: 200, 
-    code: 0, 
-    msg: "success", 
-    data: { 
-        status: "online",
-        server_time: Math.floor(Date.now() / 1000),
-        message: "Operation successful"
-    } 
-  });
-});
+    '/v1/user/profile', '/v1/game/user/info', '/api/v1/lobby/*', '/lobby/*', '/shop/*', 
+    '/api/v1/shop/*', '/user/*', '/api/v1/user/*', '/api/v1/game/*', '/game/*', '/v1/*', 
+    '/api/v1/*', '/api/v2/*', '/conn/*', '/sso/*', '/pay/*', '/api/v1/pay/*'
+], genericSuccessResponse);
 
 app.all(['/oauth/user/friends/get', '/api/v1/oauth/user/friends/get'], (req, res) => res.json({ status: 200, data: { friends: [] } }));
-app.all(['/pay/*', '/api/v1/pay/*'], (req, res) => res.json({ status: 200, message: "success" }));
 
 // -----------------------------------------------------------------------
 // LIVE RESOURCES - REDIRECIONAMENTO INTELIGENTE
 // -----------------------------------------------------------------------
-app.get(['/live/*', '/android/live/*'], (req, res) => {
+app.get(['/live/*', '/android/live/*', '/ios/live/*'], (req, res) => {
   const resourcePath = req.params[0];
   if (resourcePath && resourcePath.length > 5) {
     return res.redirect(302, `https://freefiremobile-a.akamaihd.net/live/${resourcePath}`);
@@ -268,20 +261,20 @@ app.get(['/live/*', '/android/live/*'], (req, res) => {
 });
 
 // -----------------------------------------------------------------------
-// TRATAMENTO DE ERROS E 404 - NÃO DEIXA NADA PASSAR
+// TRATAMENTO DE ERROS E 404 - FILTRO ABSOLUTO
 // -----------------------------------------------------------------------
 app.use((req, res, next) => {
-    // Se chegou aqui, o endpoint não foi mapeado, mas vamos responder sucesso para o app não travar
-    if (req.originalUrl.includes('api') || req.originalUrl.includes('oauth') || req.originalUrl.includes('game')) {
+    // Responder sucesso para qualquer rota de API/Game para evitar travamentos
+    if (req.originalUrl.match(/\/(api|oauth|game|user|lobby|shop|v1|v2|conn|sso|pay)\//i)) {
         return res.json({ status: 200, code: 0, msg: "success", data: {} });
     }
     next();
 });
 
 app.use((err, req, res, next) => {
-  console.error("ERRO NO SERVIDOR:", err);
-  res.status(200).json({ status: 200, code: 0, msg: "success", error: err.message });
+  console.error("ERRO CRÍTICO:", err);
+  res.status(200).json({ status: 200, code: 0, msg: "success", error: "Handled error" });
 });
 
 const PORT = process.env.PORT || config.port || 3000;
-app.listen(PORT, () => console.log(`✅ SERVIDOR VINI V34 TOTALMENTE OPERACIONAL NA PORTA ${PORT}`));
+app.listen(PORT, () => console.log(`✅ SERVIDOR VINI V34 OPERACIONAL EM MODO ABSOLUTO NA PORTA ${PORT}`));
