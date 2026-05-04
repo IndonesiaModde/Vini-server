@@ -13,6 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   if (Object.keys(req.query).length > 0) console.log("Query:", JSON.stringify(req.query));
+  if (req.method === 'POST' && Object.keys(req.body).length > 0) console.log("Body:", JSON.stringify(req.body));
   next();
 });
 
@@ -35,7 +36,15 @@ app.get(['/sbt/fileinfo', '/fileinfo', '/live/fileinfo', '/android/fileinfo'], (
 // Resposta de App ID com Configurações de SDK
 app.get('/v2.5/:app_id', (req, res) => {
   const appId = req.params.app_id;
-  if (appId === 'me') return res.json({ id: "1000001", name: "ViniPlayer" });
+  if (appId === 'me') {
+    return res.json({
+      id: "1000001",
+      name: "ViniPlayer",
+      first_name: "Vini",
+      last_name: "Player",
+      link: "https://facebook.com/1000001"
+    });
+  }
   res.json({
     id: appId,
     name: "Free Fire Vini",
@@ -58,13 +67,10 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
   const s = uuidv4().replace(/-/g, '');
   const token = "EAAG_VINI_" + s.substring(0, 24);
   const uid = "1000001";
-  // signed_request realista com ponto separador
   const payload = Buffer.from(JSON.stringify({ user_id: uid, algorithm: "HMAC-SHA256" })).toString('base64');
   const signed_request = "vini_sig." + payload;
-  
   const e2e = req.query.e2e || "{}";
   
-  // Parâmetros no Fragmento (#) conforme exigência do SDK 4.9.0
   const params = `access_token=${token}&expires_in=5184000&signed_request=${signed_request}&user_id=${uid}&e2e=${encodeURIComponent(e2e)}&return_scopes=true&glive_uid=${uid}`;
   const finalUrl = `fbconnect://success#${params}`;
 
@@ -114,7 +120,11 @@ const handleLoginSuccess = (req, res) => {
   res.json({ code: 0, msg: "success", data: response, ...response });
 };
 
-app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/v2.5/me', '/oauth/token/facebook/exchange', '/v2.5/dialog/oauth/confirm'], handleLoginSuccess);
+// Rotas unificadas para sucesso de login e exchange
+app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/v2.5/me', '/oauth/token/facebook/exchange', '/v2.5/dialog/oauth/confirm', '/v2.5/oauth/token/facebook/exchange'], handleLoginSuccess);
+
+// Rota padrão para favicon
+app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 const PORT = process.env.PORT || config.port;
 app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Fragment Master) na porta ${PORT}`));
