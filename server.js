@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const config = require('./config/config');
 
@@ -8,6 +9,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Servir arquivos estáticos da pasta public (login.html, oauth-callback.html, etc.)
+app.use(express.static(path.join(__dirname, 'public')));
 
 // SISTEMA DE SUPER LOG
 app.use((req, res, next) => {
@@ -33,12 +37,14 @@ config/resconf,ysnx0NubzKPaLVGszrP45y9WQH0=,34896,0
 avatar/assetindexer,IbV74Hqrb07rdlrKYQx6JZIhZ5M=,74343,0
 avatar/uma_dcs,BSJQtQt6qEeFdLv8gsrVtPDQubo=,14523,0`;
 
+// UID fixo do jogador
+const PLAYER_UID = "100067";
+
 // Endpoints de Versão e Recursos
 app.all(['/app/info/get', '/info/app/info/get'], (req, res) => {
   res.json({ status: 200, message: "success", data: { is_review: false, update_url: "", latest_version: VERSION, force_update: false } });
 });
 app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/android/versioninfo'], (req, res) => {
-  // Formato de URL para o ver.php que funcionou
   if (req.path.includes('ver.php')) {
     const myUrl = "https://vini-server.onrender.com/live/";
     return res.send(`${VERSION},${myUrl},${myUrl},${myUrl}`);
@@ -47,17 +53,33 @@ app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/and
 });
 app.get(['/sbt/fileinfo', '/fileinfo', '/live/fileinfo', '/android/fileinfo'], (req, res) => res.send(FILE_INFO));
 
-// Endpoints Facebook (Lógica de ID corrigida)
+// -----------------------------------------------------------------------
+// CORREÇÃO 1: Endpoint /v2.5/:id — distingue App ID de User ID
+// O SDK Android chama /v2.5/{APP_ID}?fields=supports_implicit_sdk_logging,...
+// e espera receber a configuração do App, não o perfil do usuário.
+// -----------------------------------------------------------------------
 app.all('/v2.5/:id', (req, res) => {
   const id = req.params.id;
-  const uid = "100067";
-  
-  // Se for 'me' ou o UID do usuário, retorna perfil
-  if (id === 'me' || id === uid) {
-    return res.json({ id: uid, name: "ViniPlayer", first_name: "Vini", last_name: "Player" });
+  const fields = req.query.fields || '';
+
+  // Se o request pede campos de configuração do SDK, é uma chamada de App Config
+  const isAppConfigRequest = fields.includes('supports_implicit_sdk_logging') ||
+                             fields.includes('android_dialog_configs') ||
+                             fields.includes('gdpv4_nux_enabled');
+
+  // Se for 'me' ou o UID do jogador E não for pedido de config, retorna perfil
+  if ((id === 'me' || id === PLAYER_UID) && !isAppConfigRequest) {
+    console.log(`[FB] Retornando perfil do usuário para id=${id}`);
+    return res.json({
+      id: PLAYER_UID,
+      name: "ViniPlayer",
+      first_name: "Vini",
+      last_name: "Player"
+    });
   }
-  
-  // Caso contrário, assume que é um App ID e retorna configurações
+
+  // Caso contrário (App ID ou pedido de config): retorna configuração do App
+  console.log(`[FB] Retornando config do App para id=${id}`);
   res.json({
     id: id,
     name: "Free Fire Vini",
@@ -65,7 +87,10 @@ app.all('/v2.5/:id', (req, res) => {
     gdpv4_nux_enabled: false,
     gdpv4_nux_content: "",
     android_dialog_configs: {
-      oauth: { url: "https://vini-server.onrender.com/v2.5/dialog/oauth" }
+      oauth: {
+        // URL do diálogo de login que o SDK vai abrir
+        url: "https://vini-server.onrender.com/v2.5/dialog/oauth"
+      }
     },
     android_sdk_error_categories: [
       { name: "login_recoverable", items: [{ code: 102, message: "Login recoverable" }] }
@@ -77,20 +102,31 @@ app.post('/v2.5/:app_id/activities', (req, res) => {
   res.json({ success: true, app_events_config: { custom_events_default_sampling_probability: 1 } });
 });
 
+// -----------------------------------------------------------------------
+// CORREÇÃO 2: /v2.5/dialog/oauth — redirecionar com ?query em vez de #fragment
+// O SDK Android do Facebook lê o token via query string (?access_token=...)
+// Fragmentos (#) são descartados pelo sistema operacional Android ao invocar
+// o deep link fbconnect://success, causando o "erro de conexão".
+// -----------------------------------------------------------------------
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const token = uuidv4();
-  const uid = "100067";
+  const uid = PLAYER_UID;
+
+  // IMPORTANTE: usar ? (query string) e NÃO # (fragment)
+  // O Android não repassa fragmentos ao app nativo via deep link
   const params = `access_token=${token}&expires_in=5184000&user_id=${uid}&base_domain=onrender.com&return_scopes=true`;
-  const finalUrl = `fbconnect://success#${params}`;
-  
+  const finalUrl = `fbconnect://success?${params}`;
+
   console.log(`[OAuth] Redirecionando para: ${finalUrl}`);
-  // Redirecionamento 302 é mais estável que script HTML para o SDK Android
   res.redirect(302, finalUrl);
 });
 
+// -----------------------------------------------------------------------
+// Handlers de login/token — aceita tokens vindos do fluxo OAuth
+// -----------------------------------------------------------------------
 const handleLoginSuccess = (req, res) => {
   const token = req.body.facebook_access_token || req.body.access_token || uuidv4();
-  const uid = "100067";
+  const uid = PLAYER_UID;
   const appId = req.body.client_id || "2036793259884297";
   const now = Date.now();
   
@@ -135,4 +171,4 @@ app.get('/live/*', (req, res) => {
 });
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V22 (FB Fix) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V23 (FB OAuth Fix) na porta ${PORT}`));
