@@ -15,68 +15,66 @@ app.use((req, res, next) => {
   next();
 });
 
-// --- PÁGINA DE LOGIN (V8 - CAPTURA POR TÍTULO E FRAGMENTO) ---
+// --- DIÁLOGO DE LOGIN (V9 - RESPOSTA DIRETA E INJEÇÃO) ---
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const token = 'EAAG' + uuidv4().replace(/-/g, '').substring(0, 32);
   const uid = '1000001';
   
-  // Redireciona para uma URL que termina em #access_token=... (padrão oficial FB)
-  const successUrl = `/connect/login_success.html#access_token=${token}&user_id=${uid}&expires_in=5184000`;
-  res.redirect(successUrl);
+  console.log("Enviando Resposta Direta de Login...");
+
+  // Se o jogo pedir JSON (comum em chamadas de API de login)
+  if (req.headers.accept && req.headers.accept.includes('json')) {
+      return res.json({ access_token: token, user_id: uid, expires_in: 5184000 });
+  }
+
+  // Se o jogo pedir HTML (WebView)
+  // Colocamos o token no título, no corpo e no fragmento para não ter erro
+  res.send(`
+    <html>
+    <head><title>Success access_token=${token}</title></head>
+    <body style="background:#000;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;">
+        <div style="text-align:center;">
+            <h2>Vini Server</h2>
+            <p>Autenticado com Sucesso!</p>
+            <!-- Texto puro para o SDK capturar via Regex -->
+            <div style="display:none;">access_token=${token}&user_id=${uid}</div>
+        </div>
+        <script>
+            const token = "${token}";
+            const uid = "${uid}";
+            
+            // Tenta todas as formas de fechar e avisar o jogo
+            window.location.hash = "access_token=" + token + "&user_id=" + uid;
+            
+            if (window.Android && window.Android.onFacebookLogin) {
+                window.Android.onFacebookLogin(token, uid);
+            }
+            
+            setTimeout(() => {
+                window.location.href = "fbconnect://success?access_token=" + token + "&user_id=" + uid;
+                setTimeout(() => { window.close(); }, 500);
+            }, 1000);
+        </script>
+    </body>
+    </html>
+  `);
 });
 
-// Página de Sucesso que o WebView monitora
-app.get('/connect/login_success.html', (req, res) => {
-    res.send(`
-        <html>
-        <head><title>Success access_token=EAAG_VINI_TOKEN</title></head>
-        <body style="background:#000;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;">
-            <div style="text-align:center;">
-                <h2>Vini Server</h2>
-                <p>Login Concluído!</p>
-            </div>
-            <script>
-                // Muda o título para o token real - Muitos WebViews capturam assim
-                const hash = window.location.hash.substring(1);
-                document.title = "Success " + hash;
-                
-                // Tenta fechar e redirecionar também por segurança
-                setTimeout(() => {
-                    window.location.href = "fbconnect://success?" + hash;
-                    if (window.Android && window.Android.onFacebookLogin) {
-                        const params = new URLSearchParams(hash);
-                        window.Android.onFacebookLogin(params.get('access_token'), params.get('user_id'));
-                    }
-                }, 1000);
-            </script>
-        </body>
-        </html>
-    `);
-});
-
-// --- ROTA DE PERFIL DO FACEBOOK (/v2.5/me) ---
+// --- ROTAS DE SUPORTE ---
 app.get('/v2.5/me', (req, res) => {
-  res.json({
-    id: "1000001",
-    name: "ViniPlayer",
-    first_name: "Vini",
-    last_name: "Player",
-    email: "vini@server.com",
-    picture: { data: { url: "https://vini-server-1.onrender.com/favicon.ico" } }
-  });
+  res.json({ id: "1000001", name: "ViniPlayer" });
 });
 
-// Validação de App ID
 app.get('/v2.5/:app_id', (req, res) => {
-  if (req.params.app_id === 'me') return; // Ignora se for a rota /me
+  if (req.params.app_id === 'me') return;
   res.json({ id: req.params.app_id, name: "Free Fire Vini", permissions: ["public_profile"] });
 });
 
-// --- BYPASS DE VERSÃO ---
+// Bypass de Versão
 app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo'], (req, res) => res.send('1.17.1'));
 app.get(['/sbt/fileinfo', '/fileinfo'], (req, res) => res.send(''));
 
-// --- RESPOSTA DE LOGIN MESTRE ---
+// Resposta de Login Mestre (API)
 const handleLoginSuccess = (req, res) => {
   const s = uuidv4().replace(/-/g, '');
   const response = {
@@ -94,7 +92,7 @@ const handleLoginSuccess = (req, res) => {
 
 app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/app/info/get', '/info/app/info/get'], handleLoginSuccess);
 
-app.get('/health', (req, res) => res.json({ status: 'ok', version: '4.1.0-fixed-v8' }));
+app.get('/health', (req, res) => res.json({ status: 'ok', version: '4.1.0-fixed-v9' }));
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V8 (Title Capture) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V9 (Direct Injection) na porta ${PORT}`));
