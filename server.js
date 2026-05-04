@@ -15,7 +15,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// VERSÃO AJUSTADA PARA 1.25.3 CONFORME APK
+// VERSÃO 1.25.3
 const VERSION = "1.25.3";
 const FILE_INFO = `gameassetbundles,GDgOUAbI0rGH7IYYozj+x4YAWiU=,5041,0,AJOItUGjSYdorK+4T8B4erfgUmo=,1487,True,0
 main/gameentry,aclCUq5ADSq/d37jcyeAUkr3Oek=,8417,0,d1gnbs/vs21V0wKzRU/I6JodIcI=,2561,True,0`;
@@ -32,14 +32,7 @@ app.all('/v2.5/:id', (req, res) => {
   const id = req.params.id;
   const uid = "100067";
   if (id === 'me' || id === uid) {
-    return res.json({
-      id: uid,
-      name: "ViniPlayer",
-      first_name: "Vini",
-      last_name: "Player",
-      email: "vini@player.com",
-      picture: { data: { url: "https://vini-server.onrender.com/favicon.ico" } }
-    });
+    return res.json({ id: uid, name: "ViniPlayer", first_name: "Vini", last_name: "Player" });
   }
   res.json({
     id: id,
@@ -51,20 +44,37 @@ app.all('/v2.5/:id', (req, res) => {
 
 app.post('/v2.5/:app_id/activities', (req, res) => res.json({ success: true }));
 
-// --- DIÁLOGO DE LOGIN ---
+// --- DIÁLOGO DE LOGIN (AJUSTADO PARA 1.25.3) ---
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const token = uuidv4();
   const uid = "100067";
-  const params = `access_token=${token}&expires_in=5184000&user_id=${uid}&return_scopes=true`;
+  const payload = Buffer.from(JSON.stringify({ user_id: uid, algorithm: "HMAC-SHA256" })).toString('base64');
+  const signed_request = "vini_sig." + payload;
+  
+  // Parâmetros de fragmento específicos para APKs mais antigos
+  const params = `access_token=${token}&expires_in=5184000&signed_request=${signed_request}&user_id=${uid}&base_domain=onrender.com&return_scopes=true`;
   const finalUrl = `fbconnect://success#${params}`;
-  res.send(`<html><script>window.location.href="${finalUrl}";</script></html>`);
+
+  res.send(`
+    <html>
+    <body style="background:#000;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;">
+        <div style="text-align:center;">
+            <h2>Vini Server</h2>
+            <p>Sincronizando...</p>
+            <script>
+                window.location.href = "${finalUrl}";
+                setTimeout(() => { window.location.href = "${finalUrl}"; }, 1000);
+            </script>
+        </div>
+    </body>
+    </html>
+  `);
 });
 
 const handleLoginSuccess = (req, res) => {
   const token = req.body.facebook_access_token || req.body.access_token || uuidv4();
   const uid = "100067";
   const now = Date.now();
-  const expires_in = 5184000;
   
   const response = {
     access_token: token,
@@ -73,17 +83,14 @@ const handleLoginSuccess = (req, res) => {
     user_id: uid,
     uid: uid,
     id: uid,
-    openid: uid,
     application_id: "2036793259884297",
-    expires_in: expires_in,
-    expires_at: now + (expires_in * 1000),
+    expires_in: 5184000,
+    expires_at: now + 5184000000,
     last_refresh: now,
     session_key: token,
     token_type: "bearer",
     permissions: ["public_profile", "email"],
     declined_permissions: [],
-    name: "ViniPlayer",
-    email: "vini@player.com",
     status: 200,
     code: 0,
     msg: "success"
@@ -91,10 +98,7 @@ const handleLoginSuccess = (req, res) => {
 
   if (req.path.includes('exchange')) {
     console.log(`[Exchange Success] UID: ${uid}`);
-    return res.json({
-      ...response,
-      data: response
-    });
+    return res.json({ ...response, data: response });
   }
 
   res.json({ code: 0, msg: "success", data: response, ...response });
@@ -103,4 +107,4 @@ const handleLoginSuccess = (req, res) => {
 app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/oauth/token/facebook/exchange'], handleLoginSuccess);
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Version 1.25.3 Master) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (1.25.3 Final) na porta ${PORT}`));
