@@ -52,16 +52,30 @@ app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/and
 });
 app.get(['/sbt/fileinfo', '/fileinfo', '/live/fileinfo', '/android/fileinfo'], (req, res) => res.send(FILE_INFO));
 
-// Facebook App Config
+// -----------------------------------------------------------------------
+// FACEBOOK API v2.5
+// -----------------------------------------------------------------------
+
+// Perfil e Permissões
+app.get('/v2.5/me', (req, res) => {
+  res.json({ id: PLAYER_UID, name: "ViniPlayer", first_name: "Vini", last_name: "Player" });
+});
+
+app.get('/v2.5/me/permissions', (req, res) => {
+  res.json({ data: [{ permission: "public_profile", status: "granted" }, { permission: "email", status: "granted" }] });
+});
+
+// App Config e Perfil Genérico
 app.all('/v2.5/:id', (req, res) => {
   const id = req.params.id;
   const fields = req.query.fields || '';
-  const isAppConfigRequest = fields.includes('supports_implicit_sdk_logging') || fields.includes('android_dialog_configs');
-
-  if ((id === 'me' || id === PLAYER_UID) && !isAppConfigRequest) {
+  
+  // Se for pedido de perfil
+  if (id === PLAYER_UID || (fields.includes('name') && !fields.includes('android_dialog_configs'))) {
     return res.json({ id: PLAYER_UID, name: "ViniPlayer", first_name: "Vini", last_name: "Player" });
   }
 
+  // Se for pedido de config do App
   res.json({
     id: id,
     name: "Free Fire Vini",
@@ -72,21 +86,29 @@ app.all('/v2.5/:id', (req, res) => {
   });
 });
 
-// Facebook OAuth Redirect (CORREÇÃO: Query String ?)
+// Facebook OAuth Redirect (CORREÇÃO: Query String + Signed Request)
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const token = uuidv4();
-  const params = `access_token=${token}&expires_in=5184000&user_id=${PLAYER_UID}&base_domain=onrender.com&return_scopes=true`;
-  res.redirect(302, `fbconnect://success?${params}`);
+  // signed_request fake para satisfazer o SDK
+  const signedRequest = "vini_signed_request_data";
+  const params = `access_token=${token}&expires_in=5184000&user_id=${PLAYER_UID}&base_domain=onrender.com&return_scopes=true&signed_request=${signedRequest}`;
+  
+  const finalUrl = `fbconnect://success?${params}`;
+  console.log(`[OAuth] Redirecionando para: ${finalUrl}`);
+  res.redirect(302, finalUrl);
+});
+
+app.post('/v2.5/:app_id/activities', (req, res) => {
+  res.json({ success: true, app_events_config: { custom_events_default_sampling_probability: 1 } });
 });
 
 // -----------------------------------------------------------------------
-// NOVOS ENDPOINTS DESCOBERTOS NO APK (classes.dex)
+// GARENA / BEETALK ENDPOINTS
 // -----------------------------------------------------------------------
 
 const createAuthResponse = (token, uid) => {
   const now = Math.floor(Date.now() / 1000);
   return {
-    // Formato esperado pelo AuthToken.java
     authToken: token,
     token: token,
     access_token: token,
@@ -104,7 +126,6 @@ const createAuthResponse = (token, uid) => {
   };
 };
 
-// Endpoints de Autenticação Garena/Beetalk
 app.all([
   '/oauth/guest/register',
   '/oauth/token/inspect',
@@ -115,10 +136,9 @@ app.all([
   '/conn/*',
   '/sso/*'
 ], (req, res) => {
-  const token = req.body.access_token || req.query.access_token || uuidv4();
+  const token = req.body.access_token || req.query.access_token || req.body.facebook_access_token || uuidv4();
   const response = createAuthResponse(token, PLAYER_UID);
   
-  // Alguns endpoints esperam o objeto dentro de uma chave 'data'
   if (req.path.includes('exchange') || req.path.includes('info/get')) {
     return res.json({ ...response, data: response });
   }
@@ -126,7 +146,6 @@ app.all([
   res.json(response);
 });
 
-// Outros endpoints do SDK
 app.all('/oauth/user/friends/get', (req, res) => res.json({ status: 200, data: { friends: [] } }));
 app.all('/pay/*', (req, res) => res.json({ status: 200, message: "success" }));
 app.all('/game/user/request/send', (req, res) => res.json({ status: 200, message: "success" }));
@@ -141,4 +160,4 @@ app.get('/live/*', (req, res) => {
 });
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V24 (APK Sync) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V25 (Final Fix) na porta ${PORT}`));
