@@ -1,11 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 const config = require('./config/config');
-const db = require('./database/database');
 
 const app = express();
 
@@ -15,103 +12,82 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Logging Middleware
+// Logging detalhado para debugar o erro de autenticação
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  if (req.body && Object.keys(req.body).length > 0) console.log("Body:", JSON.stringify(req.body));
   next();
 });
 
-// --- ROTA DE DIALOG DO FACEBOOK (CORREÇÃO DA TELA BRANCA) ---
-
+// --- ROTA DE DIALOG DO FACEBOOK ---
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const access_token = 'vini_fb_token_' + uuidv4().substring(0, 8);
   const user_id = '1000001';
-  
-  // Este HTML simula o sucesso do login e redireciona o WebView do jogo
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Facebook Login Success</title>
-        <style>
-            body { background: #000; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; }
-            .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 30px; height: 30px; animation: spin 2s linear infinite; }
-            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        </style>
-    </head>
-    <body>
-        <div style="text-align: center;">
-            <div class="loader" style="margin: 0 auto 20px;"></div>
-            <p>Autenticando no servidor Vini...</p>
-        </div>
-        <script>
-          const token = '${access_token}';
-          const userId = '${user_id}';
-          
-          // Tentar os 3 métodos de retorno do MSDK
-          setTimeout(() => {
-            // 1. Redirecionamento de Protocolo (Mais comum)
-            window.location.href = 'fbconnect://success?access_token=' + token + '&user_id=' + userId + '&expires_in=5184000';
-            
-            // 2. Interface Java (WebView)
-            if (window.Android && window.Android.onFacebookLogin) {
-              window.Android.onFacebookLogin(token, userId);
-            }
-            
-            // 3. Fallback para fechar
-            setTimeout(() => { window.close(); }, 1000);
-          }, 1500);
-        </script>
-    </body>
-    </html>
-  `;
-  res.send(html);
+  res.send(`
+    <html><body style="background:#000;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;">
+    <div style="text-align:center;"><p>Autenticando Vini Server...</p></div>
+    <script>
+      setTimeout(() => {
+        window.location.href = 'fbconnect://success?access_token=${access_token}&user_id=${user_id}&expires_in=5184000';
+        if (window.Android && window.Android.onFacebookLogin) window.Android.onFacebookLogin('${access_token}', '${user_id}');
+        setTimeout(() => { window.close(); }, 1000);
+      }, 1000);
+    </script></body></html>
+  `);
 });
 
-// Outras rotas do FB SDK
-app.all('/v2.5/:app_id/activities', (req, res) => {
-  res.json({ success: true });
-});
+// --- BYPASS DE VERSÃO ---
+app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo'], (req, res) => res.send('1.17.1'));
+app.get(['/sbt/fileinfo', '/fileinfo'], (req, res) => res.send(''));
 
-// --- ROTAS DE BYPASS DE VERSÃO ---
+// --- RESPOSTA DE LOGIN MESTRE (O SEGREDO DO SUCESSO) ---
+const handleLoginSuccess = (req, res) => {
+  const sessionKey = "vini_session_" + uuidv4().replace(/-/g, '').substring(0, 16);
+  const token = "vini_token_" + uuidv4().replace(/-/g, '').substring(0, 16);
+  const openId = "1000001";
 
-app.get(['/live/ver.php', '/ver.php'], (req, res) => {
-  res.send('1.17.1');
-});
-
-app.get(['/live/versioninfo', '/versioninfo'], (req, res) => {
-  res.send('1.17.1');
-});
-
-app.get(['/sbt/fileinfo', '/fileinfo'], (req, res) => {
-  res.send('');
-});
-
-// --- ROTAS DE LOGIN E CONFIGURAÇÃO (MSDK) ---
-
-app.all(['/app/info/get', '/info/app/info/get'], (req, res) => {
-  res.json({
-    status: 200,
-    message: "success",
-    data: { is_review: false, update_url: "", latest_version: "1.17.1" }
-  });
-});
-
-app.all(['/conn/*', '/sso/*', '/auth/facebook'], (req, res) => {
-  res.json({
+  // Resposta ultra-completa para cobrir todas as versões do MSDK/Garena
+  const response = {
     error: 0,
     msg: "success",
-    session_key: "vini_session_" + uuidv4().substring(0, 8),
-    access_token: "vini_token_" + uuidv4().substring(0, 8),
-    account_id: "1000001",
+    code: 0,
+    status: 200,
+    session_key: sessionKey,
+    access_token: token,
+    token: token,
+    refresh_token: "vini_refresh_" + uuidv4().substring(0, 8),
+    open_id: openId,
+    account_id: openId,
+    uid: openId,
     username: "ViniPlayer",
-    is_new: false
-  });
-});
+    nickname: "ViniPlayer",
+    is_new: 0,
+    region: "BR",
+    login_type: 1,
+    expire_time: 5184000,
+    session_key_expiry_time: 5184000
+  };
 
-// --- INTEGRAÇÃO COM ROTAS ORIGINAIS ---
+  // Algumas versões esperam os dados dentro de um objeto 'data'
+  if (req.path.includes('api')) {
+      return res.json({ code: 0, msg: "success", data: response });
+  }
+  
+  res.json(response);
+};
 
+// Mapear TODAS as rotas de login possíveis
+app.all([
+  '/conn/*', 
+  '/sso/*', 
+  '/auth/*', 
+  '/api/v1/auth/facebook',
+  '/api/v1/auth/login',
+  '/app/info/get',
+  '/info/app/info/get'
+], handleLoginSuccess);
+
+// --- ROTAS ORIGINAIS (INTEGRAÇÃO) ---
 const apiPrefix = config.api.prefix;
 app.use(`${apiPrefix}/auth`, require('./routes/auth'));
 app.use(`${apiPrefix}/user`, require('./routes/user'));
@@ -119,13 +95,11 @@ app.use(`${apiPrefix}/game`, require('./routes/game'));
 app.use(`${apiPrefix}/shop`, require('./routes/shop'));
 app.use(`${apiPrefix}/leaderboard`, require('./routes/leaderboard'));
 
-app.get('/health', (req, res) => res.json({ status: 'ok', version: '4.1.0-fixed-v2' }));
+app.get('/health', (req, res) => res.json({ status: 'ok', version: '4.1.0-fixed-v3' }));
 
 app.use((req, res) => {
-  res.status(404).json({ error: 'Rota não encontrada', path: req.path, method: req.method });
+  res.status(404).json({ error: 'Rota não encontrada', path: req.path });
 });
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => {
-  console.log(`✅ Servidor Vini v4.1.0 Fixed V2 rodando na porta ${PORT}`);
-});
+app.listen(PORT, () => console.log(`✅ Servidor Vini v4.1.0 Fixed V3 (Ultra-Compat) na porta ${PORT}`));
