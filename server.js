@@ -93,6 +93,8 @@ const handleLoginSuccess = (req, res) => {
   const s = uuidv4().replace(/-/g, '');
   const uid = "1000001";
   const token = "EAAG_VINI_" + s.substring(0, 24);
+  
+  // Resposta padrão para rotas de login
   const response = {
     error: 0,
     msg: "success",
@@ -117,6 +119,21 @@ const handleLoginSuccess = (req, res) => {
     glive_session_key: "s_" + s.substring(0, 16),
     glive_uid: uid
   };
+
+  // Se for a rota de exchange, o jogo costuma esperar os dados dentro de 'data' ou em um formato específico de token
+  if (req.path.includes('exchange')) {
+    return res.json({
+      code: 0,
+      msg: "success",
+      data: response,
+      // Alguns SDKs esperam o token na raiz para o exchange
+      access_token: token,
+      expires_in: 5184000,
+      user_id: uid,
+      ...response
+    });
+  }
+
   res.json({ code: 0, msg: "success", data: response, ...response });
 };
 
