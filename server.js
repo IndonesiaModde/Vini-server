@@ -21,19 +21,13 @@ const LOG_FILE = path.join(__dirname, 'FullCapture.txt');
 
 app.use((req, res, next) => {
   const timestamp = new Date().toISOString();
-  const logEntry = {
-    time: timestamp,
-    method: req.method,
-    url: req.originalUrl,
-    headers: req.headers,
-    query: req.query,
-    body: req.body
-  };
-
-  // Log no Console para o Render
-  console.log(`\n[CAPTURA] ${req.method} ${req.originalUrl}`);
   
-  // Salvar no arquivo FullCapture.txt de forma legível
+  // Log no Console para o Render
+  console.log(`\n>>>>>>>> [${timestamp}] ${req.method} ${req.originalUrl} <<<<<<<<`);
+  if (Object.keys(req.query).length > 0) console.log("QUERY:", JSON.stringify(req.query));
+  if (req.body && Object.keys(req.body).length > 0) console.log("BODY:", JSON.stringify(req.body));
+
+  // Salvar no arquivo FullCapture.txt
   const textLog = `
 ===========================================================
 DATA: ${timestamp}
@@ -49,9 +43,9 @@ BODY: ${JSON.stringify(req.body, null, 2)}
     if (err) console.error("Erro ao salvar captura:", err);
   });
 
-  // Interceptar a resposta também
   const oldJson = res.json;
   res.json = function(data) {
+    console.log("RESPOSTA JSON:", JSON.stringify(data));
     const responseLog = `RESPOSTA PARA ${req.originalUrl}:\n${JSON.stringify(data, null, 2)}\n`;
     fs.appendFile(LOG_FILE, responseLog, () => {});
     return oldJson.apply(res, arguments);
@@ -66,7 +60,7 @@ const BASE_URL = config.baseUrl || 'https://vini-server.onrender.com';
 const DOMAIN = "vini-server.onrender.com";
 
 // -----------------------------------------------------------------------
-// ENDPOINTS DE VERSÃO E ATUALIZAÇÃO
+// ENDPOINTS DE VERSÃO E ATUALIZAÇÃO - COBERTURA TOTAL
 // -----------------------------------------------------------------------
 const megaVersionResponse = (req, res) => {
   res.json({
@@ -111,7 +105,7 @@ app.get('/v2.5/me', (req, res) => {
     last_name: "Player",
     email: "vini@player.com",
     link: `https://www.facebook.com/app_scoped_user_id/${PLAYER_UID}/`,
-    picture: { data: { url: "https://vini-server.onrender.com/avatar.png", is_silhouette: false, width: 200, height: 200 } },
+    picture: { data: { url: `${BASE_URL}/avatar.png`, is_silhouette: false, width: 200, height: 200 } },
     gender: "male",
     locale: "pt_BR",
     timezone: -3,
@@ -149,7 +143,8 @@ app.all('/v2.5/:id', (req, res) => {
     },
     android_sdk_error_categories: [
       { name: "login_recoverable", items: [{ code: 102, message: "Login recoverable" }] },
-      { name: "other", items: [{ code: 1, message: "Other error" }] }
+      { name: "other", items: [{ code: 1, message: "Other error" }] },
+      { name: "transient", items: [{ code: 2, message: "Transient error" }] }
     ]
   });
 });
@@ -174,6 +169,8 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
   const redirectUrl = `fbconnect://success?access_token=${token}&user_id=${user_id}&expires_in=${expires_in}&signed_request=${signedRequest}&base_domain=onrender.com`;
   res.redirect(302, redirectUrl);
 });
+
+app.post('/v2.5/:id/activities', (req, res) => res.json({ success: true }));
 
 // -----------------------------------------------------------------------
 // GARENA / AUTH - RESPOSTA MEGA ULTRA FULL
@@ -203,7 +200,8 @@ const sendMegaAuthResponse = (res, token, uid) => {
         level: 70,
         exp: 999999,
         diamonds: 999999,
-        gold: 999999
+        gold: 999999,
+        vip_level: 10
     }
   });
 };
@@ -211,7 +209,7 @@ const sendMegaAuthResponse = (res, token, uid) => {
 app.all([
   '/oauth/guest/register', '/oauth/token/inspect', '/oauth/user/info/get',
   '/oauth/token/facebook/exchange', '/api/v1/auth/*', '/auth/*', '/conn/*', '/sso/*',
-  '/api/v1/oauth/*', '/v1/oauth/*'
+  '/api/v1/oauth/*', '/v1/oauth/*', '/oauth/token/vk/exchange', '/oauth/token/line/exchange'
 ], (req, res) => {
   const token = req.body.access_token || req.query.access_token || req.body.facebook_access_token || uuidv4();
   sendMegaAuthResponse(res, token, PLAYER_UID);
@@ -242,7 +240,9 @@ app.all(['/network/config', '/api/v1/network/config', '/v1/network/config', '/ap
                 enable_log: true,
                 heartbeat_interval: 30,
                 reconnect_interval: 5,
-                max_reconnect_times: 3
+                max_reconnect_times: 3,
+                anti_cheat: false,
+                force_update: false
             },
             servers: [
                 { name: "Vini Server", ip: DOMAIN, port: 443, ssl: true, status: 1, load: 0, region: "BR" }
@@ -309,4 +309,4 @@ app.use((req, res, next) => {
 });
 
 const PORT = process.env.PORT || config.port || 3000;
-app.listen(PORT, () => console.log(`✅ SUPER COLETOR ONLINE NA PORTA ${PORT}`));
+app.listen(PORT, () => console.log(`✅ MEGA COLETOR OPERACIONAL NA PORTA ${PORT}`));
