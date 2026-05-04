@@ -33,16 +33,13 @@ app.all(['/app/info/get', '/info/app/info/get'], (req, res) => {
 app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/android/versioninfo'], (req, res) => res.send(VERSION));
 app.get(['/sbt/fileinfo', '/fileinfo', '/live/fileinfo', '/android/fileinfo'], (req, res) => res.send(FILE_INFO));
 
-// Resposta de App ID com Configurações de SDK
+// Resposta de App ID
 app.get('/v2.5/:app_id', (req, res) => {
   const appId = req.params.app_id;
   if (appId === 'me') {
     return res.json({
-      id: "100067",
-      name: "ViniPlayer",
-      first_name: "Vini",
-      last_name: "Player",
-      link: "https://facebook.com/100067"
+      id: "1000001",
+      name: "ViniPlayer"
     });
   }
   res.json({
@@ -55,74 +52,42 @@ app.get('/v2.5/:app_id', (req, res) => {
       oauth: { url: "https://vini-server.onrender.com/v2.5/dialog/oauth" }
     },
     android_sdk_error_categories: [
-      { name: "login_recoverable", items: [{ code: 102, message: "Login recoverable" }] },
-      { name: "other", items: [{ code: 1, message: "Other error" }] },
-      { name: "transient", items: [{ code: 2, message: "Transient error" }] }
+      { name: "login_recoverable", items: [{ code: 102, message: "Login recoverable" }] }
     ]
   });
 });
 
-// Endpoint de Atividades do Facebook
-app.post('/v2.5/:app_id/activities', (req, res) => {
-  res.json({ success: true });
-});
+// Atividades
+app.post('/v2.5/:app_id/activities', (req, res) => res.json({ success: true }));
 
 const handleLoginSuccess = (req, res) => {
   const token = req.body.facebook_access_token || req.body.access_token || uuidv4();
-  const uid = req.body.client_id || "100067";
-  const appId = "2036793259884297"; // ID do Facebook App que aparece nos logs
-  const now = Math.floor(Date.now() / 1000);
-  const future = now + 5184000;
+  const uid = "1000001"; // ID de Usuário (Diferente do App ID)
+  const appId = "2036793259884297";
+  const now = Date.now(); // Milissegundos (Padrão Java/Android)
+  const expires_in = 5184000;
+  const expires_at = now + (expires_in * 1000);
   
-  // Resposta ULTRA-COMPATÍVEL baseada na engenharia reversa do APK
   const response = {
-    // Tokens
     access_token: token,
     token: token,
     key: token,
-    
-    // Identificadores
     user_id: uid,
     openid: uid,
-    open_id: uid,
     uid: uid,
-    id: uid,
-    account_id: uid,
     application_id: appId,
-    
-    // Datas e Tempos (Formato Long/Timestamp conforme código do APK)
-    expires_in: 5184000,
-    expire_time: 5184000,
-    expires_at: future,
+    expires_in: expires_in,
+    expires_at: expires_at,
     last_refresh: now,
-    issued_at: now,
-    
-    // Permissões (Arrays conforme SDK do Facebook)
-    permissions: ["public_profile", "email", "user_friends"],
+    permissions: ["public_profile", "email"],
     declined_permissions: [],
-    
-    // Perfil
-    nickname: "ViniPlayer",
-    name: "ViniPlayer",
-    username: "ViniPlayer",
-    first_name: "Vini",
-    last_name: "Player",
-    
-    // Configurações de Sessão
     session_key: token,
-    refresh_token: uuidv4().substring(0, 8),
-    token_type: "bearer",
-    source: "FACEBOOK_APPLICATION_WEB",
-    version: "1.0",
-    
-    // Status de Sucesso (Sem campos de erro para não confundir o APK)
-    code: 0,
-    status: 200,
-    msg: "success"
+    token_type: "bearer"
   };
 
   if (req.path.includes('exchange')) {
     console.log(`[Exchange Success] Token: ${token}, UID: ${uid}`);
+    // Resposta LIMPA apenas com os campos de sucesso que o APK quer
     return res.json(response);
   }
 
@@ -132,8 +97,8 @@ const handleLoginSuccess = (req, res) => {
 // Rotas unificadas
 app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/v2.5/me', '/oauth/token/facebook/exchange', '/v2.5/dialog/oauth/confirm', '/v2.5/oauth/token/facebook/exchange'], handleLoginSuccess);
 
-// Rota padrão para favicon
+// Favicon
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Engine Master) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V21 (Loop Breaker) na porta ${PORT}`));
