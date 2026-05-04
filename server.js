@@ -222,42 +222,38 @@ app.all(['/network/config', '/api/v1/network/config', '/v1/network/config', '/ap
     res.json({
         status: 200, code: 0, msg: "success",
         data: {
-            // IP do Termux (Local) e porta do seu Game Server
             lobby_server: "127.0.0.1",
             lobby_port: 10001, 
-            use_ssl: false, // Desligamos SSL pois o Termux usa TCP puro
-            
+            use_ssl: false,
             gate_server: "127.0.0.1",
             gate_port: 10001,
-            
             cdn_url: `${BASE_URL}/live/`,
             update_url: `${BASE_URL}/live/`,
-            file_server: DOMAIN,
-            log_server: DOMAIN,
-            api_server: DOMAIN,
-            pay_server: DOMAIN,
-            voice_server: DOMAIN,
-            client_config: {
-                show_loading: true,
-                skip_tutorial: true,
-                enable_log: true,
-                heartbeat_interval: 30,
-                reconnect_interval: 5,
-                max_reconnect_times: 3,
-                anti_cheat: false,
-                force_update: false
-            },
+            file_server: "127.0.0.1", // Alterado
+            log_server: "127.0.0.1",  // Alterado
+            api_server: "127.0.0.1",  // Alterado
+            
             servers: [
-                // Aqui é onde aparece a lista de servidores no início
-                { name: "Vini Server (Termux)", ip: "127.0.0.1", port: 10001, ssl: false, status: 1, load: 0, region: "BR" }
+                { 
+                    name: "Vini Termux", 
+                    ip: "127.0.0.1", 
+                    port: 10001, 
+                    ssl: false, 
+                    status: 1 
+                }
             ],
             regions: [
-                { id: "BR", name: "Brasil", domain: "127.0.0.1", port: 10001, ssl: false }
+                { 
+                    id: "BR", 
+                    name: "Brasil", 
+                    domain: "127.0.0.1", 
+                    port: 10001, 
+                    ssl: false 
+                }
             ]
         }
     });
 });
-
 // -----------------------------------------------------------------------
 // LOBBY / GAMEPLAY / USER - COBERTURA TOTAL
 // -----------------------------------------------------------------------
