@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Servir arquivos estáticos da pasta public (login.html, oauth-callback.html, etc.)
+// Servir arquivos estáticos da pasta public
 app.use(express.static(path.join(__dirname, 'public')));
 
 // SISTEMA DE SUPER LOG
@@ -37,7 +37,6 @@ config/resconf,ysnx0NubzKPaLVGszrP45y9WQH0=,34896,0
 avatar/assetindexer,IbV74Hqrb07rdlrKYQx6JZIhZ5M=,74343,0
 avatar/uma_dcs,BSJQtQt6qEeFdLv8gsrVtPDQubo=,14523,0`;
 
-// UID fixo do jogador
 const PLAYER_UID = "100067";
 
 // Endpoints de Versão e Recursos
@@ -53,122 +52,93 @@ app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/and
 });
 app.get(['/sbt/fileinfo', '/fileinfo', '/live/fileinfo', '/android/fileinfo'], (req, res) => res.send(FILE_INFO));
 
-// -----------------------------------------------------------------------
-// CORREÇÃO 1: Endpoint /v2.5/:id — distingue App ID de User ID
-// O SDK Android chama /v2.5/{APP_ID}?fields=supports_implicit_sdk_logging,...
-// e espera receber a configuração do App, não o perfil do usuário.
-// -----------------------------------------------------------------------
+// Facebook App Config
 app.all('/v2.5/:id', (req, res) => {
   const id = req.params.id;
   const fields = req.query.fields || '';
+  const isAppConfigRequest = fields.includes('supports_implicit_sdk_logging') || fields.includes('android_dialog_configs');
 
-  // Se o request pede campos de configuração do SDK, é uma chamada de App Config
-  const isAppConfigRequest = fields.includes('supports_implicit_sdk_logging') ||
-                             fields.includes('android_dialog_configs') ||
-                             fields.includes('gdpv4_nux_enabled');
-
-  // Se for 'me' ou o UID do jogador E não for pedido de config, retorna perfil
   if ((id === 'me' || id === PLAYER_UID) && !isAppConfigRequest) {
-    console.log(`[FB] Retornando perfil do usuário para id=${id}`);
-    return res.json({
-      id: PLAYER_UID,
-      name: "ViniPlayer",
-      first_name: "Vini",
-      last_name: "Player"
-    });
+    return res.json({ id: PLAYER_UID, name: "ViniPlayer", first_name: "Vini", last_name: "Player" });
   }
 
-  // Caso contrário (App ID ou pedido de config): retorna configuração do App
-  console.log(`[FB] Retornando config do App para id=${id}`);
   res.json({
     id: id,
     name: "Free Fire Vini",
     supports_implicit_sdk_logging: true,
     gdpv4_nux_enabled: false,
-    gdpv4_nux_content: "",
-    android_dialog_configs: {
-      oauth: {
-        // URL do diálogo de login que o SDK vai abrir
-        url: "https://vini-server.onrender.com/v2.5/dialog/oauth"
-      }
-    },
-    android_sdk_error_categories: [
-      { name: "login_recoverable", items: [{ code: 102, message: "Login recoverable" }] }
-    ]
+    android_dialog_configs: { oauth: { url: "https://vini-server.onrender.com/v2.5/dialog/oauth" } },
+    android_sdk_error_categories: [{ name: "login_recoverable", items: [{ code: 102, message: "Login recoverable" }] }]
   });
 });
 
-app.post('/v2.5/:app_id/activities', (req, res) => {
-  res.json({ success: true, app_events_config: { custom_events_default_sampling_probability: 1 } });
-});
-
-// -----------------------------------------------------------------------
-// CORREÇÃO 2: /v2.5/dialog/oauth — redirecionar com ?query em vez de #fragment
-// O SDK Android do Facebook lê o token via query string (?access_token=...)
-// Fragmentos (#) são descartados pelo sistema operacional Android ao invocar
-// o deep link fbconnect://success, causando o "erro de conexão".
-// -----------------------------------------------------------------------
+// Facebook OAuth Redirect (CORREÇÃO: Query String ?)
 app.get('/v2.5/dialog/oauth', (req, res) => {
   const token = uuidv4();
-  const uid = PLAYER_UID;
-
-  // IMPORTANTE: usar ? (query string) e NÃO # (fragment)
-  // O Android não repassa fragmentos ao app nativo via deep link
-  const params = `access_token=${token}&expires_in=5184000&user_id=${uid}&base_domain=onrender.com&return_scopes=true`;
-  const finalUrl = `fbconnect://success?${params}`;
-
-  console.log(`[OAuth] Redirecionando para: ${finalUrl}`);
-  res.redirect(302, finalUrl);
+  const params = `access_token=${token}&expires_in=5184000&user_id=${PLAYER_UID}&base_domain=onrender.com&return_scopes=true`;
+  res.redirect(302, `fbconnect://success?${params}`);
 });
 
 // -----------------------------------------------------------------------
-// Handlers de login/token — aceita tokens vindos do fluxo OAuth
+// NOVOS ENDPOINTS DESCOBERTOS NO APK (classes.dex)
 // -----------------------------------------------------------------------
-const handleLoginSuccess = (req, res) => {
-  const token = req.body.facebook_access_token || req.body.access_token || uuidv4();
-  const uid = PLAYER_UID;
-  const appId = req.body.client_id || "2036793259884297";
-  const now = Date.now();
-  
-  const response = {
-    access_token: token,
+
+const createAuthResponse = (token, uid) => {
+  const now = Math.floor(Date.now() / 1000);
+  return {
+    // Formato esperado pelo AuthToken.java
+    authToken: token,
     token: token,
-    key: token,
+    access_token: token,
+    refreshToken: token,
+    openId: uid,
     user_id: uid,
     uid: uid,
-    id: uid,
-    application_id: appId,
+    expiryTimestamp: now + 5184000,
     expires_in: 5184000,
-    expires_at: now + 5184000000,
-    last_refresh: now,
-    session_key: token,
-    token_type: "bearer",
-    permissions: ["public_profile", "email"],
-    declined_permissions: [],
+    lastInspectTime: now,
+    tokenProvider: 0,
     status: 200,
     code: 0,
     msg: "success"
   };
-
-  if (req.path.includes('exchange')) {
-    console.log(`[Exchange Success] UID: ${uid}`);
-    return res.json({ ...response, data: response });
-  }
-
-  res.json({ code: 0, msg: "success", data: response, ...response });
 };
 
-app.all(['/conn/*', '/sso/*', '/auth/*', '/api/v1/auth/*', '/oauth/token/facebook/exchange'], handleLoginSuccess);
+// Endpoints de Autenticação Garena/Beetalk
+app.all([
+  '/oauth/guest/register',
+  '/oauth/token/inspect',
+  '/oauth/user/info/get',
+  '/oauth/token/facebook/exchange',
+  '/api/v1/auth/*',
+  '/auth/*',
+  '/conn/*',
+  '/sso/*'
+], (req, res) => {
+  const token = req.body.access_token || req.query.access_token || uuidv4();
+  const response = createAuthResponse(token, PLAYER_UID);
+  
+  // Alguns endpoints esperam o objeto dentro de uma chave 'data'
+  if (req.path.includes('exchange') || req.path.includes('info/get')) {
+    return res.json({ ...response, data: response });
+  }
+  
+  res.json(response);
+});
 
-// Rota para recursos /live/* (CDN Redirection)
+// Outros endpoints do SDK
+app.all('/oauth/user/friends/get', (req, res) => res.json({ status: 200, data: { friends: [] } }));
+app.all('/pay/*', (req, res) => res.json({ status: 200, message: "success" }));
+app.all('/game/user/request/send', (req, res) => res.json({ status: 200, message: "success" }));
+
+// Rota para recursos /live/*
 app.get('/live/*', (req, res) => {
   const resourcePath = req.params[0];
   if (resourcePath.length > 20) {
-    const garenaCDN = `https://freefiremobile-a.akamaihd.net/live/${resourcePath}`;
-    return res.redirect(302, garenaCDN);
+    return res.redirect(302, `https://freefiremobile-a.akamaihd.net/live/${resourcePath}`);
   }
   res.status(200).end();
 });
 
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Servidor Vini V23 (FB OAuth Fix) na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V24 (APK Sync) na porta ${PORT}`));
