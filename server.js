@@ -14,15 +14,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // -----------------------------------------------------------------------
-// SUPER SCANNER DE LOGS (Monitoramento Avançado)
+// SUPER SCANNER DE LOGS
 // -----------------------------------------------------------------------
 app.use((req, res, next) => {
   const timestamp = new Date().toISOString();
   console.log(`\n>>>>>>>> [${timestamp}] ${req.method} ${req.originalUrl} <<<<<<<<`);
-  
-  // Log de Headers (Importante para ver tokens de autenticação)
   console.log("HEADERS:", JSON.stringify(req.headers));
-  
   if (Object.keys(req.query).length > 0) console.log("QUERY:", JSON.stringify(req.query));
   if (req.body && Object.keys(req.body).length > 0) console.log("BODY:", JSON.stringify(req.body));
   
@@ -31,41 +28,34 @@ app.use((req, res, next) => {
     console.log("RESPOSTA JSON:", JSON.stringify(data));
     return oldJson.apply(res, arguments);
   };
-
-  const oldSend = res.send;
-  res.send = function(data) {
-    if (typeof data === 'string' && !data.startsWith('<!DOCTYPE')) {
-        console.log("RESPOSTA TEXTO:", data);
-    }
-    return oldSend.apply(res, arguments);
-  };
-
   next();
 });
 
 const VERSION = "1.26.0";
-const FILE_INFO = `gameassetbundles,mzZtylZ1fawV5N8D8XikRyF+5mY=,12060,0
-main/gameentry,DZlCrLRuzwyuNzUZrh+p0QxJCcI=,2018,0
-localization/loc,gWXz0dDNM8MJyFcAFhzbqWWqvrY=,632921,0
-ingame/avatarmanager,Tjb+QEzOiGwy+DBpxlLrVBZRphA=,1915,0
-config/resconf,ysnx0NubzKPaLVGszrP45y9WQH0=,34896,0
-avatar/assetindexer,IbV74Hqrb07rdlrKYQx6JZIhZ5M=,74343,0
-avatar/uma_dcs,BSJQtQt6qEeFdLv8gsrVtPDQubo=,14523,0`;
-
 const PLAYER_UID = "100067";
 
-// Endpoints de Versão e Recursos
+// Endpoints de Versão
 app.all(['/app/info/get', '/info/app/info/get'], (req, res) => {
-  res.json({ status: 200, message: "success", data: { is_review: false, update_url: "", latest_version: VERSION, force_update: false } });
+  res.json({
+    status: 200,
+    message: "success",
+    data: {
+      is_review: false,
+      update_url: "",
+      latest_version: VERSION,
+      force_update: false,
+      content_url: "https://vini-server.onrender.com/live/"
+    }
+  });
 });
+
 app.get(['/live/ver.php', '/ver.php', '/live/versioninfo', '/versioninfo', '/android/versioninfo'], (req, res) => {
+  const myUrl = "https://vini-server.onrender.com/live/";
   if (req.path.includes('ver.php')) {
-    const myUrl = "https://vini-server.onrender.com/live/";
     return res.send(`${VERSION},${myUrl},${myUrl},${myUrl}`);
   }
   res.send(VERSION);
 });
-app.get(['/sbt/fileinfo', '/fileinfo', '/live/fileinfo', '/android/fileinfo'], (req, res) => res.send(FILE_INFO));
 
 // -----------------------------------------------------------------------
 // FACEBOOK API v2.5
@@ -82,11 +72,9 @@ app.get('/v2.5/me/permissions', (req, res) => {
 app.all('/v2.5/:id', (req, res) => {
   const id = req.params.id;
   const fields = req.query.fields || '';
-  
   if (id === PLAYER_UID || (fields.includes('name') && !fields.includes('android_dialog_configs'))) {
     return res.json({ id: PLAYER_UID, name: "ViniPlayer", first_name: "Vini", last_name: "Player" });
   }
-
   res.json({
     id: id,
     name: "Free Fire Vini",
@@ -105,17 +93,13 @@ app.get('/v2.5/dialog/oauth', (req, res) => {
   res.redirect(302, `fbconnect://success?${params}`);
 });
 
-app.post('/v2.5/:app_id/activities', (req, res) => {
-  res.json({ success: true, app_events_config: { custom_events_default_sampling_probability: 1 } });
-});
-
 // -----------------------------------------------------------------------
-// GARENA / BEETALK / AUTH ENDPOINTS
+// GARENA / AUTH - RESPOSTA PADRONIZADA
 // -----------------------------------------------------------------------
 
-const createAuthResponse = (token, uid) => {
+const sendAuthResponse = (res, token, uid) => {
   const now = Math.floor(Date.now() / 1000);
-  return {
+  const authData = {
     authToken: token,
     token: token,
     access_token: token,
@@ -123,14 +107,23 @@ const createAuthResponse = (token, uid) => {
     openId: uid,
     user_id: uid,
     uid: uid,
+    account_id: uid,
     expiryTimestamp: now + 5184000,
     expires_in: 5184000,
     lastInspectTime: now,
     tokenProvider: 0,
+    login_type: 2, // Facebook
+    is_guest: false,
     status: 200,
     code: 0,
     msg: "success"
   };
+
+  // Retorna o objeto puro E também dentro de 'data' para garantir compatibilidade
+  res.json({
+    ...authData,
+    data: authData
+  });
 };
 
 app.all([
@@ -144,25 +137,17 @@ app.all([
   '/sso/*'
 ], (req, res) => {
   const token = req.body.access_token || req.query.access_token || req.body.facebook_access_token || uuidv4();
-  const response = createAuthResponse(token, PLAYER_UID);
-  if (req.path.includes('exchange') || req.path.includes('info/get')) {
-    return res.json({ ...response, data: response });
-  }
-  res.json(response);
+  sendAuthResponse(res, token, PLAYER_UID);
 });
 
-// -----------------------------------------------------------------------
-// PLACEHOLDERS PARA LOBBY E GAMEPLAY (Captura de chamadas desconhecidas)
-// -----------------------------------------------------------------------
+// Outros endpoints
 app.all(['/game/*', '/api/v1/game/*', '/lobby/*', '/shop/*', '/user/*'], (req, res) => {
-  console.log(`[Lobby/Game] Chamada detectada em: ${req.path}`);
   res.json({ status: 200, code: 0, msg: "success", data: {} });
 });
 
 app.all('/oauth/user/friends/get', (req, res) => res.json({ status: 200, data: { friends: [] } }));
 app.all('/pay/*', (req, res) => res.json({ status: 200, message: "success" }));
 
-// Rota para recursos /live/*
 app.get('/live/*', (req, res) => {
   const resourcePath = req.params[0];
   if (resourcePath.length > 20) {
@@ -171,14 +156,5 @@ app.get('/live/*', (req, res) => {
   res.status(200).end();
 });
 
-// -----------------------------------------------------------------------
-// CAPTURA DE 404 (Rotas que o jogo tenta acessar e não existem)
-// -----------------------------------------------------------------------
-app.use((req, res) => {
-  console.error(`\n[!!! 404 NOT FOUND !!!] O jogo tentou acessar: ${req.method} ${req.originalUrl}`);
-  console.error("HEADERS DO 404:", JSON.stringify(req.headers));
-  res.status(404).json({ error: "Route not found", path: req.originalUrl });
-});
-
 const PORT = process.env.PORT || config.port;
-app.listen(PORT, () => console.log(`✅ Super Scanner Vini V27 na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor Vini V28 (Lobby Fix) na porta ${PORT}`));
