@@ -30,7 +30,7 @@ app.use((req, res, next) => {
 
 const VERSION = "1.26.0";
 const PLAYER_UID = "100067"; // Apenas números como no original
-const DOMAIN = "https://vini-server.onrender.com';
+const DOMAIN = "https://vini-server.onrender.com";
 const BASE_URL = `https://${DOMAIN}`;
 
 // CONFIGURAÇÃO DO GAME SERVER (TCP)
