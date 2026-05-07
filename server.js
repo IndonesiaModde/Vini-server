@@ -25,11 +25,24 @@ avatar/assetindexer,dx9nCl5JEKVr91IZSJPUrMpkhO0=,1612502,0,2SXNGYkHwORkHO85KGzbD
 optionalab_1,t+TEi174DHckEJxXOBYBHJ11Mgo=,14531942,0,CbfhgvmWCYZa4a/FG1lmxB+GXpw=,7435643,True,1
 optionalab_2,vc30vlPssnNtIg/9kRxRlxn0Blk=,9218238,0,jHwcy6KIhow3W7icBu4EqHAQ0AA=,4351697,True,1`;
 
-// --- BYPASS BARBOSA (versionscommon.barbosasmobile.com) ---
+// --- CORREÇÃO DO DIRETÓRIO /LIVE ---
+// Rota para a "pasta" /live não dar erro ao abrir o link
+app.get(['/live', '/live/'], (req, res) => {
+    res.json({ 
+        status: "online", 
+        message: "Diretório de Bypass Barbosa Ativo",
+        endpoints: ["ver.php", "versioninfo", "fileinfo", "maintenance.php"]
+    });
+});
+
+// Rotas dos arquivos dentro de /live
 app.get(['/live/ver.php', '/ver.php'], (req, res) => res.send(VERSION));
 app.get(['/live/versioninfo', '/versioninfo', '/android/versioninfo'], (req, res) => res.send(`${VERSION}\n10`));
 app.get(['/live/fileinfo', '/fileinfo', '/android/fileinfo', '/sbt/fileinfo'], (req, res) => res.send(FILE_INFO));
-app.get('/live/maintenance.php', (req, res) => res.json({ status: "online", maintenance: false, message: "Vini Server Online" }));
+app.get(['/live/maintenance.php', '/maintenance.php'], (req, res) => {
+    res.json({ status: "online", maintenance: false, message: "Vini Server Online" });
+});
+
 
 // --- BYPASS VERSÃO GARENA ---
 app.all(['/app/info/get', '/info/app/info/get'], (req, res) => {
